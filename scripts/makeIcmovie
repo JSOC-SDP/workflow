@@ -1,0 +1,89 @@
+#! /bin/csh 
+
+# set echo
+
+# make movie of last days days at cadence cadence
+# choices if cadence must be multiple of 15m.
+
+if ($#argv > 0) then
+  set want = $1
+  set want_t = `time_convert time=$want`
+  @ wantimg = $want_t / 900
+  @ endtime_t = $wantimg * 900
+else
+  set now = `date -u +%Y.%m.%d_%H:%M:%S`
+  set now_t = `time_convert time=$now`
+  @ nowimg = $now_t / 900
+  @ nowimg_t = $nowimg * 900
+  @ endtime_t = $nowimg_t - 3600
+endif
+
+set Type = jpg
+set Size = 1k
+set minFileSize = 50000
+
+foreach Quant (Ic_flat M)
+
+  set BASE = /home/jsoc/hmi/images
+  set WORK = /home/jsoc/hmi/movies/$Quant'_movies'.$$
+  mkdir $WORK
+  mkdir $WORK/frames
+
+  # First make 2 days at 15 minutes
+
+  @ imgtime_t = $endtime_t - 172800
+  @ cadence = 15 * 60
+
+  set i = 0
+  while ($imgtime_t <= $endtime_t)
+    set imgtime = `time_convert s=$imgtime_t zone=TAI`
+    set yyyymmdd = `echo $imgtime | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
+    set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
+    set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
+    set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
+    set yyyymmdd = $YEAR$MON$DAY
+    set hhmmss = `echo $imgtime | sed -e 's/_/Q/' -e 's/.*Q//' -e 's/://g' -e 's/_TAI//'`
+    set I = `printf "%04d" $i`
+    set filename = $yyyymmdd'_'$hhmmss'_'$Quant'_'$Size'.'$Type
+    set Imgpath = $BASE/$YEAR/$MON/$DAY
+    set targpath = $WORK/frames
+    set Image = $Imgpath/$filename
+    if (-e $Image) then
+      set FileSize=`stat --format="%s" $Image`
+      if ($FileSize < $minFileSize) then
+         echo Blank image detected for $Image
+      else
+         ln -s $Image $targpath/$I.$Type
+         @ i = $i + 1
+      endif
+    else
+      echo no frame found for $Image
+    endif
+    @ imgtime_t = $imgtime_t + $cadence
+  end
+  
+  set HERE = $cwd
+  cd $WORK/frames
+  
+  echo Movie making place is $cwd
+  
+# set echo
+  
+  set MOVIE = $WORK/$Quant'_2d'.mpg
+  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE 
+  if ($status == 0) then
+      cp $MOVIE $Imgpath
+      mv $MOVIE /home/jsoc/hmi/movies/latest
+  endif
+  
+  set MOVIE = $WORK/$Quant'_2d'.mp4
+  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE
+  if ($status == 0) then
+      cp $MOVIE $Imgpath
+      mv $MOVIE /home/jsoc/hmi/movies/latest
+  endif
+  
+  rm -rf $WORK
+
+  cd $HERE
+end

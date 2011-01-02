@@ -1,0 +1,147 @@
+# /bin/csh -f
+# create limb darkening removed Ic record and create image set for Ic_noLD and M for range of time
+# specified by first two arguments.
+
+ set echo
+
+set wantlow = $1
+set wanthigh = $2
+
+echo Make images for $wantlow to $wanthigh
+
+# from here make script that can make _nrt images in standard place
+
+set CADENCE = 15
+
+setenv RGBDEF /home/phil/workflow/scripts/rgb.txt
+set RENDER_IMAGE = /home/phil/workflow/bin/render_image
+set HMI_LIMBDARK = /home/phil/workflow/bin/hmi_limbdark
+
+set obslist = (Ic Ic_flat M)
+set minlist = (20000 0.3 -1500)
+set maxlist = (75000 1.2 1500)
+set scalinglist = (minmaxgiven minmaxgiven mag)
+set colorlist = (/home/phil/apps/heat.sao /home/phil/apps/heat.sao grey)
+set namelist = (Continuum Continuum Magnetogram)
+set flaglist = ("" "" -c)
+
+set end_movie_t = 0
+
+set wantlow_t = `time_convert time=$wantlow`
+set wanthigh_t = `time_convert time=$wanthigh`
+
+@ daylow = $wantlow_t / 86400
+@ dayhigh = $wanthigh_t / 86400
+
+set day = $daylow
+while ($day <= $dayhigh)
+  @ day_t = 86400 * $day
+  @ nextday_t = $day_t + 86400
+  @ last_t = $nextday_t - 45
+  if ($last_t > $wanthigh_t) set last_t = $wanthigh_t
+  set first_t = $day_t
+  if ($first_t < $wantlow_t) set first_t = $wantlow_t
+  @ cadence = $CADENCE * 60
+  @ first_mod_t = $first_t - 45
+  @ imglow_t = $first_mod_t / $cadence
+  @ imglow_t = $imglow_t + 1
+  @ first_t = $imglow_t * $cadence
+  set first = `time_convert s=$first_t zone=TAI`
+  @ last_mod_t = $last_t + $cadence
+  @ imghigh_t = $last_mod_t / $cadence
+  @ n_images = $imghigh_t - $imglow_t
+  if ($n_images < 0) set n_images = 0
+  if ($n_images == 0) then
+    @ day = $day + 1
+    continue
+  endif
+  set end_movie_t = $last_t
+  @ n_minutes = $n_images * $CADENCE
+  set QRY = '['$first'/'$n_minutes'm@'$CADENCE'm]'
+  set yyyymmdd = `echo $first | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
+  set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
+  set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
+  set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
+
+  set IMGROOT = /home/jsoc/hmi/images
+  set IMGPATH = $IMGROOT/$YEAR
+  if (!(-e $IMGPATH)) mkdir $IMGPATH
+  set IMGPATH = $IMGPATH/$MON
+  if (!(-e $IMGPATH)) mkdir $IMGPATH
+  set IMGPATH = $IMGPATH/$DAY
+  if (!(-e $IMGPATH)) mkdir $IMGPATH
+
+  cd $IMGPATH
+
+  set img = 1
+  while ($img <= $#obslist)
+    set obs = $obslist[$img]
+    if ($obs == Ic_flat) then
+      set n_source = `show_info -cq $inseries$QRY`  # use inseries from Ic pass through this loop
+      set n_dest = `show_info -cq 'hmi.Ic_noLimbDark_45s'$QRY`
+      if ($n_source > 0 && $n_dest < $n_source) then
+        $HMI_LIMBDARK in=$inseries$QRY out=hmi.Ic_noLimbDark_45s -n
+      endif
+    set inseries = hmi.Ic_noLimbDark_45s
+    else
+      set in_final = hmi.$obs'_45s'
+      set in_nrt = hmi.$obs'_45s_nrt'
+      set n_final = `show_info -cq $in_final$QRY`
+      set n_nrt = `show_info -cq $in_nrt$QRY`
+      set inseries = $in_nrt
+      if ($n_final >= $n_nrt) then
+      #  if ($n_final > 0) then
+        set inseries = $in_final
+        set msg = ""
+      else
+        set inseries = $in_nrt
+        set msg = "Quick-Look "
+      endif
+    echo Use $inseries for $QRY
+    endif
+
+set echo
+    $RENDER_IMAGE $flaglist[$img] in=$inseries$QRY \
+      pallette=$colorlist[$img] \
+      min=$minlist[$img] \
+      max=$maxlist[$img] \
+      scaling=$scalinglist[$img] \
+      scale=4,8,16,1 \
+      outid=time \
+      type=jpg \
+      outname=$obs \
+      out='| ppmlabel -color white -size {%0.75:5} -x 15 -y {%98} -text "SDO/HMI '"$msg$namelist[$img]"': {ID}" | pnmtojpeg -quality=95'
+unset echo
+    @ img = $img + 1
+  end
+
+  @ day = $day + 1
+end
+
+if ($end_movie_t > 0) then
+  set end_movie = `time_convert s=$end_movie_t zone=TAI`
+  /home/phil/workflow/scripts/makeIcmovie $end_movie
+
+  set hhmmss = `echo $end_movie | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`
+  set yyyymmdd = `echo $end_movie | sed -e 's/_.*//' -e 's/\.//g'`
+#  set LATESTLIST = $IMGROOT/image_times_UTC
+set LATESTLIST = $IMGROOT/image_times
+  set prevd = 0
+  set prevt = 0
+  if (-e $LATESTLIST) then
+    set prevM = `grep M $LATESTLIST`
+    set prevdt = $prevM[2]
+    set prevd = `echo $prevdt | sed -e 's/_.*//'`
+    set prevt = `echo $prevdt | sed -e 's/.*_//'`
+  endif
+  if ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss > $prevt) ) then
+    set latest = $yyyymmdd'_'$hhmmss
+    cat > $LATESTLIST <<END
+Ic:	$latest
+Ic_flat:	$latest
+M:	$latest
+END
+  endif
+endif
+
+exit 0

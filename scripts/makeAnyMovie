@@ -1,0 +1,135 @@
+#! /bin/csh 
+
+# set echo
+
+# make movie of selected days at cadence cadence
+# choices 0f cadence must be multiple of 15m.
+# args are:  start  stop  cadence  quantity (Ic, Ic_flat, M), size (256,512,1k,4k)
+# Defaults are 1k, M, 15m, last 2 days.  Leading args must be present.
+
+@ min15 = 60 * 15
+if ($#argv > 0) then # get start time
+  set want = $1
+  set want_t = `time_convert time=$want`
+  @ startimg = $want_t / $min15
+  shift
+else
+  set now = `date -u +%Y.%m.%d_%H:%M:%S`
+  set now_t = `time_convert time=$now`
+  @ nowimg = $now_t / $min15
+  @ day2 = 48 * 4
+  @ startimg = $nowimg - $day2
+endif
+@ starttime_t = $startimg * $min15
+
+if ($#argv > 0) then # get end time
+  set want = $1
+  set want_t = `time_convert time=$want`
+  @ endimg = $want_t / $min15
+  shift
+else
+  set now = `date -u +%Y.%m.%d_%H:%M:%S`
+  set now_t = `time_convert time=$now`
+  @ endimg = $now_t / $min15
+endif
+@ endtime_t = $endimg * $min15
+
+if ($#argv > 0) then # get cadence in minutes
+  set want = $1
+  @ want15 = $want * 15
+  @ want = $want15 / 15
+  @ cadence = $want * 60
+  shift
+else
+  set cadence = $min15
+endif
+
+if ($#argv > 0) then # get observable
+  set want = $1
+  if ($want == Ic || $want == Ic_flat || $want == M) then
+    set Quant = $want
+  else
+    echo Quantity must be one of Ic, Ic_flat, or M, NOT $want
+    exit 1
+  endif
+  shift
+else
+  set Quant = M
+endif
+
+if ($#argv > 0) then # get size
+  set want = $1
+  if ($want == 256 || $want == 512 || $want == 1k || $want == 4k) then
+    set Size = $want
+  else
+    echo Siz must be one of 256, 512, 1k, 4k, NOT $want
+    exit 1
+  endif
+else
+  set Size = 1k
+endif
+  
+set Type = jpg
+set minFileSize = 50000
+if ($Size == 256) set minFileSize = 5000
+
+set BASE = /home/jsoc/hmi/images
+set WORK = /home/jsoc/hmi/movies/$Quant'_movies'.$$
+mkdir $WORK
+mkdir $WORK/frames
+
+@ imgtime_t = $starttime_t 
+set i = 0
+while ($imgtime_t <= $endtime_t)
+  set imgtime = `time_convert s=$imgtime_t zone=TAI`
+  set yyyymmdd = `echo $imgtime | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
+  set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
+  set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
+  set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
+  set yyyymmdd = $YEAR$MON$DAY
+  set hhmmss = `echo $imgtime | sed -e 's/_/Q/' -e 's/.*Q//' -e 's/://g' -e 's/_TAI//'`
+  set I = `printf "%04d" $i`
+  set filename = $yyyymmdd'_'$hhmmss'_'$Quant'_'$Size'.'$Type
+  if ($i == 0) set Startname = $yyyymmdd'_'$hhmmss
+  set Endname = $yyyymmdd'_'$hhmmss
+  set Imgpath = $BASE/$YEAR/$MON/$DAY
+  set targpath = $WORK/frames
+  set Image = $Imgpath/$filename
+  if (-e $Image) then
+    set FileSize=`stat --format="%s" $Image`
+    if ($FileSize < $minFileSize) then
+       echo Blank image detected for $Image
+    else
+       ln -s $Image $targpath/$I.$Type
+       @ i = $i + 1
+    endif
+  else
+    echo no frame found for $Image
+  endif
+  @ imgtime_t = $imgtime_t + $cadence
+end
+
+set HERE = $cwd
+
+cd $WORK/frames
+
+echo Movie making place is $cwd
+
+# set echo
+
+@ mins = $cadence / 60
+set MOVIE = $WORK/$Quant'_'$Size'_'$Startname'-'$Endname'_'$mins'm'
+
+cd $WORK/frames
+ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mpg 
+if ($status == 0) then
+    mv $MOVIE.mpg /home/jsoc/hmi/movies/special
+endif
+
+ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mp4 
+if ($status == 0) then
+    mv $MOVIE.mp4 /home/jsoc/hmi/movies/special
+endif
+
+rm -rf $WORK
+cd $HERE
