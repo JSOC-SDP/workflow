@@ -1,0 +1,8 @@
+This dir contains special purpose programs used by the
+workflow scripts.
+
+Also some reference versions of HMI observables code,
+to be kept here until the "official" versions are
+checked in and can be built in ~jsoc.
+
+The binaries are not checked in, so copy from ~phil/jsoc/proj/workflow/bin for now.
