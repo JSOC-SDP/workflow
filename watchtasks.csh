@@ -138,7 +138,7 @@ while (1)
       endif # some done
    end
    if ($keep_watching) then
-      sleep 10
+      sleep 30
    else
       break
    endif

@@ -27,7 +27,9 @@ set special = NONE
 
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set nowt = `time_convert time=$now`
-@ expiret = $nowt + 86400
+# @ expiret = $nowt + 86400
+# change to 3 days default
+@ expiret = $nowt + 259200
 set expire = `time_convert s=$expiret`
 
 while ( $#argv > 0)

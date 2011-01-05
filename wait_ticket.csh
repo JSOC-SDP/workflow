@@ -43,8 +43,6 @@ endif
 
 # for now, just look at all of them
 
-# /auto/home0/phil/workflow/tasks/offset_vwV_fdM_test_task/active/offset_vwV_fdM_test_task-root/ticket_return
-
 set WASFOUND = 0
 
 while (1)

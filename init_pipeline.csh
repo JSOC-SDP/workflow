@@ -4,6 +4,10 @@
 # If the tasks and gates directories exist only the test gates and tasks will be rebuilt.
 # If the gates and tasks diretories are not present, they will be created.
 
+echo This program is only used once.
+echo If you are sure you want to use it, remove the next line:
+exit 1
+
 if ($?WORKFLOW_ROOT) then
   set WFDIR = $WORKFLOW_ROOT
 else

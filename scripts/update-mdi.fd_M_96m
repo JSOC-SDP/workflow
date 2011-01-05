@@ -1,0 +1,101 @@
+#! /bin/csh -f
+# general script for migrating datasets from DRMS stored DSDS datasets
+# into DRMS per record datasets using ingestdsds_a.
+
+# Works with workflow systeem
+
+set echo
+set noglob
+
+# Set the following lines for the target series to migrate
+set SERIES = fd_M_96m_01d
+# DRMS series of datasets
+set SUM_SER = "dsds.mdi__lev1_8__fd_M_96m_01d"
+# new DRMS series of records
+set NEW_SER = mdi.fd_M_96m_lev18
+# control file for ingest_dsds_a
+set INGESTMAP =  /home/phil/jsoc/proj/myproj/apps/fd_M_96m/fd_M_96m.map
+
+set TEMP = temp.DIRS
+
+set WANTLOW = `cat wantlow`
+set WANTLOW_t = `time_convert time=$WANTLOW`
+set WANTLOW = `time_convert zone=TAI s=$WANTLOW_t`
+
+set WANTHIGH = `cat wanthigh`
+set WANTHIGH_t = `time_convert time=$WANTHIGH`
+set WANTHIGH = `time_convert zone=TAI s=$WANTHIGH_t`
+
+set HERE = $cwd
+set babble = $HERE/babble
+mkdir $HERE/qsubs_running
+mkdir $HERE/$TEMP
+set LOG = $HERE/runlog
+
+# wait here if qsub queue too big already
+while (`qstat -u $USER | wc -l` > 40)
+      sleep 10
+      echo -n '.' >>$babble
+end
+
+set FDS = `time_index -d time=$WANTLOW`
+set LDS = `time_index -d time=$WANTHIGH`
+
+# This block of code should be same in each 96-minute-by-day update script
+# the workflow ticket may have a "special" line in which case the FILLGAPSLOW
+# time may be present.  If so all gaps between FILLGAPSLOW and wantlow should
+# be plugged with missing records.
+
+set SPECIAL = `grep SPECIAL ticket`
+if ($? == 0) then
+    foreach SPECIALWORD ($SPECIAL)
+         set $SPECIALWORD
+    end
+if ($?FILLGAPSLOW) then
+    set FILLGAPSLOWDS = `time_index -d time=$FILLGAPSLOW`
+    @ FILLGAPSHIGHDS = $FDS - 1
+    if ($FILLGAPSHIGHDS >= $FILLGAPSLOWDS) then
+        # some older gaps should be plugged with missing
+        set FILLGAPSHIGH_m = `time_index -m hour=$FILLGAPSHIGHDS`
+        @ FILLGAPSHIGH_m = $FILLGAPSHIGH_m + 1440 - 96
+        set FILLGAPSHIGH = `time_index -t minute=$FILLGAPSHIGH_m`
+        # set_gaps_missing ds=$NEW_SER low=$FILLGAPSLOW high=$FILLGAPSHIGH > $HERE/$TEMP/gapsfilled
+        echo set_gaps_missing ds=$NEW_SER low=$FILLGAPSLOW high=$FILLGAPSHIGH
+    endif
+endif
+
+set INSTANCE = $FDS'_'$LDS
+
+set TEMPCMD = $TEMP/CMD.$INSTANCE
+set TEMPLOG = $TEMP/LOG.$INSTANCE
+set TEMPLIST = $TEMP/LIST.$INSTANCE
+rm -f $TEMPCMD $TEMPLOG $TEMPLIST
+
+show_info -pq $SUM_SER"["$FDS-$LDS"]" >$TEMPLIST
+
+set retstatus=0
+set n = `wc -l < $TEMPLIST`
+if ($n == 0) then
+      echo No datasets found for $FDS through $LDS >>$babble
+else
+      echo $n hours in $FDS >>$babble
+
+      echo "#! /bin/csh -f " >$TEMPCMD
+      echo "cd $HERE" >>$TEMPCMD
+      echo "hostname >>&$TEMPLOG" >>$TEMPCMD
+      echo 'ingest_dsds_a -v -L in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
+      echo 'echo $status >retstatus' >>$TEMPCMD
+      echo "rm -f $HERE/qsubs_running/$INSTANCE" >>$TEMPCMD
+      
+      touch $HERE/qsubs_running/$INSTANCE
+      qsub -sync yes -e $HERE/$TEMPLOG -o $HERE/$TEMPLOG -q j.q $HERE/$TEMPCMD
+endif
+
+# while (`/bin/ls $HERE/qsubs_running/ | wc -l` > 0)
+    # sleep 10
+    # echo -n '+' >>$babble
+
+echo Done >>$LOG
+if (-e retstatus) set retstatus = `cat retstatus`
+
+exit $retstatus
