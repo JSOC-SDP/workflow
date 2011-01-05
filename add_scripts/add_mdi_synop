@@ -1,0 +1,72 @@
+#! /bin/csh -f
+#
+# WARNING - do not run this while gatekeeper is active
+
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_DATA
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+set WFScripts = $WFCODE/scripts
+
+cd $WFDIR
+rm -f Keep_running
+while (-e GATEKEEPERBUSY)
+  echo waiting for gatekeeper to quit.
+  sleep 5
+  end
+
+# clean up test user gates and tasks
+cd $WFDIR
+if (-e tasks/mdi.Synop) rm -rf tasks/mdi.Synop
+if (-e gates/mdi.Synop)  rm -rf gates/mdi.Synop
+
+if (-e tasks/mdi.fd_Remap) rm -rf tasks/mdi.fd_Remap
+if (-e gates/mdi.Blos_Remap)  rm -rf gates/mdi.Blos_Remap
+
+cd $WFDIR
+$WFCODE/maketask.csh task=mdi.fd_Remap \
+                manager=taskmanager.csh \
+                target=mdi.Blos_Remap \
+                command=scripts/update_mdi.fd_Remap \
+                maxrange=864000 
+mkdir tasks/mdi.fd_Remap/preconditions/mdi.fdM_96m
+echo "set ACTION=3" > tasks/mdi.fd_Remap/preconditions/mdi.fdM_96m/prepare_ticket
+
+$WFCODE/maketask.csh task=mdi.Synop \
+                manager=taskmanager.csh \
+                target=mdi.Synop \
+                command=scripts/update_mdi.Synop \
+                maxrange=864000 
+
+set TICKDIR = tasks/mdi.Synop/preconditions/mdi.Blos_Remap
+mkdir $TICKDIR
+echo "set ACTION=4" > $TICKDIR/prepare_ticket
+echo 'set USELOW = `/home/wso/bin/_linux4/ctimes -j  "CT"$WANTLOW":360"`' >> $TICKDIR/prepare_ticket
+echo 'set USEHIGH = `/home/wso/bin/_linux4/ctimes -j "CT"$WANTHIGH":0"`' >> $TICKDIR/prepare_ticket
+
+
+
+cd $WFDIR
+$WFCODE/makegate.csh gate_name=mdi.Blos_Remap \
+		project = MDI \
+                 product=mdi.fd_M_96m_remap \
+                 type=time \
+                 key=T_REC \
+                 low=NaN \
+                 high=NaN \
+                 actiontask=mdi.fd_Remap \
+                 statustask=scripts/status-general.csh
+
+$WFCODE/makegate.csh gate_name=mdi.Synop \
+		project = MDI \
+		 product=mdi.synop \
+                 key=CAR_ROT \
+                 type=CARROT \
+                 low=NaN \
+                 high=NaN \
+		 actiontask=mdi.Synop \
+		 statustask=scripts/status-general.csh
+

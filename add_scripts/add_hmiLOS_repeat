@@ -1,0 +1,48 @@
+#! /bin/csh -f
+
+#
+# WARNING - do not run this while gatekeeper is active
+
+# script to add a repeating processing to make e.g. to run a task each day.
+
+# This script is setup for HMI LOS data.
+
+set WFDIR = $WORKFLOW_DATA
+set WFCODE = $WORKFLOW_ROOT
+cd $WFDIR
+
+set NEWTASK = repeat_hmi_LOS
+set NEWGATE = repeat_hmi_LOS
+
+# remove prior test version
+
+if (-e tasks/$NEWTASK) rm -rf tasks/$NEWTASK
+if (-e gates/$NEWGATE) rm -rf gates/$NEWGATE
+
+# finally make task 
+$WFCODE/maketask.csh task=$NEWTASK manager=taskmanager.csh target=$NEWGATE maxrange=8640000 \
+                command=scripts/start_hmi_LOS.csh
+
+mkdir tasks/$NEWTASK/preconditions/hmi.lev1
+cat >tasks/$NEWTASK/preconditions/hmi.lev1/prepare_ticket <<STOP
+    set ACTION = 3
+    set USEHIGH_t = \`time_convert time=\$USEHIGH\`
+    @ USEHIGH_t = \$USEHIGH_t + 240
+    set USEHIGH = \`time_convert s=\$USEHIGH_t zone=TAI\`
+STOP
+
+mkdir tasks/$NEWTASK/preconditions/hmi.cosmic_rays
+cat >tasks/$NEWTASK/preconditions/hmi.cosmic_rays/prepare_ticket <<STOP
+    set ACTION = 3
+    set USEHIGH_t = \`time_convert time=\$USEHIGH\`
+    @ USEHIGH_t = \$USEHIGH_t + 135
+    set USEHIGH = \`time_convert s=\$USEHIGH_t zone=TAI\`
+STOP
+
+
+$WFCODE/makegate.csh gate_name=$NEWGATE product=none type=time key=NA \
+	low=2010.03.24_00:00:00_TAI high=2010.03.24_00:00:00_TAI \
+	actiontask=$NEWTASK statustask=scripts/status_clock.csh
+
+# initialization ticket not needed. 
+

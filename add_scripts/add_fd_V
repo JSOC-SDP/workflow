@@ -1,0 +1,52 @@
+#! /bin/csh -f
+#
+# WARNING - do not run this while gatekeeper is active
+
+set WFDIR = $WORKFLOW_DATA
+set WFCODE = $WORKFLOW_ROOT
+
+cd $WFDIR
+
+if (-e tasks/update_mdi.fd_V) rm -rf tasks/update_mdi.fd_V tasks/stage_dsds.fd_V
+if (-e gates/mdi.fdV) rm -rf gates/mdi.fdV gates/dsds.fdV
+
+$WFCODE/maketask.csh task=update_mdi.fd_V \
+		manager=taskmanager.csh \
+		target=mdi.fdV \
+                command=scripts/update-mdi.fd_V \
+		maxrange=864000 \
+		parallelOK=5
+set PRECOND = tasks/update_mdi.fd_V/preconditions/dsds.fdV
+mkdir $PRECOND
+echo "set ACTION = 5" > $PRECOND/prepare_ticket
+
+# specific update task to stage hourly DSDS data, only the taskname and target need to be specific
+$WFCODE/maketask.csh task=stage_dsds.fd_V \
+                manager=taskmanager.csh \
+                target=dsds.fdV \
+                command=scripts/stage-dsds_hourly_data.csh \
+                maxrange=8640000
+
+cd $WFCODE
+# use type time and let the status and action tasks convert to DSDS seriesnumbers
+$WFCODE/makegate.csh gate_name=mdi.fdV \
+		 product=mdi.fd_V_lev18 \
+		 type=time \
+		 key=T_REC \
+		 project=MDI \
+		 actiontask=update_mdi.fd_V \
+		 statustask=scripts/status-general.csh
+
+# gate for staging DSDS data, the gatename, product, and actiontask need to be specific
+$WFCODE/makegate.csh gate_name=dsds.fdV \
+                 product=dsds.mdi__lev1_8__fd_V_01h \
+                 type=time \
+                 key=snum \
+		 project=MDI \
+                 actiontask=stage_dsds.fd_V \
+                 statustask=scripts/status-dsds_hourly.csh
+
+# initialization tickets
+$WFCODE/maketicket.csh gate=mdi.fdV action=6 wantlow=NaN wanthigh=NaN
+$WFCODE/maketicket.csh gate=dsds.fdV action=6 wantlow=NaN wanthigh=NaN
+

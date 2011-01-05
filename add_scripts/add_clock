@@ -1,0 +1,61 @@
+#! /bin/csh -f
+#
+# WARNING - do not run this while gatekeeper is active
+
+# script to add an clock, a clock that keeps time.
+
+set WFDIR = $WORKFLOW_DATA
+set WFCODE = $WORKFLOW_ROOT
+cd $WFDIR
+
+# remove prior test version
+
+if (-e tasks/clock_task) rm -rf tasks/clock_task 
+if (-e gates/clock_gate) rm -rf gates/clock_gate
+
+# get current hour slot
+set NOW = `date -u +%Y.%m.%d_%H:%M:%S`
+
+# make clock status task
+# this status task will set the high value of the oclock gate to the current time.
+cat > $WFCODE/scripts/status_clock.csh << ENDSCRIPT
+#! /bin/csh -f
+# the clock status task simply reflects the current time
+
+set WFDIR = $WORKFLOW_DATA
+
+cd $WFDIR/gates/\$1
+set NOW = \`date -u +%Y.%m.%d_%H:%M:%S\`
+echo \$NOW > high
+echo \$NOW > lastupdate
+rm -f statusbusy
+ENDSCRIPT
+
+chmod +x $WFCODE/scripts/status_clock.csh
+
+# make the clock task
+maketask.csh task=clock_task \
+                manager=taskmanager.csh \
+                target=clock_gate \
+		maxrange=86400 \
+                command=scripts/true.csh
+
+# make the clock gate
+#
+# WARNING - updelta MUST be more than the gatekeeper basic loop time or the clock will never process
+# new tickets!
+
+makegate.csh gate_name=clock_gate \
+		 product=none \
+		 type=time \
+		 key=NA \
+		 low=1993 \
+		 high=$NOW \
+                 updatedelta=15 \
+		 actiontask=clock_task \
+		 statustask=scripts/status_clock.csh
+
+# initialization tickets not needed. 
+
+enablegate.csh clock_gate
+
