@@ -13,9 +13,9 @@ echo Make images for $wantlow to $wanthigh
 
 set CADENCE = 15
 
-setenv RGBDEF /home/phil/workflow/scripts/rgb.txt
-set RENDER_IMAGE = /home/phil/workflow/bin/render_image
-set HMI_LIMBDARK = /home/phil/workflow/bin/hmi_limbdark
+setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
+set RENDER_IMAGE = /home/phil/jsoc/proj/workflow/bin/render_image
+set HMI_LIMBDARK = /home/phil/jsoc/proj/workflow/bin/hmi_limbdark
 
 set obslist = (Ic Ic_flat M)
 set minlist = (20000 0.3 -1500)
@@ -120,7 +120,7 @@ end
 
 if ($end_movie_t > 0) then
   set end_movie = `time_convert s=$end_movie_t zone=TAI`
-  /home/phil/workflow/scripts/makeIcmovie $end_movie
+  /home/phil/jsoc/proj/workflow/scripts/makeIcmovie $end_movie
 
   set hhmmss = `echo $end_movie | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`
   set yyyymmdd = `echo $end_movie | sed -e 's/_.*//' -e 's/\.//g'`
