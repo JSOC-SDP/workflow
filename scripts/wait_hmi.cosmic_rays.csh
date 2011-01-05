@@ -93,6 +93,7 @@ set mmdd = `echo $yyyymmdd | sed -e "s/.....//" -e "s/://" `
 mkdir CRlogs
 set CRLOG = $HERE/CRlogs
 set module_flatfield = /home/production/cvs/JSOC/bin/linux_x86_64/module_flatfield
+set cosmic_ray_post = /home/production/cvs/JSOC/bin/linux_x86_64/cosmic_ray_post
 
 set QSUBCMD = CRY_$mmdd
 cat > $QSUBCMD <<END
@@ -121,7 +122,16 @@ endif
 $module_flatfield input_series=hmi.lev1 cadence=\$cadence cosmic_rays=1 flatfield=0 fid=\$fid camera=\$camera fsn_first=$FIRST_FSN fsn_last=$LAST_FSN datum=$yyyymmdd >>& $CRLOG/\$ID.log
 END
 
-qsub -q j8.q -o $LOG -e $LOG -t 1-48 -sync yes $QSUBCMD
+qsub -q j.q -o $LOG -e $LOG -t 1-48 -sync yes $QSUBCMD
+
+# Now do the post processing
+set QSUBCMD = POS_$mmdd
+cat > $QSUBCMD <<END
+#
+set echo
+$cosmic_ray_post fsn_first=$FIRST_FSN fsn_last=$LAST_FSN >>& $CRLOG/post.log
+END
+qsub -q j.q -o $LOG -e $LOG -sync yes $QSUBCMD
 
 if ($status) then
   echo >>$LOG "Failure in at least one FID module_flatfield run"
