@@ -47,7 +47,7 @@ foreach gate ( $LIST )
      if ($ntickets) then
          echo " "
          echo -n "GATE $gate" "   for "
-         cat product
+         cat ../product
          foreach ticket ($ticketlist)
             set STATUS = `grep STATUS $ticket`
  	    set WANTLOW = `grep WANTLOW $ticket`
