@@ -50,7 +50,7 @@ cd tasks/$task
 
 #  Now in task directory, get static task information
 # foreach keyfile (task maxrange parallelOK target state)
-foreach keyfile ( maxrange parallelOK target state)
+foreach keyfile ( maxrange parallelOK target state command)
         set $keyfile = `cat $keyfile`
 end
 
@@ -60,6 +60,9 @@ if ($gate != $target) then
 #XXXXX return ticket too
    exit(1)
 endif
+
+# Get the path to the command
+set ACTIONCOMMAND = $WFCODE/$command
 
 #  Make an instance of this task and go to it
 
@@ -86,7 +89,8 @@ ln $WFDIR/gates/$gate/active_tickets/$ticket ticket
 set TYPE = `cat $WFDIR/gates/$gate/type`
 set PRODUCT = `cat $WFDIR/gates/$gate/product`
 set KEY = `cat $WFDIR/gates/$gate/key`
-set STATUSCOMMAND = $WFDIR/gates/$gate/statustask
+set STATUSTASK = `cat $WFDIR/gates/$gate/statustask`
+set STATUSCOMMAND = $WFCODE/$STATUSTASk
 if (-e $WFDIR/gates/$gate/coverage_args) then
   set COVERAGEARGS = `cat $WFDIR/gates/$gate/coverage_args`
 else
@@ -318,7 +322,7 @@ echo 2 >state
 	
 # FINALLY - execute the command to make the product
 
-$WFDIR/tasks/$task/command
+$ACTION_COMMAND
 
 set command_status = $?
 if ($command_status) then

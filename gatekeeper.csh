@@ -59,9 +59,9 @@ while ($keep_running > 0)
    # inspect each gate and deal with all tickets at that gate
    foreach gate (`/bin/ls gates`)
 	cd $WFDIR/gates/$gate
-        # get gate information attirbutes
+        # get gate information attributes
         if (-e statusbusy) then
-		if ($verbosemode) echo "GATEKEEPER statuscommand running, skip gate for now"
+		if ($verbosemode) echo "GATEKEEPER statustask running, skip gate for now"
                 continue
         endif
         set nextupdate = `cat nextupdate`
@@ -70,6 +70,7 @@ while ($keep_running > 0)
         set actiontask = `cat actiontask`
         set gatestatus = `cat gatestatus`
         set product = `cat product`
+        set statustask = `cat statustask`
         if ($gatestatus == "HOLD") then
             if ($verbosemode) echo "GATEKEEPER Gate: $gate on HOLD, skip this gate"
             continue
@@ -86,12 +87,11 @@ echo starting $gate
 		time_convert s=$nextupdatetime > nextupdate
 		echo $nowtxt > lastupdate
                 touch statusbusy
-		# ./statustask $gate &
                 if ($gate == "clock_gate") then
-		        ./statustask $gate   # do clock_gate inline
+                        $WFCODE/$statustask $gate # do clock_gate inline
                 else
-		        ./statustask $gate &
-		         continue # stop with this gate until update is done
+                        $WFCODE/$statustask $gate & 
+		        continue # stop with this gate until update is done
                 endif
 	endif
         set low = `cat low`
@@ -100,7 +100,7 @@ echo starting $gate
 	if ($#low == 0 || $low == "NaN" || $#high == 0 || $high == "NaN") then
 		if ($verbosemode) echo "GATEKEEPER Gate $gate not properly initialized, try to init"
 		touch statusbusy
-		./statustask $gate &
+                $WFCODE/$statustask $gate & 
 		continue  # stop with this gate until update is done
 	endif
 if ($low == -1) then
@@ -108,7 +108,7 @@ echo "GATEKEEPER DEBUG $gate low is -1, reset"
 ls active_tickets
 echo NaN >low
 touch statusbusy
-./statustask $gate &
+$WFCODE/$statustask $gate & 
 continue
 endif
         if ($type == "time") then
@@ -212,7 +212,8 @@ endif
                                 set pending = `cat $WFDIR/tasks/$actiontask/state`
 			        @ pending = $pending + 1
                                 echo $pending >  $WFDIR/tasks/$actiontask/state
-			        $WFDIR/tasks/$actiontask/manager gate=$gate task=$actiontask ticket=$ticket >>&$WFDIR/tasks/$actiontask/manager.log  &
+                                set TASKMANAGER = `cat $WFDIR/tasks/$actiontask/manager`
+			        $WFCODE/$TASKMANAGER gate=$gate task=$actiontask ticket=$ticket >>&$WFDIR/tasks/$actiontask/manager.log  &
                                 echo $! > $WFDIR/tasks/$actiontask/manager.pid
                         endif
 		# else if ($ACTION == 5) then # unconditionally cause new data to be processed
@@ -224,7 +225,8 @@ endif
                         set pending = `cat $WFDIR/tasks/$actiontask/state`
 			@ pending = $pending + 1
                         echo $pending >  $WFDIR/tasks/$actiontask/state
-			$WFDIR/tasks/$actiontask/manager gate=$gate task=$actiontask ticket=$ticket >>&$WFDIR/tasks/$actiontask/manager.log  &
+			set TASKMANAGER = `cat $WFDIR/tasks/$actiontask/manager`
+			$WFCODE/$TASKMANAGER gate=$gate task=$actiontask ticket=$ticket >>&$WFDIR/tasks/$actiontask/manager.log  &
 		else if ($ACTION == 6) then # make coverage map, may be slow
 			# ACTION == 6, Generate COVERAGE map
 			echo "NaN" > low
@@ -232,7 +234,7 @@ endif
 			echo "STATUS=2" >> new_tickets/$ticket
 			mv new_tickets/$ticket active_tickets # must happen before statustask
                         touch statusbusy
-			./statustask $gate low=$low high=$high &
+                        $WFCODE/$statustask $gate low=$low high=$high &
 		endif
 		if ($verbosemode) echo GATEKEEPER moved new_tickets/$ticket to active_tickets with action=$ACTION
 	end # done with new tickets
@@ -417,7 +419,7 @@ q
 			if ($verbosemode) echo "GATEKEEPER Ticket is complete, return to owner"
 			# XXXXX need to update coverage here with want range in done ticket.  For now call get coverage.
 			touch statusbusy
-			./statustask $gate  # wait for this to complete.
+			$WFCODE/$statustask $gate  # wait for this to complete.
                         # ticket should have been already removed from the target task's pending list
                         # but check anyway
                         if (-e $WFDIR/tasks/$task/active/$TASKID/ticket_return) then

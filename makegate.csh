@@ -30,7 +30,7 @@ set key = "NOT_SPECIFIED"
 set lastupdate = 1993    # 
 set nextupdate = `date +%Y.%m.%d_%H:%M:%S`    # 
 set updatedelta = 86400
-set statustask = $WFCODE/statustask.csh
+set statustask = scripts/statustask.csh
 set actiontask = "NOT_SPECIFIED"
 set project = "NA"
 set coverage_args = "none"
@@ -63,15 +63,12 @@ endif
 if ("$actiontask" == "NOT_SPECIFIED") then
   echo warning - actiontask is not specified
 endif
-if (!(-e $statustask)) then
-  echo STOP, the script/program statustask should be created before a gate that uses it is created.
-  exit
-else if (!(-e $statustask)) then
-  echo STOP, the script/program $statustask must be executable.
+if (!(-x $WFCODE/$statustask)) then
+  echo STOP, the script/program statustask should be created and executable before a gate that uses it is created.
   exit
 endif
 if (!(-x $WFDIR/tasks/$actiontask)) then
-  echo STOP, the task $actiontask should be created before a gate that uses it is created.
+  echo STOP, the command $actiontask should be created before a gate that uses it is created.
   exit
 endif
 
@@ -102,7 +99,7 @@ echo "$key" > key
 echo "$lastupdate" > lastupdate
 echo "$nextupdate" > nextupdate
 echo "$updatedelta" > updatedelta
-ln -s "$statustask"  statustask
+echo "$statustask" > statustask
 echo "$actiontask" > actiontask
 echo "$project" > project
 echo "$coverage_args" > coverage_args

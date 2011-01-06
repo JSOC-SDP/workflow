@@ -24,7 +24,7 @@ set retain = 1
 set note = ""
 set state = 0
 set command = "NOT_SPECIFIED"
-set manager = $WFCODE/taskmanager.csh
+set manager = taskmanager.csh
 
 while ( $#argv > 0)
   foreach keyname (task parallelOK maxrange retain target note command manager )
@@ -48,7 +48,7 @@ endif
 if ("$command" == "NOT_SPECIFIED") then
   echo command must be specified
   exit
-else if (!( -x $command)) then
+else if (!( -x $WFCODE/$command)) then
   echo STOP - in task $task the command $command must be executable.
   exit 1
 endif
@@ -56,7 +56,7 @@ if ("$maxrange" == "NaN") then
   echo maxrange must be specified
   exit
 endif
-if (!( -x $manager)) then
+if (!( -x $WFCODE/$manager)) then
   echo STOP - in task $task the taskmanager $manager must be executable.
   exit 1
 endif
@@ -91,9 +91,8 @@ echo "$target" > target
 echo "$note" > note
 echo "$state" > state
 echo "$taskid" > taskid
-
-ln -s $command command
-ln -s $manager manager
+echo "$command" > command
+echo "$manager" > manager
 
 mkdir preconditions
 mkdir active

@@ -3,6 +3,8 @@
 set WFCODE = $WORKFLOW_ROOT
 
 cd $WFCODE
+set CTIMES = /home/wso/bin/_linux4/ctimes
+
 
 set dsdshigh = `cat DATA/gates/dsds.vwV/high`
 set dsdshigh_t = `time_convert time=$dsdshigh`
@@ -26,7 +28,7 @@ maketicket.csh gate=mdi.fdM_96m wantlow=$mdihigh wanthigh=$dsdshigh action=5
 
 set synophigh = `cat DATA/gates/mdi.Synop/high`
 
-set fdMhigh = `ctimes -c $dsdshigh`
+set fdMhigh = `$CTIMES -c $dsdshigh`
 set crhigh = `echo $fdMhigh | sed -e 's/CT//' -e 's/:.*//'`
 
 if ($crhigh > $synophigh) then

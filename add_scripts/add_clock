@@ -2,6 +2,8 @@
 #
 # WARNING - do not run this while gatekeeper is active
 
+set echo
+
 # script to add an clock, a clock that keeps time.
 
 set WFDIR = $WORKFLOW_DATA
