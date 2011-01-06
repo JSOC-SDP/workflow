@@ -50,7 +50,7 @@ $WFCODE/maketask.csh task=update_hmi.lev1nrt \
 cd $WFDIR
 # use type time and let the status and action tasks convert to DSDS seriesnumbers
 $WFCODE/makegate.csh gate_name=hmi.lev1nrt \
-		 product=hmi.lev1c_nrt \
+		 product=hmi.lev1_nrt \
 		 type=time \
 		 key=T_OBS \
 		 project=HMI \
