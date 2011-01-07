@@ -2,8 +2,8 @@
 
 # set echo
 
-set start_t=`time_convert time=2010.05.02_00_TAI`
-set end_t=`time_convert time=2010.08.06_TAI`
+set start_t=`time_convert time=$1`
+set end_t=`time_convert time=$2`
 set delta = 43200
 
 while ($start_t < $end_t)
