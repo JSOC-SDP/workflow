@@ -60,7 +60,8 @@ while ($WORKDAY_D <= $WANTHIGH_D)
 
   # now make tickets to compute the desired products for this day
   set LOSARGS = "gate=hmi.LOS       taskid=$TASKID wantlow=$LOSLOW wanthigh=$LOSHIGH action=5"
-  set IMGARGS = "gate=hmi.webImages taskid=$TASKID wantlow=$LOSLOW wanthigh=$IMGHIGH action=5"
+# webImages runs with precondition for nrt data
+  # set IMGARGS = "gate=hmi.webImages taskid=$TASKID wantlow=$LOSLOW wanthigh=$IMGHIGH action=5"
   set VECARGS = "gate=hmi.Vector    taskid=$TASKID wantlow=$VECLOW wanthigh=$VECHIGH action=5"
 
   set LOS_TICKET = `$WFCODE/maketicket.csh $LOSARGS `
