@@ -51,7 +51,7 @@ STOP
 
 mkdir $PRECOND/hmi.V_drift_coefs
 cat > $PRECOND/hmi.V_drift_coefs/prepare_ticket <<STOP
-    set ACTION = 4
+    set ACTION = 5
     set TMPLOW_t = \`time_convert time=\$USELOW\`
     @   TMPLOW_t = \$TMPLOW_t - 86400
     set USELOW = \`time_convert zone=TAI s=\$TMPLOW_t\`
@@ -112,7 +112,7 @@ $WFCODE/makegate.csh gate_name=hmi.cosmic_rays product=hmi.cosmic_rays type=time
 
 $WFCODE/makegate.csh gate_name=hmi.V_drift_coefs product=hmi.coefficients type=time key=T_REC project=HMI \
 		 actiontask=wait_hmi.V_drift_coefs statustask=scripts/status-general.csh \
-                 low=2010.09.16_TAI high=NaN
+                 low=2010.09.16_TAI high=NaN coverage_args=NEVER
 
 
 # initialize the gates
