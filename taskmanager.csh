@@ -86,16 +86,20 @@ mkdir ticket_return
 ln $WFDIR/gates/$gate/active_tickets/$ticket ticket
 #  get some gate info, such as time type
 
+# set echo
+
 set TYPE = `cat $WFDIR/gates/$gate/type`
 set PRODUCT = `cat $WFDIR/gates/$gate/product`
 set KEY = `cat $WFDIR/gates/$gate/key`
 set STATUSTASK = `cat $WFDIR/gates/$gate/statustask`
-set STATUSCOMMAND = $WFCODE/$STATUSTASk
+set STATUSCOMMAND = $WFCODE/$STATUSTASK
 if (-e $WFDIR/gates/$gate/coverage_args) then
   set COVERAGEARGS = `cat $WFDIR/gates/$gate/coverage_args`
 else
   set COVERAGEARGS = none
 endif
+
+# unset echo
 
 #  get the ticket specifics
 set WANTLOW=undefined
@@ -322,7 +326,7 @@ echo 2 >state
 	
 # FINALLY - execute the command to make the product
 
-$ACTION_COMMAND
+$ACTIONCOMMAND
 
 set command_status = $?
 if ($command_status) then
