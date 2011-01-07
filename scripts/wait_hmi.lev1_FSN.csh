@@ -50,8 +50,8 @@ while ($n_have < $n_expect)
   sleep 600
   echo -n '.' >>$BABBLE
   @ n_tries = $n_tries + 1
-  if ($n_tries > 144) then
-      echo "Timeout after 1 day $n_have found, expect $n_expect hmi.lev1 records" >>$LOG
+  if ($n_tries > 288) then
+      echo "Timeout after 2 days $n_have found, expect $n_expect hmi.lev1 records" >>$LOG
       exit 1
   endif
 end

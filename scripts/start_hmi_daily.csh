@@ -9,8 +9,8 @@ set WFCODE = $WORKFLOW_ROOT
 
 # Note that start/stop minute are hour 23 minute 54 for LOS and 24 for vector.
 @ LOS_offset = 6 * 60
-@ Vector_offset = 36 * 60
-@ lev1_offset = 180
+@ VEC_offset = 36 * 60
+@ lev1_offset = 150
 
 set WANTLOW = `cat wantlow`
 set WANTHIGH = `cat wanthigh`
@@ -18,10 +18,10 @@ set WANTHIGH = `cat wanthigh`
 set WANTLOW_t = `time_convert time=$WANTLOW`
 set WANTHIGH_t = `time_convert time=$WANTHIGH`
 
-@ WANTLOW_DAY_D = $WANTLOW_t / 86400
+@ WANTLOW_D = $WANTLOW_t / 86400
 # now WANTLOW_D is TAI of day  containing WANTLOW
 
-@ WANTHIGH_DAY_D = $WANTHIGH_t / 86400
+@ WANTHIGH_D = $WANTHIGH_t / 86400
 # now WANTHIGH_D is TAI of day  containing WANTHIGH
 
 
@@ -39,7 +39,7 @@ $WFCODE/maketicket.csh gate=repeat_hmi_daily wantlow=$WANTNEXTLOW wanthigh=$WANT
 # First get taskid of the current instance, it is the name of the current directory
 set TASKID = $cwd:t
 
-set WORKDAY_D = $WANTLOW_DAY_D
+set WORKDAY_D = $WANTLOW_D
 while ($WORKDAY_D <= $WANTHIGH_D)
   @ WORKDAY_T = $WORKDAY_D * 86400
   set WORKDAY = `time_convert zone=TAI s=$WORKDAY_T`
@@ -52,15 +52,15 @@ while ($WORKDAY_D <= $WANTHIGH_D)
   @ VECLOW_T = $WORKDAY_T - $VEC_offset
   @ VECHIGH_T = $VECLOW_T + 86400
   
-  set LOWLOW = `time_convert zone=TAI s=$LOSLOW_T`
-  set LOWHIGH = `time_convert zone=TAI s=$LOSHIGH_T`
+  set LOSLOW = `time_convert zone=TAI s=$LOSLOW_T`
+  set LOSHIGH = `time_convert zone=TAI s=$LOSHIGH_T`
   set IMGHIGH = `time_convert zone=TAI s=$IMGHIGH_T`
   set VECLOW = `time_convert zone=TAI s=$VECLOW_T`
   set VECHIGH = `time_convert zone=TAI s=$VECHIGH_T`
 
   # now make tickets to compute the desired products for this day
-  set LOSARGS = "gate=hmi.LOS       taskid=$TASKID wantlow=$LOSLOW wanthigh=$LOWHIGH action=5"
-  set IMGARGS = "gate=hmi.webImages taskid=$TASKID wantlow=$LOSLOW wanthigh=$IMGWIGH action=5"
+  set LOSARGS = "gate=hmi.LOS       taskid=$TASKID wantlow=$LOSLOW wanthigh=$LOSHIGH action=5"
+  set IMGARGS = "gate=hmi.webImages taskid=$TASKID wantlow=$LOSLOW wanthigh=$IMGHIGH action=5"
   set VECARGS = "gate=hmi.Vector    taskid=$TASKID wantlow=$VECLOW wanthigh=$VECHIGH action=5"
 
   set LOS_TICKET = `$WFCODE/maketicket.csh $LOSARGS `
@@ -68,7 +68,7 @@ while ($WORKDAY_D <= $WANTHIGH_D)
   set IMG_TICKET = `$WFCODE/maketicket.csh $IMGARGS `
 
   cd pending_tickets
-  while ((-e $LOS_TICKET || -e $IMG_TICKET || -e $LOS_TICKET))
+  while ((-e $LOS_TICKET || -e $IMG_TICKET || -e $VEC_TICKET))
      echo -n '.'
      sleep 3600
   end
