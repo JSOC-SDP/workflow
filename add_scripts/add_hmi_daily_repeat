@@ -23,19 +23,16 @@ if (-e gates/$NEWGATE) rm -rf gates/$NEWGATE
 $WFCODE/maketask.csh task=$NEWTASK manager=taskmanager.csh target=$NEWGATE maxrange=86400 \
                 command=scripts/start_hmi_daily.csh
 
-mkdir tasks/$NEWTASK/preconditions/hmi.lev1
-cat >tasks/$NEWTASK/preconditions/hmi.lev1/prepare_ticket <<STOP
+mkdir tasks/$NEWTASK/precondition/hmi.lev1_wait_FSN
+cat >tasks/$NEWTASK/preconditions/hmi.lev1_wait_FSN/prepare_ticket <<STOP
     set ACTION = 3
-    set USEHIGH_t = \`time_convert time=\$USEHIGH\`
-    @ USEHIGH_t = \$USEHIGH_t + 240
-    set USEHIGH = \`time_convert s=\$USEHIGH_t zone=TAI\`
 STOP
 
 mkdir tasks/$NEWTASK/preconditions/hmi.cosmic_rays
 cat >tasks/$NEWTASK/preconditions/hmi.cosmic_rays/prepare_ticket <<STOP
     set ACTION = 3
     set USEHIGH_t = \`time_convert time=\$USEHIGH\`
-    @ USEHIGH_t = \$USEHIGH_t + 135
+    @ USEHIGH_t = \$USEHIGH_t - 15
     set USEHIGH = \`time_convert s=\$USEHIGH_t zone=TAI\`
 STOP
 
