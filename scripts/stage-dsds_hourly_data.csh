@@ -34,7 +34,7 @@ end
 # gate dir.  Follow the tree back to the gate.
 
 set gate = `cat ../../target`
-set product = `cat $WORKFLOW_ROOT/gates/$gate/product`
+set product = `cat $WORKFLOW_DATA/gates/$gate/product`
  
 # FIX times for DSDS time_index
 set LOW = `time_index time=$WANTLOW -t`

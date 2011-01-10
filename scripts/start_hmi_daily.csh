@@ -66,7 +66,8 @@ while ($WORKDAY_D <= $WANTHIGH_D)
 
   set LOS_TICKET = `$WFCODE/maketicket.csh $LOSARGS `
   set VEC_TICKET = `$WFCODE/maketicket.csh $VECARGS `
-  set IMG_TICKET = `$WFCODE/maketicket.csh $IMGARGS `
+  # set IMG_TICKET = `$WFCODE/maketicket.csh $IMGARGS `
+  set IMG_TICKET = NOTYET
 
   cd pending_tickets
   while ((-e $LOS_TICKET || -e $IMG_TICKET || -e $VEC_TICKET))
