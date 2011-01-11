@@ -129,7 +129,8 @@ set QSUBCMD = POS_$mmdd
 cat > $QSUBCMD <<END
 #
 set echo
-$cosmic_ray_post fsn_first=$FIRST_FSN fsn_last=$LAST_FSN >>& $CRLOG/post.log
+$cosmic_ray_post fsn_first=$FIRST_FSN fsn_last=$LAST_FSN camera=1 >>& $CRLOG/post.log
+$cosmic_ray_post fsn_first=$FIRST_FSN fsn_last=$LAST_FSN camera=2 >>& $CRLOG/post.log
 END
 qsub -q j.q -o $LOG -e $LOG -sync yes $QSUBCMD
 
