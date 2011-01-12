@@ -24,14 +24,10 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-# set IQUVprogram = /home/couvidat/cvs/JSOC/bin/linux_x86_64/HMI_IQUV_averaging
-# set IQUVprogram = $WFCODE/bin/HMI_IQUV_averaging
-# set HMIprogram = /home/couvidat/cvs/JSOC/bin/linux_x86_64/HMI_observables
-set HMIprogram = $WFCODE/bin/HMI_observables
-# set HMI_segment = /home/couvidat/cvs/JSOC/bin/linux_x86_64/hmi_segment_module
-set HMI_segment = $WFCODE/bin/hmi_segment_module
-# set HMI_patch = /home/couvidat/cvs/JSOC/bin/linux_x86_64/hmi_patch_module
-set HMI_patch = $WFCODE/bin/hmi_patch_module
+set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_IQUV_averaging
+set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
+set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
+set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_patch_module
 
 # set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1 quicklook=0"
 set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1" 
