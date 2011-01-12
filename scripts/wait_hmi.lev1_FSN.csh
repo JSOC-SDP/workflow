@@ -43,6 +43,7 @@ echo "First_FSN = " $First_FSN >> $LOG
 echo "Last_FSN = " $Last_FSN >> $LOG
 
 # Wait until all FSN in the range are accounted for
+# Note - this test is for FSN not for times.
 @ n_expect = 1 + $Last_FSN - $First_FSN
 set n_have = `show_info -cq hmi.lev1'[]['$First_FSN'-'$Last_FSN']'`
 set n_tries = 0
@@ -51,23 +52,9 @@ while ($n_have < $n_expect)
   echo -n '.' >>$BABBLE
   @ n_tries = $n_tries + 1
   if ($n_tries > 288) then
-      echo "Timeout after 2 days $n_have found, expect $n_expect hmi.lev1 records" >>$LOG
+      echo "Timeout after 5 days $n_have found, expect $n_expect hmi.lev1 records" >>$LOG
       exit 1
   endif
 end
-
-# now wait until lev1 rnge is filled in
-# set N_UNK = `show_coverage -q ds=hmi.lev1 key=FSN low=$First_FSN high=$Last_FSN | grep UNK | wc -l`
-# set n_try = 0
-# while ($N_UNK > 0)
-    # echo -n '.' >>$BABBLE
-    # @ n_try = $n_try + 1
-    # if ($n_try > 288) then
-      # echo "Timeout after 1 day $N_UNK hmi.lev1 records not available" >>$LOG
-      # exit 1
-    # endif
-    # sleep 300
-    # set N_UNK = `show_coverage -q ds=hmi.lev1 key=FSN low=$First_FSN high=$Last_FSN | grep UNK | wc -l`
-# end
 
 exit 0
