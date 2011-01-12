@@ -84,10 +84,9 @@ mkdir subtasks
 mkdir pending_tickets
 mkdir ticket_return
 ln $WFDIR/gates/$gate/active_tickets/$ticket ticket
+
 #  get some gate info, such as time type
-
 # set echo
-
 set TYPE = `cat $WFDIR/gates/$gate/type`
 set PRODUCT = `cat $WFDIR/gates/$gate/product`
 set KEY = `cat $WFDIR/gates/$gate/key`
@@ -105,7 +104,7 @@ endif
 set WANTLOW=undefined
 set WANTHIGH=undefined
 set TASKID=undefined
-foreach key (WANTLOW WANTHIGH TASKID ACTION)
+foreach key (WANTLOW WANTHIGH TASKID ACTION SPECIAL)
 	set setval = `grep $key ticket`
 	if ($#setval) set $setval
 end
@@ -158,7 +157,7 @@ if ($wantrange > $maxrange) then
 			endif
 		        set num_pending = `/bin/ls  pending_tickets | wc -l`
                 end
-		set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$gate wantlow=$thislow wanthigh=$thishigh action=$TICKET_ACTION`
+		set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$gate wantlow=$thislow wanthigh=$thishigh action=$TICKET_ACTION special="$SPECIAL"`
 		echo 1 >state
 		@ thislow_t = $thislow_t + $maxrange
                 if ($verbosemode) echo "TASKMANAGER new ticket $newticket registered, new wantlow = $thislow"
@@ -203,18 +202,39 @@ endif
 # so step 2.5 will be do a show_coverage | grep UNK and make a new action==5 ticket on each UNK section.
 # since only action==4 in this section, does not recurs indefinitely.
 # if there are no gaps in wantrange, just drop through to exit OK.
+# COVERAGEARGS comes from the gate, but MISCARGS can also come from SPECIAL on the ticket.
+# If the ticket contains a SPECIAL=COVERAGEARGS=m=1 for instance it will be parsed in parts
+# first extracting COVERAGEARGS=M=1 and then in the code here, to M=1 which will be added to MISCARGS
+# for use in show_coverage.
 
 if ($TICKET_ACTION == 4) then
-    if ($PRODUCT == none) then
+    if ($PRODUCT == none || $PRODUCT == NONE) then
       goto EXITOK
     endif
-    if ($COVERAGEARGS == none) then
+    if ($COVERAGEARGS == none || $COVERAGEARGS == NONE) then
       set MISCARGS = " "
     else if ($COVERAGEARGS == NEVER) then
       goto ACTION_4_OR_5
     else
       set MISCARGS = "$COVERAGEARGS"
     endif
+    if ($SPECIAL != NONE) then
+      # look for COVERAGEARGS
+      set OLD_COVERAGE_ARGS = $COVERAGEARGS
+      set SPECIAL_ARGS = `echo $SPECIAL | sed -e 's/,/ /g'`
+      # now special_args contains a=b c=d
+      set NSPECARGS = $#SPECIAL_ARGS
+      while ($NSPECARGS)
+        if ($SPECIAL_ARGS[$NSPECARGS] =~ "COVERAGEARGS=*") then
+          set $SPECIAL_ARGS[$NSPECARGS]
+          set MISCARGS = ($COVERAGEARGS $MISCARGS)
+          break
+        endif
+        @ NSPECARGS = $NSPECARGS - 1
+      end 
+      set COVERAGEARGS = $OLD_COVERAGE_ARGS 
+    endif
+echo XXXX now MISCARGS = $MISCARGS
     ($STATUSCOMMAND $gate low=$WANTLOW high=$WANTHIGH $MISCARGS ; echo $status > stat_status) | grep UNK > gaplist
     set stat_status = `cat stat_status`
     if ($stat_status) then
@@ -249,7 +269,7 @@ if ($TICKET_ACTION == 4) then
 		endif
 		set num_pending = `/bin/ls  pending_tickets | wc -l`
 	end
-	set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$gate wantlow=$gapfirst wanthigh=$gaplast action=5`
+	set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$gate wantlow=$gapfirst wanthigh=$gaplast action=5 special="$SPECIAL"`
 	echo 1 >state
 	if ($verbosemode) echo "TASKMANAGER new ticket $newticket registered, new wantlow = $gapfirst"
 	@ igap = $igap + 1
@@ -286,7 +306,7 @@ foreach pregate (` /bin/ls $WFDIR/tasks/$task/preconditions/ `)
 		source prepare_ticket
 		cd $herewd
         endif
-	set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$pregate wantlow=$USELOW wanthigh=$USEHIGH action=$ACTION special=$SPECIAL`
+	set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$pregate wantlow=$USELOW wanthigh=$USEHIGH action=$ACTION special="$SPECIAL"`
 end
 echo 3 >state
 
