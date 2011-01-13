@@ -50,8 +50,8 @@ cat > $PRECOND/hmi.cosmic_rays/prepare_ticket <<STOP
     set USEHIGH = \`time_convert zone=TAI s=\$TMPHIGH_t\`
 STOP
 
-mkdir $PRECOND/hmi.drift_coefs
-cat > $PRECOND/hmi.drift_coefs/prepare_ticket <<STOP
+mkdir $PRECOND/hmi.V_drift_coefs
+cat > $PRECOND/hmi.V_drift_coefs/prepare_ticket <<STOP
     set ACTION = 5
     set TMPLOW_t = \`time_convert time=\$USELOW\`
     @   TMPLOW_t = \$TMPLOW_t - 86400
