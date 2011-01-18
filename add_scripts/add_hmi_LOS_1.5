@@ -40,7 +40,7 @@ set PRECOND = $WFDIR/tasks/update_hmi.LOS/preconditions
 
 mkdir $PRECOND/hmi.cosmic_rays
 cat > $PRECOND/hmi.cosmic_rays/prepare_ticket <<STOP
-    set ACTION = 3
+    set ACTION = 5
     set TMPLOW_t = \`time_convert time=\$USELOW\`
     @   TMPLOW_t = \$TMPLOW_t - 180
     set USELOW = \`time_convert zone=TAI s=\$TMPLOW_t\`
