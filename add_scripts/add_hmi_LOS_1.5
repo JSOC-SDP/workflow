@@ -53,8 +53,7 @@ mkdir $PRECOND/hmi.V_drift_coefs
 cat > $PRECOND/hmi.V_drift_coefs/prepare_ticket <<STOP
     # skip precondition for times before nrt data exists
     set PREPARE_TMP1 = \`time_convert time=$WANTLOW\`
-    set PREPARE_TMP2 = \`cat \$GATEDIR/low\`
-    set PREPARE_TMP3 = \`time_convert time=\$PREPARE_TMP2\`
+    set PREPARE_TMP3 = \`time_convert time=2010.06.12_12\`
     if (\$PREPARE_TMP1 < \$PREPARE_TMP3) then
       set ACTION=1
     else
