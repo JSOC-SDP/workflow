@@ -56,7 +56,7 @@ cat > $PRECOND/hmi.V_drift_coefs/prepare_ticket <<STOP
     set PREPARE_TMP2 = \`cat \$GATEDIR/low\`
     set PREPARE_TMP3 = \`time_convert time=\$PREPARE_TMP2\`
     if (\$PREPARE_TMP1 < \$PREPARE_TMP3) then
-      set ACTION=2
+      set ACTION=1
     else
       set ACTION = 5
       set TMPLOW_t = \`time_convert time=\$USELOW\`
@@ -100,7 +100,7 @@ cat >$PRECOND/hmi.LOSnrt/prepare_ticket <<STOP
     set PREPARE_TMP2 = \`cat \$GATEDIR/low\`
     set PREPARE_TMP3 = \`time_convert time=\$PREPARE_TMP2\`
     if (\$PREPARE_TMP1 < \$PREPARE_TMP3) then
-      set ACTION=2
+      set ACTION=1
     else
       set ACTION=3
     endif
