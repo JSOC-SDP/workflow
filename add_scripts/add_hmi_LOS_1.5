@@ -51,13 +51,21 @@ STOP
 
 mkdir $PRECOND/hmi.V_drift_coefs
 cat > $PRECOND/hmi.V_drift_coefs/prepare_ticket <<STOP
-    set ACTION = 5
-    set TMPLOW_t = \`time_convert time=\$USELOW\`
-    @   TMPLOW_t = \$TMPLOW_t - 86400
-    set USELOW = \`time_convert zone=TAI s=\$TMPLOW_t\`
-    set TMPHIGH_t = \`time_convert time=\$USEHIGH\`
-    @   TMPHIGH_t = \$TMPHIGH_t + 181
-    set USEHIGH = \`time_convert zone=TAI s=\$TMPHIGH_t\`
+    # skip precondition for times before nrt data exists
+    set PREPARE_TMP1 = \`time_convert time=$WANTLOW\`
+    set PREPARE_TMP2 = \`cat \$GATEDIR/low\`
+    set PREPARE_TMP3 = \`time_convert time=\$PREPARE_TMP2\`
+    if (\$PREPARE_TMP1 < \$PREPARE_TMP3) then
+      set ACTION=2
+    else
+      set ACTION = 5
+      set TMPLOW_t = \`time_convert time=\$USELOW\`
+      @   TMPLOW_t = \$TMPLOW_t - 86400
+      set USELOW = \`time_convert zone=TAI s=\$TMPLOW_t\`
+      set TMPHIGH_t = \`time_convert time=\$USEHIGH\`
+      @   TMPHIGH_t = \$TMPHIGH_t + 181
+      set USEHIGH = \`time_convert zone=TAI s=\$TMPHIGH_t\`
+    endif
 STOP
 
 mkdir $PRECOND/hmi.temps
@@ -87,7 +95,15 @@ $WFCODE/maketask.csh task=wait_hmi.V_drift_coefs manager=taskmanager.csh target=
 set PRECOND = $WFDIR/tasks/wait_hmi.V_drift_coefs/preconditions
 mkdir $PRECOND/hmi.LOSnrt
 cat >$PRECOND/hmi.LOSnrt/prepare_ticket <<STOP
-set ACTION=3
+    # skip precondition for times before nrt data exists
+    set PREPARE_TMP1 = \`time_convert time=$WANTLOW\`
+    set PREPARE_TMP2 = \`cat \$GATEDIR/low\`
+    set PREPARE_TMP3 = \`time_convert time=\$PREPARE_TMP2\`
+    if (\$PREPARE_TMP1 < \$PREPARE_TMP3) then
+      set ACTION=2
+    else
+      set ACTION=3
+    endif
 STOP
 
 # Now make any user gates.
