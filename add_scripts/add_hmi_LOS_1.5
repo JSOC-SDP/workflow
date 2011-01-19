@@ -80,7 +80,7 @@ $WFCODE/maketask.csh task=wait_hmi.temps manager=taskmanager.csh target=hmi.temp
 		command=scripts/nop_task.csh maxrange=86400 parallelOK=1
 
 $WFCODE/maketask.csh task=wait_hmi.cosmic_rays manager=taskmanager.csh target=hmi.cosmic_rays \
-		command=scripts/nop_task.csh maxrange=3600 parallelOK=1
+		command=scripts/update_hmi_cosmic_rays.csh maxrange=3600 parallelOK=1
 
 $WFCODE/maketask.csh task=wait_hmi.V_drift_coefs manager=taskmanager.csh target=hmi.V_drift_coefs \
 		command=scripts/update_hmi.V_drift.csh maxrange=864000 parallelOK=1
