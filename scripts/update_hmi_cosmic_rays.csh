@@ -101,8 +101,8 @@ set mmdd = `echo $yyyymmdd | sed -e "s/.....//" -e "s/://" `
 
 mkdir CRlogs
 set CRLOG = $HERE/CRlogs
-set module_flatfield = /home/production/cvs/JSOC/bin/linux_x86_64/module_flatfield
-set cosmic_ray_post = /home/production/cvs/JSOC/bin/linux_x86_64/cosmic_ray_post
+set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/module_flatfield
+set cosmic_ray_post = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/cosmic_ray_post
 
 set QSUBCMD = CRY_$mmdd
 set QSTAT = CRY_status
