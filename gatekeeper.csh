@@ -103,14 +103,14 @@ echo starting $gate
                 $WFCODE/$statustask $gate & 
 		continue  # stop with this gate until update is done
 	endif
-if ($low == -1) then
-echo "GATEKEEPER DEBUG $gate low is -1, reset"
-ls active_tickets
-echo NaN >low
-touch statusbusy
-$WFCODE/$statustask $gate & 
-continue
-endif
+# if ($low == -1) then
+# echo "GATEKEEPER DEBUG $gate low is -1, reset"
+# ls active_tickets
+# echo NaN >low
+# touch statusbusy
+# $WFCODE/$statustask $gate & 
+# continue
+# endif
         if ($type == "time") then
 		set low_t = `time_convert time=$low`
 # echo set low_t = `time_convert time=$low`
@@ -278,12 +278,13 @@ q
                 echo "STATUS=5" >> $donetask/ticket
 		mv $donetask ../archive/failed
 if ($debugmode) then
-echo -n $WFDIR/tasks/$actiontask/archive/failed/$donetask " at " >> $WFDIR/FAILED_TASKS
+echo -n "$actiontask FAILED for " >>$WFDIR/FAILED_TASKS
+echo -n `grep WANTLOW $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket` >> $WFDIR/FAILED_TASKS
+echo -n "  " >> $WFDIR/FAILED_TASKS
+echo -n   `grep WANTHIGH $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket` >> $WFDIR/FAILED_TASKS
+echo -n "  at " >> $WFDIR/FAILED_TASKS
 date >> $WFDIR/FAILED_TASKS
-echo -n "     "
-echo -n `grep WANTLOW $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket`
-echo -n "  "
-echo    `grep WANTHIGH $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket`
+echo "     See:" $WFDIR/tasks/$actiontask/archive/failed/$donetask >> $WFDIR/FAILED_TASKS
 endif
 	    endif
 if ($verbosemode) echo "GATEKEEPER done queue, move $GATE/active_tickets/$TICKET to /$parenttask/active/$TASKID/ticket_return"
@@ -369,14 +370,14 @@ endif
 				# exit 1
                         # endif
 			if ($type == "time") then
-echo XXXXX
-cat active_tickets/$ticket
- echo XXXXX low=$low,
- echo XXXXX set low_t = `time_convert time=$low`
+# echo XXXXX
+# cat active_tickets/$ticket
+# echo XXXXX low=$low,
+# echo XXXXX set low_t = `time_convert time=$low`
 				set low_t = `time_convert time=$low`
 
- echo xxxxx high=$high,
- echo xxxxx set high_t = `time_convert time=$high`
+# echo xxxxx high=$high,
+# echo xxxxx set high_t = `time_convert time=$high`
 				set high_t = `time_convert time=$high`
 			else
 				set low_t = $low

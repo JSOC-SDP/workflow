@@ -40,7 +40,7 @@ set PRECOND = $WFDIR/tasks/update_hmi.LOS/preconditions
 
 mkdir $PRECOND/hmi.cosmic_rays
 cat > $PRECOND/hmi.cosmic_rays/prepare_ticket <<STOP
-    set ACTION = 5
+    set ACTION = 4
     set TMPLOW_t = \`time_convert time=\$USELOW\`
     @   TMPLOW_t = \$TMPLOW_t - 180
     set USELOW = \`time_convert zone=TAI s=\$TMPLOW_t\`
@@ -117,13 +117,13 @@ $WFCODE/makegate.csh gate_name=hmi.LOS product=hmi.M_45s type=time key=T_REC pro
 # Prerequisite gates
 
 $WFCODE/makegate.csh gate_name=hmi.lev1_wait_FSN product=hmi.lev1 type=time key=T_OBS project=HMI \
-		 actiontask=wait_hmi.lev1_FSN statustask=scripts/status_hmi_camera2.csh
+		 actiontask=wait_hmi.lev1_FSN statustask=scripts/status_hmi_camera2.csh coverage_args=NEVER
 
 $WFCODE/makegate.csh gate_name=hmi.temps product=hmi.temperature_summary_300s type=time key=T_START project=HMI \
 		 actiontask=wait_hmi.temps statustask=scripts/status-general.csh
 
 $WFCODE/makegate.csh gate_name=hmi.cosmic_rays product=hmi.cosmic_rays type=time key=T_OBS project=HMI \
-		 actiontask=wait_hmi.cosmic_rays statustask=scripts/status-general.csh
+		 coverage_args=NEVER actiontask=wait_hmi.cosmic_rays statustask=scripts/status-general.csh
 
 $WFCODE/makegate.csh gate_name=hmi.V_drift_coefs product=hmi.coefficients type=time key=T_REC project=HMI \
 		 actiontask=wait_hmi.V_drift_coefs statustask=scripts/status-general.csh \

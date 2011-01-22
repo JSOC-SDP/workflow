@@ -66,8 +66,9 @@ if ($LFSN <= $FFSN) then
   goto FAILUREEXIT
 endif
 
+show_info hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? (QUALITY & '$QUALMASK') = 0 ?][? CAMERA = '$CAMERA' ?][? T_OBS > 0 ?]' -q key=FSN > FSN_lev1
+
 if ($action == 4) then
-  show_info hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? (QUALITY & '$QUALMASK') = 0 ?][? CAMERA = '$CAMERA' ?][? T_OBS > 0 ?]' -q key=FSN > FSN_lev1
   show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? CAMERA = '$CAMERA' ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
   comm -23 FSN_lev1 FSN_cosmic > NOCR
   set N_NOCR = `wc -l <NOCR`
@@ -132,12 +133,12 @@ else
 endif
 
 $module_flatfield -L input_series=hmi.lev1 cadence=\$cadence cosmic_rays=1 flatfield=0 fid=\$fid camera=\$camera fsn_first=$FIRST_FSN fsn_last=$LAST_FSN datum=$yyyymmdd >>& $CRLOG/\$ID.log
-if ($status) echo -n "E" >> $QSTAT
+if (\$status) echo  "\$ID error" >> $QSTAT
 END
 
 qsub -q j.q -o $LOG -e $LOG -t 1-48 -sync yes $QSUBCMD
 
-set QSTAT_errcnt = `wc -c < $QSTAT`
+set QSTAT_errcnt = `wc -l < $QSTAT`
 if ($QSTAT_errcnt) then
   echo $QSTAT_errcnt " status errors in module_flatfield" >>$LOG
   echo $QSTAT_errcnt " status errors in module_flatfield" >>$FAIL_reason
@@ -152,14 +153,14 @@ cat > $QSUBCMD <<END
 #
 set echo
 setenv OMP_NUM_THREADS 1
-$cosmic_ray_post -L fsn_first=$FIRST_FSN fsn_last=$LAST_FSN camera=1 >>& $CRLOG/post.log
-if ($status) echo -n "E" >> $QSTAT
-$cosmic_ray_post -L fsn_first=$FIRST_FSN fsn_last=$LAST_FSN camera=2 >>& $CRLOG/post.log
-if ($status) echo -n "E" >> $QSTAT
+$cosmic_ray_post -L input_series=su_production.cosmic_rays fsn_first=$FIRST_FSN fsn_last=$LAST_FSN camera=1 >>& $CRLOG/post.log
+if (\$status) echo  "Cam1 error" >> $QSTAT
+$cosmic_ray_post -L input_series=su_production.cosmic_rays fsn_first=$FIRST_FSN fsn_last=$LAST_FSN camera=2 >>& $CRLOG/post.log
+if (\$status) echo  "Cam2 error" >> $QSTAT
 END
 qsub -q j.q -o $LOG -e $LOG -sync yes $QSUBCMD
 
-set QSTAT_errcnt = `wc -c < $QSTAT`
+set QSTAT_errcnt = `wc -l < $QSTAT`
 if ($QSTAT_errcnt) then
   echo $QSTAT_errcnt " status errors in cosmic_ray_post" >>$LOG
   echo $QSTAT_errcnt " status errors in cosmic_ray_post" >>$FAIL_reason
