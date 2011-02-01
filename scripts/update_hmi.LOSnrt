@@ -1,4 +1,4 @@
-#
+#! /bin/csh -f
 # Script to make HMI lev1.5 observables from HMI lev1 data
 #
 # this is run in the task instance directory where there is a 'ticket' file that specifies
@@ -63,13 +63,16 @@ set babble = $HERE/babble
 set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
+echo "BEFORE qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "setenv OMP_NUM_THREADS 8" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
+echo 'echo before cmd OMP_NUM_THREADS = $OMP_NUM_THREADS'" >>$TEMPLOG" >>$TEMPCMD
 echo "$HMIprogram lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
+echo 'echo after cmd OMP_NUM_THREADS = $OMP_NUM_THREADS'" >>$TEMPLOG" >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 # echo 'if ($retstatus == 0) then' >>$TEMPCMD
 # echo "  echo XXXX Start image processing" >>$TEMPCMD
@@ -79,15 +82,16 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 
 # execute qsub script
 touch $HERE/qsub_running
-qsub -e $TEMPLOG -o $TEMPLOG -q j8.q $TEMPCMD
-endif
+qsub -e $TEMPLOG -o $TEMPLOG -sync yes -q p8.q,j8.q $TEMPCMD
+
+echo "AFTER qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
 
 set waitcount=0
 while (-e $HERE/qsub_running)
-    sleep 10
+    sleep 60
     @ waitcount = $waitcount + 1
-    if ($waitcount > 720) then
-      echo "timed out after 2 hours" >$HERE/FailMessage
+    if ($waitcount > 600 ) then
+      echo "timed out after 10 hours" >$HERE/FailMessage
       set retstatus = 5
       exit $retstatus
     endif

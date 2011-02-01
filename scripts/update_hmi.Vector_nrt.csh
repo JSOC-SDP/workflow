@@ -1,9 +1,9 @@
-#
+#! /bin/csh -f
 # Script to make HMI lev1.5 720s nrt observables from HMI lev1_nrt data
 #
 
 # XXXXXXXXXX test
-# set echo
+ set echo
 # XXXXXXXXXX test
 
 set HERE = $cwd 
@@ -99,7 +99,7 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 
 # execute qsub script
 touch $HERE/qsub_running
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j8.q $TEMPCMD >> runlog
+qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q p8.q,j8.q $TEMPCMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus

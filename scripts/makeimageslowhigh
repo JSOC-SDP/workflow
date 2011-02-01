@@ -1,4 +1,4 @@
-# /bin/csh -f
+#! /bin/csh -f
 # create limb darkening removed Ic record and create image set for Ic_noLD and M for range of time
 # specified by first two arguments.
 

@@ -1,4 +1,4 @@
-#
+#! /bin/csh -f
 # Script to make HMI V drift coefficient tables from hmi.V_45s_nrt data
 #
 # set echo

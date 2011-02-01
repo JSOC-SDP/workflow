@@ -1,4 +1,4 @@
-#
+#! /bin/csh -f
 # Script to make HMI lev1.5 observables from HMI lev1 data
 #
 # this is run in the task instance directory where there is a 'ticket' file that specifies

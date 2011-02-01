@@ -1,4 +1,4 @@
-#
+#! /bin/csh -f
 # Script to make HMI lev1.5 720s observables from HMI lev1 data
 #
 

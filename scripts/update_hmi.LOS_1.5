@@ -1,4 +1,4 @@
-#
+#! /bin/csh -f
 # Script to make HMI lev1.5 observables from HMI lev1 data
 #
 
@@ -70,6 +70,7 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 # execute qsub script
 touch $HERE/qsub_running
 qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j8.q $TEMPCMD >> runlog
+# qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q p8.q $TEMPCMD >> runlog
 
 # set waitcount=0
 # while (-e $HERE/qsub_running)

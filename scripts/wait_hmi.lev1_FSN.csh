@@ -1,4 +1,4 @@
-#
+#! /bin/csh -f
 # Script to wait for HMI lev1 data to be filled in
 #
 # this is run in the task instance directory where there is a 'ticket' file that specifies

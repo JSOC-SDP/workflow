@@ -12,6 +12,10 @@ set HERE = $cwd
 set LOG = $HERE/runlog
 set BABBLE = $HERE/babble
 
+# post processing flag.  Set to 1 for cosmic_rays to be made in su_production.cosmic_rays
+# with cosmic_ray_post program used to merge and move to hmi.cosmic_rays
+# set to 1 to enable, otherwise only hmi.cosmic_rays will be used.
+set DO_POST = 0
 
 date > $LOG
 
@@ -26,36 +30,33 @@ endif
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
+hostname >> $LOG
+date >> $LOG
 echo "wanthigh = " $wanthigh >> $LOG
 echo "wantlow = " $wantlow >> $LOG
-set action = `grep ACTION ticket`
+set ACTION = `grep ACTION ticket`
+set $ACTION
 
-set special = `grep SPECIAL ticket`
-if ($#special > 0) then
-echo variable special is $special >> $LOG
-  set $special
-echo variable SPECIAL is $SPECIAL >> $LOG
-  if ($SPECIAL == NONE) then
-    set CAMERA = 2
+# process SPECIAL ticket args
+set FIXMISSING = 0
+set SPECIAL = (`grep SPECIAL ticket`)
+set $SPECIAL
+set special = (`echo $SPECIAL | sed -e 's/,/ /g'`)
+# now special contains a=b c=d
+set NSPECARGS = $#special
+set SPECARG = 1
+while ($SPECARG <= $NSPECARGS)
+  echo Extracting SPECIAL component $SPECARG which is $special[$SPECARG]
+  if ($special[$SPECARG] == NONE) then
   else
-    set $SPECIAL
-echo now variable SPECIAL is $SPECIAL >> $LOG
+    set $special[$SPECARG]
   endif
-else
-  set CAMERA = 2
-endif
-
-# new way
-# set CAMERA=2
-# set special = `grep SPECIAL ticket`
-# if ($#special > 0) then
-# echo variable special is $special >> $LOG
-  # set $special
-# endif
+  @ SPECARG = $SPECARG + 1
+end
 
 # set QUALMASK = 0x2F000
-
 set QUALMASK = 192512
+
 set FFSN = `show_info hmi.lev1'['$wantlow'-'$wanthigh'][? (QUALITY & '$QUALMASK') = 0 ?]' n=1 -q key=FSN`
 set LFSN = `show_info hmi.lev1'['$wantlow'-'$wanthigh'][? (QUALITY & '$QUALMASK') = 0 ?]' n=-1 -q key=FSN`
 
@@ -66,10 +67,33 @@ if ($LFSN <= $FFSN) then
   goto FAILUREEXIT
 endif
 
-show_info hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? (QUALITY & '$QUALMASK') = 0 ?][? CAMERA = '$CAMERA' ?][? T_OBS > 0 ?]' -q key=FSN > FSN_lev1
+# get expected list of cosmic_ray records
+show_info hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? (QUALITY & '$QUALMASK') = 0 ?][? T_OBS > 0 ?]' -q key=FSN > FSN_lev1
 
-if ($action == 4) then
-  show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? CAMERA = '$CAMERA' ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
+set N_NOCR = 100000000
+# unless a SPECIAL arg of FIXMISSING=1 is present, just wait here until all records are present.  I.e. convert to a proper action=3
+if ($ACTION == 4 && $FIXMISSING == 0) then
+  while ($N_NOCR > 0)
+    set loopcount = 0
+    show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
+    comm -23 FSN_lev1 FSN_cosmic > NOCR
+    set N_NOCR = `wc -l <NOCR`
+    echo "Lev1 records without cosmic ray records count = " $N_NOCR >>$LOG
+    if ($N_NOCR < 1) exit 0
+    if ($loopcount > 576) then
+      echo "FAIL - give up waiting after 4 days." >>$LOG
+      echo "FAIL - give up waiting after 4 days." >>FAIL_reason
+      cat N_NOCR >>FAIL_reason
+      echo " " >>FAIL_reason
+      set retstat = 9
+      goto FAILUREEXIT
+    endif
+    sleep 600
+  end
+endif
+
+if ($ACTION == 4) then
+  show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
   comm -23 FSN_lev1 FSN_cosmic > NOCR
   set N_NOCR = `wc -l <NOCR`
   echo "Lev1 records without cosmic ray records count = " $N_NOCR >>$LOG
@@ -78,14 +102,32 @@ if ($action == 4) then
 
   set FIRST_FSN = `head -1 NOCR`
   set LAST_FSN = `tail -1 NOCR`
-else # action == 5
+else # ACTION == 5
   set FIRST_FSN = $FFSN
   set LAST_FSN = $LFSN
 endif
 
 # increase range to allow preceeding and following filtergrams
 @ FIRST_FSN = $FIRST_FSN - 96
+#  set CHK_FSN1 = `show_info hmi.lev1'[? FSN = '$FIRST_FSN' ?]' n=-1 -q key=T_OBS`
+  set CHK_FSN1 = `show_info hmi.lev1'[][$FIRST_FSN]' n=1 -q key=T_OBS_index`
+    while ( $CHK_FSN1 < 0 ) 
+#      @ FIRST_FSN =  $FIRST_FSN - 1
+#      set CHK_FSN1 = `show_info hmi.lev1'[? FSN = '$FIRST_FSN' ?]' n=-1 -q key=T_OBS`
+      @ FIRST_FSN =  $FIRST_FSN + 1
+      set CHK_FSN1 = `show_info hmi.lev1'[][$FIRST_FSN]' n=1 -q key=T_OBS_index` 
+    end
+
 @ LAST_FSN = $LAST_FSN + 96
+#  set CHK_FSN2 = `show_info hmi.lev1'[? FSN = '$LAST_FSN' ?]' n=-1 -q key=T_OBS`
+  set CHK_FSN2 = `show_info hmi.lev1'[][$LAST_FSN]' n=1 -q key=T_OBS_index`
+    while ( $CHK_FSN2 < 0 ) 
+#      @ LAST_FSN =  $LAST_FSN + 1
+#      set CHK_FSN2 = `show_info hmi.lev1'[? FSN = '$LAST_FSN' ?]' n=-1 -q key=T_OBS`
+      @ LAST_FSN =  $LAST_FSN - 1
+      set CHK_FSN2 = `show_info hmi.lev1'[][$LAST_FSN]' n=1 -q key=T_OBS_index`
+    end
+
 
 # get day of first FSN
 
@@ -102,16 +144,21 @@ set mmdd = `echo $yyyymmdd | sed -e "s/.....//" -e "s/://" `
 
 mkdir CRlogs
 set CRLOG = $HERE/CRlogs
-set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/module_flatfield
+# set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/module_flatfield
+set module_flatfield = /home/production/cvs/JSOC/bin/linux_x86_64/module_flatfield
 set cosmic_ray_post = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/cosmic_ray_post
 
 set QSUBCMD = CRY_$mmdd
-set QSTAT = CRY_status
+set QSTAT = $HERE/CRY_status
 touch $QSTAT
-cat > $QSUBCMD <<END
+cat > $QSUBCMD <<ENDCAT
 #
+#\$ -cwd
 set echo
-setenv OMP_NUM_THREADS 1
+setenv OMP_NUM_THREADS 8
+ENDCAT
+
+# Do these serially in a single node
 # 135, camera=1
 set FIDLIST_1 = (10054 10055 10056 10057 10058 10059 10074 10075 10076 10077 10078 10079 \
                  10094 10095 10096 10097 10098 10099 10114 10115 10116 10117 10118 10119 \
@@ -119,37 +166,61 @@ set FIDLIST_1 = (10054 10055 10056 10057 10058 10059 10074 10075 10076 10077 100
 # 45s, camera=2
 set FIDLIST_2 = (10058 10059 10078 10079 10098 10099 10118 10119 10138 10139 10158 10159)
 
-set ID = \$SGE_TASK_ID
-if (\$ID <= 36) then
-   set ID1 = \$ID
-   set cadence = "135s"
-   set camera = 1
-   set fid = \$FIDLIST_1[\$ID1]
-else
-   @ ID2 = \$ID - 36
-   set cadence = "45s"
-   set camera = 2
-   set fid = \$FIDLIST_2[\$ID2]
+# set ID = \$SGE_TASK_ID
+set ID = 1
+while ($ID <= 48)
+  if ($ID <= 36) then
+     set ID1 = $ID
+     set cadence = "135s"
+     set camera = 1
+     set fid = $FIDLIST_1[$ID1]
+  else
+     @ ID2 = $ID - 36
+     set cadence = "45s"
+     set camera = 2
+     set fid = $FIDLIST_2[$ID2]
+  endif
+
+  if ($DO_POST) then
+    cat >>$QSUBCMD <<ENDCAT
+$module_flatfield -L input_series=hmi.lev1 cadence=$cadence cosmic_rays=1 flatfield=0 fid=$fid camera=$camera fsn_first=$FIRST_FSN fsn_last=$LAST_FSN datum=$yyyymmdd >>& $CRLOG/$ID.log
+if (\$status) echo  "$ID error" >> $QSTAT
+ENDCAT
+  else
+    cat >>$QSUBCMD <<ENDCAT
+$module_flatfield -L input_series=hmi.lev1 cosmic_ray_series=hmi.cosmic_rays cadence=$cadence cosmic_rays=1 flatfield=0 fid=$fid camera=$camera fsn_first=$FIRST_FSN fsn_last=$LAST_FSN datum=$yyyymmdd >>& $CRLOG/$ID.log
+if (\$status) echo  "$ID error" >> $QSTAT
+ENDCAT
+  endif
+
+  @ ID = $ID + 1
+end
+
+# qsub -q j.q -o $LOG -e $LOG -t 1-48 -sync yes $QSUBCMD
+qsub -q j8.q -o $LOG -e $LOG -sync yes $QSUBCMD
+# qsub -q p8.q -o $LOG -e $LOG -sync yes $QSUBCMD
+set QSUBSTATUS = $status
+if ($QSUBSTATUS) then
+  echo qsub failed with exit status $QSUBSTATUS >>$LOG
+  set retstatus = 11
+  echo qsub failure >>$FAIL_REASON
+  goto FAILUREEXIT
 endif
-
-$module_flatfield -L input_series=hmi.lev1 cadence=\$cadence cosmic_rays=1 flatfield=0 fid=\$fid camera=\$camera fsn_first=$FIRST_FSN fsn_last=$LAST_FSN datum=$yyyymmdd >>& $CRLOG/\$ID.log
-if (\$status) echo  "\$ID error" >> $QSTAT
-END
-
-qsub -q j.q -o $LOG -e $LOG -t 1-48 -sync yes $QSUBCMD
 
 set QSTAT_errcnt = `wc -l < $QSTAT`
 if ($QSTAT_errcnt) then
   echo $QSTAT_errcnt " status errors in module_flatfield" >>$LOG
   echo $QSTAT_errcnt " status errors in module_flatfield" >>$FAIL_reason
   set retstatus = 7
+  goto FAILUREEXIT
 endif
 
+if ($DO_POST) then
 # Now do the post processing
-set QSUBCMD = POS_$mmdd
-set QSTAT = POS_status
-touch $QSTAT
-cat > $QSUBCMD <<END
+  set QSUBCMD = POS_$mmdd
+  set QSTAT = $HERE/POS_status
+  touch $QSTAT
+  cat > $QSUBCMD <<ENDCAT
 #
 set echo
 setenv OMP_NUM_THREADS 1
@@ -157,30 +228,34 @@ $cosmic_ray_post -L input_series=su_production.cosmic_rays fsn_first=$FIRST_FSN 
 if (\$status) echo  "Cam1 error" >> $QSTAT
 $cosmic_ray_post -L input_series=su_production.cosmic_rays fsn_first=$FIRST_FSN fsn_last=$LAST_FSN camera=2 >>& $CRLOG/post.log
 if (\$status) echo  "Cam2 error" >> $QSTAT
-END
-qsub -q j.q -o $LOG -e $LOG -sync yes $QSUBCMD
+ENDCAT
 
-set QSTAT_errcnt = `wc -l < $QSTAT`
-if ($QSTAT_errcnt) then
-  echo $QSTAT_errcnt " status errors in cosmic_ray_post" >>$LOG
-  echo $QSTAT_errcnt " status errors in cosmic_ray_post" >>$FAIL_reason
-  set retstatus = 7
-endif
+  qsub -q j.q -o $LOG -e $LOG -sync yes $QSUBCMD
+
+  set QSTAT_errcnt = `wc -l < $QSTAT`
+  if ($QSTAT_errcnt) then
+    echo $QSTAT_errcnt " status errors in cosmic_ray_post" >>$LOG
+    echo $QSTAT_errcnt " status errors in cosmic_ray_post" >>$FAIL_reason
+    set retstatus = 7
+    goto FAILUREEXIT
+  endif
+
+endif # DO_POST
 
 # verify make of cosmic ray records
 
-show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? CAMERA = '$CAMERA' ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
+show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
 comm -23 FSN_lev1 FSN_cosmic > NOCR
 set N_NOCR = `wc -l <NOCR`
 echo "Lev1 records now without cosmic ray records count = " $N_NOCR >>$LOG
 
 if ($N_NOCR > 10) then
-  echo "$N_NOCR lev1 records are missing matching cosmic_ray records. " >>FAIL_reason
+  echo "$N_NOCR lev1 records are still missing matching cosmic_ray records. " >>FAIL_reason
   echo "The missing cosmic_ray records are FSNs: ">>FAIL_reason
   cat NOCR >>FAIL_reason
   echo " " >>FAIL_reason
   set retstatus = 3
-  # goto FAILUREEXIT
+  goto FAILUREEXIT
 endif
 
 exit 0
