@@ -2,7 +2,7 @@
 # create limb darkening removed Ic record and create image set for Ic_noLD and M for range of time
 # specified by first two arguments.
 
- set echo
+# set echo
 
 set wantlow = $1
 set wanthigh = $2
@@ -77,8 +77,8 @@ while ($day <= $dayhigh)
   while ($img <= $#obslist)
     set obs = $obslist[$img]
     if ($obs == Ic_flat) then
-      set n_source = `show_info -cq $inseries$QRY`  # use inseries from Ic pass through this loop
-      set n_dest = `show_info -cq 'hmi.Ic_noLimbDark_45s'$QRY`
+      set n_source = `show_info -cq $inseries"$QRY"`  # use inseries from Ic pass through this loop
+      set n_dest = `show_info -cq 'hmi.Ic_noLimbDark_45s'"$QRY"`
       if ($n_source > 0 && $n_dest < $n_source) then
         $HMI_LIMBDARK in=$inseries$QRY out=hmi.Ic_noLimbDark_45s -n
       endif
@@ -86,8 +86,8 @@ while ($day <= $dayhigh)
     else
       set in_final = hmi.$obs'_45s'
       set in_nrt = hmi.$obs'_45s_nrt'
-      set n_final = `show_info -cq $in_final$QRY`
-      set n_nrt = `show_info -cq $in_nrt$QRY`
+      set n_final = `show_info -cq $in_final"$QRY"`
+      set n_nrt = `show_info -cq $in_nrt"$QRY"`
       set inseries = $in_nrt
       if ($n_final >= $n_nrt) then
       #  if ($n_final > 0) then
@@ -97,11 +97,11 @@ while ($day <= $dayhigh)
         set inseries = $in_nrt
         set msg = "Quick-Look "
       endif
-    echo Use $inseries for $QRY
+    echo Use $inseries for "$QRY"
     endif
 
 set echo
-    $RENDER_IMAGE $flaglist[$img] in=$inseries$QRY \
+    $RENDER_IMAGE $flaglist[$img] in=$inseries"$QRY" \
       pallette=$colorlist[$img] \
       min=$minlist[$img] \
       max=$maxlist[$img] \
