@@ -44,10 +44,6 @@ set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
 set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
-# make qsub name from index from wantlow
-# set indexbase = `index_convert ds=$product $key=2010.03.24_TAI`
-# @ qsubname = $indexhigh - $indexbase
-# set timestr = `echo $wantlow  | sed -e 's/[._:]//g' -e 's/^.......//' -e 's/TAI//'`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 
 set timename = NRT
@@ -69,34 +65,13 @@ echo "#! /bin/csh -f " >$TEMPCMD
 echo "setenv OMP_NUM_THREADS 8" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo 'echo before cmd OMP_NUM_THREADS = $OMP_NUM_THREADS'" >>$TEMPLOG" >>$TEMPCMD
 echo "$HMIprogram lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
-echo 'echo after cmd OMP_NUM_THREADS = $OMP_NUM_THREADS'" >>$TEMPLOG" >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
-# echo 'if ($retstatus == 0) then' >>$TEMPCMD
-# echo "  echo XXXX Start image processing" >>$TEMPCMD
-# echo "  $MAKEIMAGES $wantlow $wanthigh" >>$TEMPCMD
-# echo "endif" >> $TEMPCMD
-echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 
 # execute qsub script
 touch $HERE/qsub_running
 qsub -e $TEMPLOG -o $TEMPLOG -sync yes -q p8.q,j8.q $TEMPCMD
-
-echo "AFTER qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
-
-set waitcount=0
-while (-e $HERE/qsub_running)
-    sleep 60
-    @ waitcount = $waitcount + 1
-    if ($waitcount > 600 ) then
-      echo "timed out after 10 hours" >$HERE/FailMessage
-      set retstatus = 5
-      exit $retstatus
-    endif
-    echo -n '+' >>$babble
-end
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
