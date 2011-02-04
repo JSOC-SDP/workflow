@@ -89,6 +89,7 @@ if ($ACTION == 4 && $FIXMISSING == 0) then
       goto FAILUREEXIT
     endif
     sleep 600
+    @ loopcount = $loopcount + 1
   end
 endif
 

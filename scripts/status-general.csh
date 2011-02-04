@@ -56,15 +56,19 @@ if ($?) then
    set STATUS = 1
    goto EXITPLACE
 endif
-set nhigh = `wc -c <high`
-if ($nhigh == 0) then # There are no records in the series
-echo #### SETTING -1 where product=$product and show_info call gives:
-show_info -q  $product'[$]' key=$key 
-        echo "-1" > low
-        echo "-1" > high
-        set STATUS = 0
-        goto EXITPLACE
-endif
+
+# if ($#argv < 2) then
+#   set nhigh = `wc -c <high`
+#  if ($nhigh == 0) then # There are no records in the series
+#   echo #### SETTING -1 where product=$product and show_info call gives:
+#   show_info -q  $product'[$]' key=$key 
+#         echo "-1" > low
+#         echo "-1" > high
+#         set STATUS = 0
+#         goto EXITPLACE
+#   endif
+# endif
+
 set high = `cat high`
 
 # unset echo

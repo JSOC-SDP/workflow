@@ -80,7 +80,7 @@ while ($day <= $dayhigh)
       set n_source = `show_info -cq $inseries"$QRY"`  # use inseries from Ic pass through this loop
       set n_dest = `show_info -cq 'hmi.Ic_noLimbDark_45s'"$QRY"`
       if ($n_source > 0 && $n_dest < $n_source) then
-        $HMI_LIMBDARK in=$inseries$QRY out=hmi.Ic_noLimbDark_45s -n
+        $HMI_LIMBDARK in=$inseries"$QRY" out=hmi.Ic_noLimbDark_45s -n
       endif
     set inseries = hmi.Ic_noLimbDark_45s
     else
