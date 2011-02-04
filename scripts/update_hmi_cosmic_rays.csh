@@ -1,4 +1,4 @@
-#
+#! /bin/csh -f
 # Script to generate or fill in HMI cosmic ray tables
 #
 # this is run in the task instance directory where there is a 'ticket' file that specifies
