@@ -56,6 +56,35 @@ if ($gate == NOT_SPECIFIED) then
 endif
 
 cd $WFDIR/gates/$gate
+
+# Check reasonableness of times
+# but only if gate key type is time
+set keytype = `cat type`
+if ($keytype == time) then
+   set wantlow_t = `time_convert time=$wantlow`
+   set wanthigh_t = `time_convert time=$wanthigh`
+   set project = `cat project`
+   if ( $project == HMI || $project == AIA ) then
+      set oklow = 1996.01.01
+   else if ( $project == MDI ) then
+      set oklow = 1993.01.02
+   else if ( $project == WSO ) then
+      set oklow = 1975.05.16
+   else
+      set oklow = 1601.01.02
+   endif
+   set oklow_t = `time_convert time=$oklow`
+   if ($wantlow_t < $oklow_t) then
+      echo "*** wantlow $wantlow is not valid for $project" 
+      exit 1
+   endif
+   @ maxhigh = $nowt + 8640000
+   if ($wanthigh_t > $maxhigh) then
+      echo "*** wanthigh $wanthigh is not allowed to be more than 100 days in future."
+      exit 1
+   endif
+endif
+
 set ticket = `$WFCODE/bin/GetNextID sequence_number`
 # create the blank ticket
 touch $ticket
