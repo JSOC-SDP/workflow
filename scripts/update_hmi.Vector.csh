@@ -24,10 +24,10 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-# set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_IQUV_averaging
-# set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
-set IQUVprogram = /home/phil/cvs/JSOC/bin/linux_x86_64/HMI_IQUV_averaging
-set HMIprogram = /home/phil/cvs/JSOC/bin/linux_x86_64/HMI_observables
+set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_IQUV_averaging
+set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
+# set IQUVprogram = /home/phil/cvs/JSOC/bin/linux_x86_64/HMI_IQUV_averaging
+# set HMIprogram = /home/phil/cvs/JSOC/bin/linux_x86_64/HMI_observables
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
 set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_patch_module
 

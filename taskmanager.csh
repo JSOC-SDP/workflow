@@ -23,10 +23,19 @@ endif
 cd $WFDIR
 
 $WFCODE/scripts/checkDRMSnSUMS.csh
-if ($?) then
-  echo DRMS and/or SUMS is down, EXIT Taskmanager
-  exit 1
-endif
+set DRMSstat = $?
+set DRMSwaits = 0
+while ($DRMSstat)
+  echo -n "DRMS and/or SUMS is down at " ; date
+  if ($DRMSwaits > 360) then
+    echo DRMS down for 6 hours, quit.
+    exit 1
+  endif
+  sleep 60
+  $WFCODE/scripts/checkDRMSnSUMS.csh
+  set DRMSstat = $?
+  @ DRMSwaits = $DRMSwaits + 1
+end
 
 set task=NOT_SPECIFIED
 set gate=NOT_SPECIFIED
@@ -207,6 +216,9 @@ endif
 # first extracting COVERAGEARGS=M=1 and then in the code here, to M=1 which will be added to MISCARGS
 # for use in show_coverage.
 
+set echo
+
+set OTHER_SPECIAL
 if ($TICKET_ACTION == 4) then
     if ($PRODUCT == none || $PRODUCT == NONE) then
       goto EXITOK
@@ -216,26 +228,30 @@ if ($TICKET_ACTION == 4) then
     else if ($COVERAGEARGS == NEVER) then
       goto ACTION_4_OR_5
     else
-      set MISCARGS = "$COVERAGEARGS"
+      set MISCARGS = ($COVERAGEARGS)
     endif
     if ($SPECIAL != NONE) then
       # look for COVERAGEARGS
       set OLD_COVERAGE_ARGS = $COVERAGEARGS
-      set SPECIAL_ARGS = `echo $SPECIAL | sed -e 's/,/ /g'`
+      set SPECIAL_ARGS = (`echo $SPECIAL | sed -e 's/,/ /g'`)
       # now special_args contains a=b c=d
       set NSPECARGS = $#SPECIAL_ARGS
-      while ($NSPECARGS)
-        if ($SPECIAL_ARGS[$NSPECARGS] =~ "COVERAGEARGS=*") then
-          set $SPECIAL_ARGS[$NSPECARGS]
+      set SPECARG = 1
+      while ($SPECARG <= $NSPECARGS)
+        if ($SPECIAL_ARGS[$SPECARG] =~ "COVERAGEARGS=*") then
+          set $SPECIAL_ARGS[$SPECARG]
           set MISCARGS = ($COVERAGEARGS $MISCARGS)
-          break
+        else
+          set OTHER_SPECIAL = ($OTHER_SPECIAL $SPECIAL_ARGS[$SPECARG])
         endif
-        @ NSPECARGS = $NSPECARGS - 1
+        @ SPECARG = $SPECARG + 1
       end 
       set COVERAGEARGS = $OLD_COVERAGE_ARGS 
     endif
+    if ($#OTHER_SPECIAL == 0) set OTHER_SPECIAL = NONE
 echo XXXX now MISCARGS = $MISCARGS
-    ($STATUSCOMMAND $gate low=$WANTLOW high=$WANTHIGH $MISCARGS ; echo $status > stat_status) | grep UNK > gaplist
+    #($STATUSCOMMAND $gate low=$WANTLOW high=$WANTHIGH $MISCARGS ; echo $status > stat_status) | grep UNK > gaplist
+    (show_coverage $PRODUCT -iq low=$WANTLOW high=$WANTHIGH $MISCARGS ; echo $status > stat_status) | grep UNK > gaplist
     set stat_status = `cat stat_status`
     if ($stat_status) then
       # if show_coverage fails, cant check for gaps
@@ -269,13 +285,15 @@ echo XXXX now MISCARGS = $MISCARGS
 		endif
 		set num_pending = `/bin/ls  pending_tickets | wc -l`
 	end
-	set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$gate wantlow=$gapfirst wanthigh=$gaplast action=5 special="$SPECIAL"`
+	set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$gate wantlow=$gapfirst wanthigh=$gaplast action=5 special="$OTHER_SPECIAL"`
 	echo 1 >state
 	if ($verbosemode) echo "TASKMANAGER new ticket $newticket registered, new wantlow = $gapfirst"
 	@ igap = $igap + 1
     end
     goto SUBTICKETSDONE
 endif
+
+unset echo
 
 ACTION_4_OR_5:
 
@@ -298,7 +316,7 @@ foreach pregate (` /bin/ls $WFDIR/tasks/$task/preconditions/ `)
 	set USELOW = $WANTLOW
 	set USEHIGH = $WANTHIGH
 	set ACTION = 4
-	set SPECIAL = NONE
+	set SPECIAL = "$SPECIAL" 
         set GATEDIR = $WFDIR/gates/$pregate
         if (-e $WFDIR/tasks/$task/preconditions/$pregate/prepare_ticket) then
                 set herewd = $cwd

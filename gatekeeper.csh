@@ -3,7 +3,8 @@
 
 # gatekeeper
 
-set CADENCE = 4
+
+set CADENCE = 10
 set FASTCADENCE = $CADENCE
 set SLOWCADENCE = 60
 
@@ -16,7 +17,9 @@ else
 endif
 
 cd $WFDIR
-touch Keep_running
+
+echo $USER > Gatekeeper_owner
+echo $HOST'.'$$ > Keep_running
 set keep_running = 1
 
 while ($keep_running > 0)
@@ -158,11 +161,13 @@ echo starting $gate
 		# the tickets are moved to the active ticket queue
 		# and are waited for in the next section.
                 if ($verbosemode) echo "GATEKEEPER examine new ticket $ticket for action = $ACTION"
+
 		if ($ACTION == 1) then  # get low and high range for gate.
 			echo "GATELOW=$low" >> new_tickets/$ticket
 			echo "GATEHIGH=$high" >> new_tickets/$ticket
 			echo "STATUS=0" >> new_tickets/$ticket
 			mv new_tickets/$ticket active_tickets
+
 		else if ($ACTION == 2) then # check for wanted range, answer yes or no
 			if ($low_t > $WANTLOW_t || $high_t < $WANTHIGH_t) then
 				if ($low_t > $WANTLOW_t) then
@@ -182,51 +187,25 @@ echo starting $gate
 				echo "STATUS=0" >> new_tickets/$ticket
 			endif
 			mv new_tickets/$ticket active_tickets
-		else if ($ACTION == 3 ) then # wait for data, set status=2 and wait for later if data is not ready
+
+		else if ($ACTION == 3) then # wait for data, set status=2 and wait for later if data is not ready
 			echo "STATUS=2" >> new_tickets/$ticket
 			mv new_tickets/$ticket active_tickets
-		# else if ($ACTION == 4) then # cause new data to be processed if needed
-# the coverage check should be moved into the action=4 task, i.e. the command script should
-# determine what needs to be done for action=4 but do the whole range for action=5.  The problem
-# is that the show_coverage command needs special args in some cases and the gatekeeper should not
-# have gate/tasks specific actions.  When ready to make this change just remove this action=4 code.
-		else if ($ACTION == -4) then # cause new data to be processed if needed -- SKIP THIS NOW
-                        if ($verbosemode) echo GATEKEEPER ACTION=4 started for ticket $ticket
-			# ACTION == 4, push gate.
-			# check to see if gate is already available, assumes gate status is current
-                        # Note, special case if "product" is "none" do not do ACTION==4 gap search
-			# but if any UNK in the want range, assume needs processing
-                        if ($product == none) then
-                          set n_UNK = 1
-                        else
-		 	  set n_UNK = `show_coverage ds=$product low=$WANTLOW high=$WANTHIGH | grep UNK | wc -l`
-                        endif
-                        if ($n_UNK == 0 && ($WANTLOW_t >= $low_t && $WANTHIGH_t <= $high_t )) then
-                                echo "GATELOW=$WANTLOW" >> new_tickets/$ticket
-                                echo "GATEHIGH=$WANTHIGH" >> new_tickets/$ticket
-                                echo "STATUS=0" >> new_tickets/$ticket
-				mv new_tickets/$ticket active_tickets
-			else
-			        echo "STATUS=3" >> new_tickets/$ticket
-			        mv new_tickets/$ticket active_tickets # must happen before actiontask is started
-                                set pending = `cat $WFDIR/tasks/$actiontask/state`
-			        @ pending = $pending + 1
-                                echo $pending >  $WFDIR/tasks/$actiontask/state
-                                set TASKMANAGER = `cat $WFDIR/tasks/$actiontask/manager`
-			        $WFCODE/$TASKMANAGER gate=$gate task=$actiontask ticket=$ticket >>&$WFDIR/tasks/$actiontask/manager.log  &
-                                echo $! > $WFDIR/tasks/$actiontask/manager.pid
-                        endif
-		# else if ($ACTION == 5) then # unconditionally cause new data to be processed
+
 		else if ($ACTION == 4 || $ACTION == 5) then # start actiontask to do 4 and 5
                         if ($verbosemode) echo GATEKEEPER ACTION=5 started for ticket $ticket
-			# ACTION == 5, push gate.
 			echo "STATUS=3" >> new_tickets/$ticket
 			mv new_tickets/$ticket active_tickets # must happen before actiontask is started
+
                         set pending = `cat $WFDIR/tasks/$actiontask/state`
 			@ pending = $pending + 1
                         echo $pending >  $WFDIR/tasks/$actiontask/state
+
 			set TASKMANAGER = `cat $WFDIR/tasks/$actiontask/manager`
-			$WFCODE/$TASKMANAGER gate=$gate task=$actiontask ticket=$ticket >>&$WFDIR/tasks/$actiontask/manager.log  &
+                        mkdir $WFDIR/tasks/$actiontask/logs/$ticket
+			$WFCODE/$TASKMANAGER gate=$gate task=$actiontask ticket=$ticket >>&$WFDIR/tasks/$actiontask/logs/$ticket/manager.log  &
+			echo $! > $WFDIR/tasks/$actiontask/logs/$ticket/manager.pid
+
 		else if ($ACTION == 6) then # make coverage map, may be slow
 			# ACTION == 6, Generate COVERAGE map
 			echo "NaN" > low
@@ -263,7 +242,7 @@ echo starting $gate
 		set $setval
 	    end
             set parenttask = `echo $TASKID | sed -e 's/-.*//'`
-            rm -f $donetask/manager.pid
+            rm -f ../logs/$TICKET/manager.pid
             if ($verbosemode) echo "GATEKEEPER parent task is $parenttask"
 	    ex - $donetask/ticket <<!
 /STATUS/d
@@ -277,7 +256,8 @@ q
 	    else 
                 echo "STATUS=5" >> $donetask/ticket
 		mv $donetask ../archive/failed
-if ($debugmode) then
+#if ($debugmode) then
+echo " " >> $WFDIR/FAILED_TASKS
 echo -n "$actiontask FAILED for " >>$WFDIR/FAILED_TASKS
 echo -n `grep WANTLOW $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket` >> $WFDIR/FAILED_TASKS
 echo -n "  " >> $WFDIR/FAILED_TASKS
@@ -285,8 +265,9 @@ echo -n   `grep WANTHIGH $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticke
 echo -n "  at " >> $WFDIR/FAILED_TASKS
 date >> $WFDIR/FAILED_TASKS
 echo "     See:" $WFDIR/tasks/$actiontask/archive/failed/$donetask >> $WFDIR/FAILED_TASKS
-endif
+#endif
 	    endif
+            mv ../logs/$TICKET ../archive/logs
 if ($verbosemode) echo "GATEKEEPER done queue, move $GATE/active_tickets/$TICKET to /$parenttask/active/$TASKID/ticket_return"
             if (-e $WFDIR/gates/$GATE/active_tickets/$TICKET) then
 	      mv $WFDIR/gates/$GATE/active_tickets/$TICKET $WFDIR/tasks/$parenttask/active/$TASKID/ticket_return
@@ -419,8 +400,10 @@ q
 		if ($STATUS != 3 && $STATUS != 2) then   # 2,3 means still owned by some task, else return ticket
 			if ($verbosemode) echo "GATEKEEPER Ticket is complete, return to owner"
 			# XXXXX need to update coverage here with want range in done ticket.  For now call get coverage.
+echo Start statustask
 			touch statusbusy
 			$WFCODE/$statustask $gate  # wait for this to complete.
+echo done statustask
                         # ticket should have been already removed from the target task's pending list
                         # but check anyway
                         if (-e $WFDIR/tasks/$task/active/$TASKID/ticket_return) then
@@ -440,20 +423,9 @@ ALL_GATES_DONE:
     if (!(-e Keep_running)) then
 	set keep_running = 0
     else
+        echo "XXXXXXXXXXXXXXXXX Start Sleeping XXXXXXXXXXXXXXXX"
         sleep $CADENCE
     endif
-    # This synchronizing stuff should be replaced with a counter of number of watchers so
-    # that multiple programs could be safely watching progress.
-    # set watchercount=0
-    # while (-e WATCHERBUSY)
-       # sleep 0.3
-       # @ watchercount = $watchercount + 1
-       # if ($watchercount > 100) then
-          # rm keep_watching
-	  # sleep $FASTCADENCE
-          # rm WATCHERBUSY
-       # endif
-    # end #wait for watcher process
 
 end # keep_running loop
 

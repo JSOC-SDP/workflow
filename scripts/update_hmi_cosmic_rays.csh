@@ -37,6 +37,8 @@ echo "wantlow = " $wantlow >> $LOG
 set ACTION = `grep ACTION ticket`
 set $ACTION
 
+set CAMERA = 0
+
 # process SPECIAL ticket args
 set FIXMISSING = 0
 set SPECIAL = (`grep SPECIAL ticket`)
@@ -54,6 +56,12 @@ while ($SPECARG <= $NSPECARGS)
   @ SPECARG = $SPECARG + 1
 end
 
+if ($CAMERA > 0) then
+  set CAMARG = '[? CAMERA='$CAMERA' ?]'
+else
+  set CAMARG
+endif
+
 # set QUALMASK = 0x2F000
 set QUALMASK = 192512
 
@@ -68,14 +76,14 @@ if ($LFSN <= $FFSN) then
 endif
 
 # get expected list of cosmic_ray records
-show_info hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? (QUALITY & '$QUALMASK') = 0 ?][? T_OBS > 0 ?]' -q key=FSN > FSN_lev1
+show_info hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? (QUALITY & '$QUALMASK') = 0 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_lev1
 
 set N_NOCR = 100000000
 # unless a SPECIAL arg of FIXMISSING=1 is present, just wait here until all records are present.  I.e. convert to a proper action=3
 if ($ACTION == 4 && $FIXMISSING == 0) then
   while ($N_NOCR > 0)
     set loopcount = 0
-    show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
+    show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
     comm -23 FSN_lev1 FSN_cosmic > NOCR
     set N_NOCR = `wc -l <NOCR`
     echo "Lev1 records without cosmic ray records count = " $N_NOCR >>$LOG
@@ -94,7 +102,7 @@ if ($ACTION == 4 && $FIXMISSING == 0) then
 endif
 
 if ($ACTION == 4) then
-  show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
+  show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
   comm -23 FSN_lev1 FSN_cosmic > NOCR
   set N_NOCR = `wc -l <NOCR`
   echo "Lev1 records without cosmic ray records count = " $N_NOCR >>$LOG
@@ -156,6 +164,7 @@ cat > $QSUBCMD <<ENDCAT
 #
 #\$ -cwd
 set echo
+echo $HOST 
 setenv OMP_NUM_THREADS 8
 ENDCAT
 
@@ -245,7 +254,7 @@ endif # DO_POST
 
 # verify make of cosmic ray records
 
-show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]' -q key=FSN > FSN_cosmic
+show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
 comm -23 FSN_lev1 FSN_cosmic > NOCR
 set N_NOCR = `wc -l <NOCR`
 echo "Lev1 records now without cosmic ray records count = " $N_NOCR >>$LOG

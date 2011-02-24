@@ -1,10 +1,9 @@
 #! /bin/csh -f
 #
-# maketicket.csh gate low high
-# call with taskid, gate, wantlow, wanthigh, action, special
-#
-# if taskid is absent then create a new taskid for the task associated
-# with the target gate and make the ticket appear to be from that taskid.
+# wait_ticket.csh ticket
+# call with ticketID
+
+set noglob
 
 set here = $cwd
 
@@ -19,6 +18,11 @@ endif
 cd $WFDIR
 
 set ticket = $1
+if ($#ticket < 1 || $ticket[1] == '***') then
+   echo "Invalid ticket $ticket"
+   exit 1
+endif
+
 set gate = `echo $ticket | sed -e 's/-.*//'`
 
 if (!( -e gates/$gate)) then

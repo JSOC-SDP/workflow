@@ -93,14 +93,18 @@ while (1)
            endif
            if ($nfailed > 0) then
                 echo "     FAILED:"
-                set maxfailed = 2
-  	        set failedlist = `/bin/ls archive/failed | tail -$maxfailed` 
-                foreach failedtask ( $failedlist )
+                set maxfailed = 3
+  	        set failedlist = (`/bin/ls archive/failed | tail -$maxfailed`) 
+                set nfailedlist = $#failedlist
+                while ($nfailedlist)
+                    set failedtask = $failedlist[$nfailedlist]
+                # foreach failedtask ( $failedlist )
                     set tickstatus = `grep STATUS archive/failed/$failedtask/ticket`
                     set tickname = `grep TICKET archive/failed/$failedtask/ticket`
                     set wantlow = `grep WANTLOW archive/failed/$failedtask/ticket`
                     set wanthigh = `grep WANTHIGH archive/failed/$failedtask/ticket`
                     echo "         $failedtask, $tickname, $wantlow, $wanthigh, $tickstatus"
+                    @ nfailedlist = $nfailedlist - 1
                 end #failedtask
                 if ($nfailed > $maxfailed) then
                     echo "         ..."

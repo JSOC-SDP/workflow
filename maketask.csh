@@ -100,6 +100,8 @@ mkdir done
 mkdir archive
 mkdir archive/ok
 mkdir archive/failed
+mkdir archive/logs
+mkdir logs
 
 # If and only if, completed OK task records are to be kept, uncomment the following
 # touch DEBUG

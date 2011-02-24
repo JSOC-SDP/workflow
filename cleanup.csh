@@ -20,6 +20,8 @@ foreach task ( * )
   set here = $cwd
   cd archive/ok
   find . -depth -mtime +$DAYS -print -delete 
+  cd ../logs
+  find . -depth -mtime +$DAYS -print -delete 
   cd $here
   set rootreturn = active/$task'-root'/ticket_return
   if (-e $rootreturn) then
