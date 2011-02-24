@@ -2,15 +2,26 @@
 
 # restart gatekeeper and put log in pipeline directory.
 
-set WORKFLOW_DATA = /home/jsoc/pipeline
-set WORKFLOW_ROOT = /home/phil/jsoc/proj/workflow
+echo " "
+echo -n Restart gatekeeper at " "
+date
+
+setenv WORKFLOW_DATA /home/jsoc/pipeline
+setenv WORKFLOW_ROOT /home/phil/jsoc/proj/workflow
 
 cd $WORKFLOW_DATA
 rm -f Keep_running
 
-while (-e GATEKEEPER_BUSY)
+echo -n Waiting
+while (-e GATEKEEPERBUSY)
   sleep 1
+  echo -n '.'
 end
+echo " "
 
+# allow extra time to simulate normal gatekeeper sleep.
+sleep 10
+
+echo -n "Gatekeeper PID = "
 $WORKFLOW_ROOT/gatekeeper.csh >& log &
 
