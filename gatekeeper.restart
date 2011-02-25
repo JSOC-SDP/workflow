@@ -5,6 +5,8 @@
 echo " "
 echo -n Restart gatekeeper at " "
 date
+echo -n "On "
+hostname
 
 setenv WORKFLOW_DATA /home/jsoc/pipeline
 setenv WORKFLOW_ROOT /home/phil/jsoc/proj/workflow
