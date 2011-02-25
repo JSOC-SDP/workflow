@@ -8,7 +8,6 @@ else
   exit 1
 endif
 
-
 set noglob
 
 set TMP = /tmp/$$
@@ -22,6 +21,23 @@ while (-e GATEKEEPERBUSY)
   echo -n '.'
 end
 echo " "
+
+if (-e restart.log) then
+  grep '^On' restart.log >$TMP
+  set nrestart = `wc -l <$TMP`
+  if ($nrestart > 0) then
+    set On_line = `head -1 $TMP`
+    set gatekeeper_host = $On_line[2]
+    set now_host = `hostname`
+    if ($gatekeeper_host != $now_host) then
+      echo Gatekeeper is running on $gatekeeper_host, NOT $now_host.
+      echo exit.
+      exit 1
+    endif
+  endif
+    echo No hostname in restart.log
+endif
+    
 
 ps ax | grep manager >$TMP.t
 grep ticket <$TMP.t >$TMP
