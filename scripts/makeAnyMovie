@@ -1,4 +1,4 @@
-#! /bin/csh 
+#! /bin/csh -f
 
 # set echo
 
@@ -6,6 +6,9 @@
 # choices 0f cadence must be multiple of 15m.
 # args are:  start  stop  cadence  quantity (Ic, Ic_flat, M), size (256,512,1k,4k)
 # Defaults are 1k, M, 15m, last 2 days.  Leading args must be present.
+# An optional 6th arg is full path to optional movie name and location.
+# default is http://jsoc.stanford.edu/data/hmi/movies/special/ with file
+# name made from the args. Name should include one of .mp4 or .mpg
 
 @ min15 = 60 * 15
 if ($#argv > 0) then # get start time
@@ -65,9 +68,20 @@ if ($#argv > 0) then # get size
     echo Siz must be one of 256, 512, 1k, 4k, NOT $want
     exit 1
   endif
+  shift
 else
   set Size = 1k
 endif
+
+if ($#argv > 0) then # get destination
+  set specified_path = $1
+  set path_given=1
+  shift
+else
+  set path_given=0
+endif
+
+#   time makeAnyMovie 2011.03.17_17_TAI 2011.03.31_17_TAI 15 Ic_flat 1k /home/jsoc/hmi/movies/latest/Ic_flat_14d.mp4
   
 set Type = jpg
 set minFileSize = 50000
@@ -114,21 +128,28 @@ set HERE = $cwd
 cd $WORK/frames
 
 echo Movie making place is $cwd
+echo $WORK
 
-# set echo
+ set echo
 
 @ mins = $cadence / 60
-set MOVIE = $WORK/$Quant'_'$Size'_'$Startname'-'$Endname'_'$mins'm'
 
 cd $WORK/frames
-ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mpg 
-if ($status == 0) then
-    mv $MOVIE.mpg /home/jsoc/hmi/movies/special
-endif
 
-ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mp4 
-if ($status == 0) then
-    mv $MOVIE.mp4 /home/jsoc/hmi/movies/special
+if ($path_given == 0) then
+  set MOVIE = $WORK/$Quant'_'$Size'_'$Startname'-'$Endname'_'$mins'm'
+
+  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mpg 
+  if ($status == 0) then
+      mv $MOVIE.mpg /home/jsoc/hmi/movies/special
+  endif
+
+  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mp4 
+  if ($status == 0) then
+      mv $MOVIE.mp4 /home/jsoc/hmi/movies/special
+  endif
+else
+  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $specified_path
 endif
 
 rm -rf $WORK

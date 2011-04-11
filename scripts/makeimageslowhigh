@@ -3,6 +3,7 @@
 # specified by first two arguments.
 
 # set echo
+# modified to only make new movie if NRT data.
 
 set wantlow = $1
 set wanthigh = $2
@@ -24,6 +25,8 @@ set scalinglist = (minmaxgiven minmaxgiven mag)
 set colorlist = (/home/phil/apps/heat.sao /home/phil/apps/heat.sao grey)
 set namelist = (Continuum Continuum Magnetogram)
 set flaglist = ("" "" -c)
+
+set isNRT = 1
 
 set end_movie_t = 0
 
@@ -93,6 +96,7 @@ while ($day <= $dayhigh)
       #  if ($n_final > 0) then
         set inseries = $in_final
         set msg = ""
+        set isNRT = 0
       else
         set inseries = $in_nrt
         set msg = "Quick-Look "
@@ -118,9 +122,10 @@ unset echo
   @ day = $day + 1
 end
 
-if ($end_movie_t > 0) then
+set exitstatus = 0
+
+if ($end_movie_t > 0 ) then
   set end_movie = `time_convert s=$end_movie_t zone=TAI`
-  /home/phil/jsoc/proj/workflow/scripts/makeIcmovie $end_movie
 
   set hhmmss = `echo $end_movie | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`
   set yyyymmdd = `echo $end_movie | sed -e 's/_.*//' -e 's/\.//g'`
@@ -142,6 +147,12 @@ Ic_flat:	$latest
 M:	$latest
 END
   endif
+
+  if ($isNRT) then
+      /home/phil/jsoc/proj/workflow/scripts/makeIcmovie $end_movie
+  set exitstatus = $?
+  endif
+
 endif
 
-exit 0
+exit $exitstatus

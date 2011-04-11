@@ -1,5 +1,6 @@
-#! /bin/csh 
+#! /bin/csh -f
 
+# optional arg is start_time
 # set echo
 
 # make movie of last days days at cadence cadence
@@ -22,10 +23,13 @@ set Type = jpg
 set Size = 1k
 set minFileSize = 50000
 
+set BASE = /home/jsoc/hmi/images
+set WORKBASE = /home/jsoc/hmi/movies
+
 foreach Quant (Ic_flat M)
 
-  set BASE = /home/jsoc/hmi/images
-  set WORK = /home/jsoc/hmi/movies/$Quant'_movies'.$$
+  set THISWORK = $Quant'_movies'.$$
+  set WORK = $WORKBASE/$THISWORK
   mkdir $WORK
   mkdir $WORK/frames
 
@@ -67,7 +71,7 @@ foreach Quant (Ic_flat M)
   
   echo Movie making place is $cwd
   
-# set echo
+ #set echo
   
   set MOVIE = $WORK/$Quant'_2d'.mpg
   ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE 
@@ -82,8 +86,43 @@ foreach Quant (Ic_flat M)
       cp $MOVIE $Imgpath
       mv $MOVIE /home/jsoc/hmi/movies/latest
   endif
-  
-  rm -rf $WORK
 
-  cd $HERE
+set echo   
+  cd $WORKBASE
+  rm -rf $THISWORK
+
+  cd $HERE    
+
+  if (!(-e 14dmovies)) mkdir 14dmovies
+
+  # on even hour endtime, make longer movie also
+  @ nowtime_t = $endtime_t / 3600
+  @ nowhour_t = $nowtime_t * 3600
+  if ($nowhour_t == $endtime_t) then
+    set THISWORK = $Quant'_movies'.$$
+    set WORK = $WORKBASE/$THISWORK
+    mkdir $WORK
+    mkdir $WORK/frames
+    cd $WORK/frames
+    @ fourteen = 86400 * 14
+    @ nowtime_t = $endtime_t - $fourteen
+    set nowtime = `time_convert zone=TAI s=$nowtime_t`
+    set endtime = `time_convert zone=TAI s=$endtime_t`
+    /home/jsoc/pipeline/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/14dmovies/$Quant"_14d.mp4"
+    cd $WORKBASE
+    rm -rf $THISWORK
+  endif
+
 end
+
+cd $HERE
+if ( -e 14dmovies/Ic_flat_14d.mp4 ) then
+  mv 14dmovies/Ic_flat_14d.mp4 /home/jsoc/hmi/movies/latest/
+endif
+if ( -e 14dmovies/M_14d.mp4 ) then
+  mv 14dmovies/M_14d.mp4 /home/jsoc/hmi/movies/latest/
+endif
+if ( -e 14dmovies ) then
+  rm -rf 14dmovies
+endif
+
