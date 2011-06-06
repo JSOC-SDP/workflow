@@ -36,6 +36,10 @@ set green = ($hgreen $agreen)
 set yellow = ($hyellow $ayellow)
 set red = ($hred $ared)
 
+@ r = 0
+@ y = 0
+@ g = 0
+
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set now_t = `$TIME_CONVERT time=$now`
 
@@ -76,10 +80,13 @@ while ($iprod <= $nprod)
   @  lags = ( $now_t - $times_t ) / 60
   if ($lags <= $green[$iprod]) then
     set stat = GREEN
+    @ g = 1
   else if ($lags <= $yellow[$iprod]) then
     set stat = YELLOW
+    @ y = 1
   else
     set stat = RED
+    @ r = 1
   endif
   if ($lags < 60) then
     set lag = "$lags minutes"
@@ -118,6 +125,17 @@ echo 'Times given are lag between observation time and the current time' >>$TMP
 echo '<BR>' >>$TMP
 echo 'Colors indicate: green -> as expected; yellow -> late; red -> very late' >>$TMP
 echo '<P>' >>$TMP
-echo '</BODY></HTML>' >>$TMP
+
+if ($r == 1) then
+  set favicon = red_sq.gif
+else if ($y == 1) then
+  set favicon = yellow_sq.gif
+else
+  set favicon = green_sq.gif 
+endif
+echo '</BODY>' >>$TMP
+#echo '<HEAD><link rel="stat icon" href="http://jsoc.stanford.edu/data/tmp/favicon.ico"></HEAD>' >>$TMP
+echo '<HEAD><link rel="stat icon" href="http://jsoc.stanford.edu/data/tmp/'$favicon'"></HEAD>' >>$TMP
+echo '</HTML>' >>$TMP
 
 mv $TMP $TARG/jsoc_proc_status.html
