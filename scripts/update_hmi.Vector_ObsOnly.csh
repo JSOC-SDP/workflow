@@ -29,8 +29,9 @@ set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observable
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
 set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_patch_module
 
-# set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1 quicklook=0"
-set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1" 
+# set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1 quicklook=0 dpath=/home/couvidat/cvs/JSOC/proj/lev1.5_hmi/apps"
+#set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1 dpath=/home/couvidat/cvs/JSOC/proj/lev1.5_hmi/apps" 
+set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1"
 set SEG_args = "beta=0.7 alpha=[0,-4] T=[1,1,0.9,0] y=hmi.Marmask_720s"
 set PATCH_args = "bb=hmi.Mpatch_720s"
 
@@ -71,12 +72,12 @@ echo 'if ($IQUVstatus) goto DONE' >>&$TEMPCMD
 echo "$HMIprogram begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set OBSstatus = $?' >>$TEMPCMD
 echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
-echo "$HMI_segment xm=hmi.M_720s["$wantlow"-"$wanthigh"]" "xp=hmi.Ic_720s["$wantlow"-"$wanthigh"]" $SEG_args  ">>&$TEMPLOG" >>$TEMPCMD
+#echo "$HMI_segment xm=hmi.M_720s["$wantlow"-"$wanthigh"]" "xp=hmi.Ic_720s["$wantlow"-"$wanthigh"]" $SEG_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus = $?' >>$TEMPCMD
 echo 'if ($SEGstatus) goto DONE' >>&$TEMPCMD
-echo "$HMI_patch x=hmi.Marmask_720s["$wantlow"-"$wanthigh"]" $PATCH_args  ">>&$TEMPLOG" >>$TEMPCMD
-echo 'set PATstatus = $?' >>$TEMPCMD
-echo 'if ($PATstatus) goto DONE' >>&$TEMPCMD
+# echo "$HMI_patch x=hmi.Marmask_720s["$wantlow"-"$wanthigh"]" $PATCH_args  ">>&$TEMPLOG" >>$TEMPCMD
+# echo 'set PATstatus = $?' >>$TEMPCMD
+# echo 'if ($PATstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $IQUVstatus >IQUVstatus' >>&$TEMPCMD
 echo 'echo $OBSstatus >OBSstatus' >>&$TEMPCMD

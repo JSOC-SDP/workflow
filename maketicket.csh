@@ -33,14 +33,14 @@ set nowt = `time_convert time=$now`
 set expire = `time_convert s=$expiret`
 
 while ( $#argv > 0)
-  foreach keyname (taskid gate wantlow wanthigh action special)
+  foreach keyname (taskid gate wantlow wanthigh action special expire)
     if ($1 =~ $keyname=*) then
        set $1
        break
     endif
     end # foreach
   shift
-  end #while
+end #while
 
 if ($wantlow == NOT_SPECIFIED) then
    echo MUST provide wantlow=value argument

@@ -1,5 +1,14 @@
 #! /bin/csh -f
 
+#source ~phil/.cshrc
+#source ~phil/.login
+
+source $HOME/.cshrc
+source $HOME/.login
+setenv WORKFLOW_DATA /home/jsoc/pipeline
+setenv WORKFLOW_ROOT /home/phil/jsoc/proj/workflow
+
+cd $WORKFLOW_DATA
 # restart gatekeeper and put log in pipeline directory.
 
 echo " "
@@ -8,16 +17,17 @@ date
 echo -n "On "
 hostname
 
-setenv WORKFLOW_DATA /home/jsoc/pipeline
-setenv WORKFLOW_ROOT /home/phil/jsoc/proj/workflow
-
-cd $WORKFLOW_DATA
 rm -f Keep_running
-
+set loopcount=0
 echo -n Waiting
 while (-e GATEKEEPERBUSY)
   sleep 1
   echo -n '.'
+  @ loopcount = $loopcount + 1
+  if ($loopcount > 120) then
+    echo Givup waiting after 2 minutes
+    rm -f GATEKEEPERBUSY
+    endif
 end
 echo " "
 
@@ -25,5 +35,19 @@ echo " "
 sleep 10
 
 echo -n "Gatekeeper PID = "
-$WORKFLOW_ROOT/gatekeeper.csh >& log &
+gatekeeper.csh >& log 
 
+set gatekeeper_status = $status
+
+if ($gatekeeper_status || -e GATEKEEPERBUSY) then
+  echo -n "XXX gatekeeper failed at "
+  date
+  echo "XXX Status was $gatekeeper_status"
+  rm -f GATEKEEPERBUSY
+  rm -f Keep_running
+  echo "XXX force restart"
+  /home/phil/jsoc/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
+else
+  echo -n Gatekeeper stopped by operator at " "
+  date
+endif

@@ -25,7 +25,8 @@ end
 
 # set CoefProgram = /home/couvidat/cvs/JSOC/bin/linux_x86_64/correction_velocities
 # copied 29 Oct 2010 2:00 PM
-set CoefProgram = $WFCODE/bin/correction_velocities
+#set CoefProgram = $WFCODE/bin/correction_velocities
+set CoefProgram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/correction_velocities
 
 # verify that there is at least one V_drift record within 24 hours
 # both before and after both the first and last record to be processed.

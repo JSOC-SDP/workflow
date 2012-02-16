@@ -3,7 +3,7 @@
 #
 
 # XXXXXXXXXX test
-# set echo
+ set echo
 # XXXXXXXXXX test
 
 set HERE = $cwd 
@@ -25,25 +25,28 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
-set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_patch_module
+#set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_patch_module
 
-set PATCH_args = "-L bb=hmi.Mpatch_720s"
+#set PATCH_args = "-L bb=hmi.Mpatch_720s"
+
+set wantlow = `cat wantlow`
+set wanthigh = `cat wanthigh`
 
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
-@ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
-# set timestr = `echo $wantlow  | sed -e 's/[._:]//g' -e 's/^.......//' -e 's/TAI//'`
+#set indexlow = `index_convert ds=$product $key=$WANTLOW`
+#set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+#@ indexhigh = $indexhigh - 1
+#set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
+#set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+#set timestr = `echo $wantlow  | sed -e 's/[._:]//g' -e 's/^.......//' -e 's/TAI//'`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = MSK
 set qsubname = $timename$timestr
 
-if ($indexhigh < $indexlow) then
-   echo No data to process, $WANTLOW to $WANTHIGH > $HERE/runlog
-   exit 0
-endif
+#if ($indexhigh < $indexlow) then
+#   echo No data to process, $WANTLOW to $WANTHIGH > $HERE/runlog
+#   exit 0
+#endif
 
 set TEMPLOG = $HERE/runlog
 set babble = $HERE/babble
@@ -56,19 +59,20 @@ echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus=0' >>&$TEMPCMD
-echo 'set PATstatus=0' >>&$TEMPCMD
+# echo 'set PATstatus=0' >>&$TEMPCMD
 
-echo "$HMI_segment xm=hmi.M_720s["$wantlow"-"$wanthigh"]" "xp=hmi.Ic_720s["$wantlow"-"$wanthigh"] beta=0.7 alpha=[0,-4] T=[1,1,0.9,0] y=hmi.Marmask_720s >>&$TEMPLOG" >>$TEMPCMD
+echo "$HMI_segment xm=hmi.M_720s\["$wantlow"-"$wanthigh"]" "xp=hmi.Ic_noLimbDark_720s\["$wantlow"-"$wanthigh"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus = $?' >>$TEMPCMD
 echo 'if ($SEGstatus) goto DONE' >>&$TEMPCMD
-echo "$HMI_patch x=hmi.Marmask_720s["$wantlow"-"$wanthigh"]" $PATCH_args  ">>&$TEMPLOG" >>$TEMPCMD
-echo 'set PATstatus = $?' >>$TEMPCMD
-echo 'if ($PATstatus) goto DONE' >>&$TEMPCMD
+# echo "$HMI_patch x=hmi.Marmask_720s["$wantlow"-"$wanthigh"]" $PATCH_args  ">>&$TEMPLOG" >>$TEMPCMD
+# echo 'set PATstatus = $?' >>$TEMPCMD
+# echo 'if ($PATstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
-echo 'echo $SEGstatus >SEGstatus' >>&$TEMPCMD
-echo 'echo $PATstatus >PATstatus' >>&$TEMPCMD
-echo '@ retstatus = $SEGstatus + $PATstatus' >>$TEMPCMD
-echo 'echo $retstatus >retstatus' >>$TEMPCMD
+echo 'echo $SEGstatus >retstatus' >>&$TEMPCMD
+# echo 'echo $SEGstatus >SEGstatus' >>&$TEMPCMD
+# echo 'echo $PATstatus >PATstatus' >>&$TEMPCMD
+# echo '@ retstatus = $SEGstatus + $PATstatus' >>$TEMPCMD
+# echo 'echo $retstatus >retstatus' >>$TEMPCMD
 
 # execute qsub script
 qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q $TEMPCMD >> runlog

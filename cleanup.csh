@@ -22,6 +22,8 @@ foreach task ( * )
   find . -depth -mtime +$DAYS -print -delete 
   cd ../logs
   find . -depth -mtime +$DAYS -print -delete 
+  cd ../failed
+  find . -depth -mtime +10 -print -delete 
   cd $here
   set rootreturn = active/$task'-root'/ticket_return
   if (-e $rootreturn) then

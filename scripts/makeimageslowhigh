@@ -15,16 +15,20 @@ echo Make images for $wantlow to $wanthigh
 set CADENCE = 15
 
 setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
-set RENDER_IMAGE = /home/phil/jsoc/proj/workflow/bin/render_image
-set HMI_LIMBDARK = /home/phil/jsoc/proj/workflow/bin/hmi_limbdark
+#set RENDER_IMAGE = /home/phil/jsoc/proj/workflow/bin/render_image
+set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
+#set HMI_LIMBDARK = /home/phil/jsoc/proj/workflow/bin/hmi_limbdark
+set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
 
-set obslist = (Ic Ic_flat M)
-set minlist = (20000 0.3 -1500)
-set maxlist = (75000 1.2 1500)
-set scalinglist = (minmaxgiven minmaxgiven mag)
-set colorlist = (/home/phil/apps/heat.sao /home/phil/apps/heat.sao grey)
-set namelist = (Continuum Continuum Magnetogram)
-set flaglist = ("" "" -c)
+set obslist = (Ic Ic_flat M M_color)
+set minlist = (20000 0.3 -1500 -1500)
+set maxlist = (75000 1.2 1500 1500)
+set scalinglist = (minmaxgiven minmaxgiven mag minmaxgiven)
+set colorlist = (/home/phil/apps/heat.sao /home/phil/apps/heat.sao grey /home/priya/Colormaps/For_Todd/mag.lut)
+set namelist = (Continuum Continuum Magnetogram Magnetogram)
+set flaglist = ("" "" -c -c)
+
+set finalimagetime = NONE
 
 set isNRT = 1
 
@@ -83,12 +87,17 @@ while ($day <= $dayhigh)
       set n_source = `show_info -cq $inseries"$QRY"`  # use inseries from Ic pass through this loop
       set n_dest = `show_info -cq 'hmi.Ic_noLimbDark_45s'"$QRY"`
       if ($n_source > 0 && $n_dest < $n_source) then
-        $HMI_LIMBDARK in=$inseries"$QRY" out=hmi.Ic_noLimbDark_45s -n
+        $HMI_LIMBDARK in=$inseries"$QRY" out=hmi.Ic_noLimbDark_45s -nf
       endif
-    set inseries = hmi.Ic_noLimbDark_45s
+      set inseries = hmi.Ic_noLimbDark_45s
     else
-      set in_final = hmi.$obs'_45s'
-      set in_nrt = hmi.$obs'_45s_nrt'
+      if ($obs == M_color ) then
+        set in_final = hmi.M_45s
+        set in_nrt = hmi.M_45s_nrt
+      else
+        set in_final = hmi.$obs'_45s'
+        set in_nrt = hmi.$obs'_45s_nrt'
+      endif
       set n_final = `show_info -cq $in_final"$QRY"`
       set n_nrt = `show_info -cq $in_nrt"$QRY"`
       set inseries = $in_nrt
@@ -101,20 +110,22 @@ while ($day <= $dayhigh)
         set inseries = $in_nrt
         set msg = "Quick-Look "
       endif
-    echo Use $inseries for "$QRY"
     endif
+    echo Use $inseries for "$QRY"
 
 set echo
     $RENDER_IMAGE $flaglist[$img] in=$inseries"$QRY" \
-      pallette=$colorlist[$img] \
-      min=$minlist[$img] \
-      max=$maxlist[$img] \
-      scaling=$scalinglist[$img] \
-      scale=4,8,16,1 \
-      outid=time \
-      type=jpg \
-      outname=$obs \
-      out='| ppmlabel -color white -size {%0.75:5} -x 15 -y {%98} -text "SDO/HMI '"$msg$namelist[$img]"': {ID}" | pnmtojpeg -quality=95'
+    pallette=$colorlist[$img] \
+    min=$minlist[$img] \
+    max=$maxlist[$img] \
+    scaling=$scalinglist[$img] \
+    scale=4,8,16,1 \
+    outid=time \
+    type=jpg \
+    outname=$obs \
+    out='| ppmlabel -color white -size {%0.75:5} -x 15 -y {%98} -text "SDO/HMI '"$msg$namelist[$img]"': {ID}" | pnmtojpeg -quality=95'
+
+    set finalimagetime = `show_info -q $inseries"$QRY" n=-1 key=T_REC`
 unset echo
     @ img = $img + 1
   end
@@ -124,35 +135,42 @@ end
 
 set exitstatus = 0
 
-if ($end_movie_t > 0 ) then
-  set end_movie = `time_convert s=$end_movie_t zone=TAI`
-
-  set hhmmss = `echo $end_movie | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`
-  set yyyymmdd = `echo $end_movie | sed -e 's/_.*//' -e 's/\.//g'`
-#  set LATESTLIST = $IMGROOT/image_times_UTC
-set LATESTLIST = $IMGROOT/image_times
+set echo
+if ($finalimagetime != NONE) then
+  set hhmmss = `echo $finalimagetime | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`
+  set yyyymmdd = `echo $finalimagetime | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
+  set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
+  set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
+  set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
+  set yyyymmdd = $YEAR$MON$DAY
+  set LATESTLIST = $IMGROOT/image_times
   set prevd = 0
   set prevt = 0
   if (-e $LATESTLIST) then
-    set prevM = `grep M $LATESTLIST`
+    set prevM = `grep Time $LATESTLIST`
     set prevdt = $prevM[2]
     set prevd = `echo $prevdt | sed -e 's/_.*//'`
     set prevt = `echo $prevdt | sed -e 's/.*_//'`
   endif
   if ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss > $prevt) ) then
+    set imagepath = http://jsoc.stanford.edu/data/hmi/images/$YEAR/$MON/$DAY
     set latest = $yyyymmdd'_'$hhmmss
-    cat > $LATESTLIST <<END
-Ic:	$latest
-Ic_flat:	$latest
-M:	$latest
-END
+    echo "Time    " $latest >  $LATESTLIST
+    set img = 1
+    while ($img <= $#obslist)
+      set obs = $obslist[$img]
+      echo "$obs " $imagepath/$latest"_"$obs >> $LATESTLIST
+      @ img = $img + 1
+    end
   endif
+endif
 
-  if ($isNRT) then
-      /home/phil/jsoc/proj/workflow/scripts/makeIcmovie $end_movie
+unset echo
+
+if ($end_movie_t > 0 && $isNRT ) then
+  set end_movie = `time_convert s=$end_movie_t zone=TAI`
+  /home/jsoc/pipeline/scripts/makeIcmovie $end_movie
   set exitstatus = $?
-  endif
-
 endif
 
 exit $exitstatus

@@ -86,7 +86,7 @@ else
 	echo "cd $HERE" >>$TEMPCMD
 	echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 	echo 'ingest_dsds_a -v -L  in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
-	# echo '/home/arta/cvs/JSOC/bin/linux_x86_64/ingest_dsds_a -v -L  in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
+	# echo '/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/ingest_dsds_a -v -L  in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
         echo 'echo $status >retstatus' >>$TEMPCMD
 	echo "rm -f $HERE/qsubs_running/$INSTANCE" >>$TEMPCMD
 

@@ -81,8 +81,8 @@ show_info hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? (QUAL
 set N_NOCR = 100000000
 # unless a SPECIAL arg of FIXMISSING=1 is present, just wait here until all records are present.  I.e. convert to a proper action=3
 if ($ACTION == 4 && $FIXMISSING == 0) then
+  set loopcount = 0
   while ($N_NOCR > 0)
-    set loopcount = 0
     show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
     comm -23 FSN_lev1 FSN_cosmic > NOCR
     set N_NOCR = `wc -l <NOCR`
@@ -154,7 +154,7 @@ set mmdd = `echo $yyyymmdd | sed -e "s/.....//" -e "s/://" `
 mkdir CRlogs
 set CRLOG = $HERE/CRlogs
 # set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/module_flatfield
-set module_flatfield = /home/production/cvs/JSOC/bin/linux_x86_64/module_flatfield
+set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/module_flatfield
 set cosmic_ray_post = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/cosmic_ray_post
 
 set QSUBCMD = CRY_$mmdd

@@ -83,7 +83,7 @@ while (1)
         cd ..
    end
    if ($keep_watching) then
-       sleep 30
+       sleep 15 
    else
        break
    endif

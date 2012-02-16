@@ -26,7 +26,8 @@ set minFileSize = 50000
 set BASE = /home/jsoc/hmi/images
 set WORKBASE = /home/jsoc/hmi/movies
 
-foreach Quant (Ic_flat M)
+#foreach Quant (Ic_flat M)
+foreach Quant (Ic_flat M M_color)
 
   set THISWORK = $Quant'_movies'.$$
   set WORK = $WORKBASE/$THISWORK
@@ -66,7 +67,9 @@ foreach Quant (Ic_flat M)
     @ imgtime_t = $imgtime_t + $cadence
   end
   
-  set HERE = $cwd
+#  set HERE = $cwd
+  set HERE = /home/jsoc/hmi/movies/
+  ls -ld $WORK/frames
   cd $WORK/frames
   
   echo Movie making place is $cwd
@@ -91,9 +94,10 @@ set echo
   cd $WORKBASE
   rm -rf $THISWORK
 
-  cd $HERE    
-
-  if (!(-e 14dmovies)) mkdir 14dmovies
+#  set 14dMOVIES = .14dmovies
+#  set D14dMOVIES = /tmp/14dmovies
+  set D14dMOVIES = .14dmovies
+  if (!(-e $D14dMOVIES)) mkdir $D14dMOVIES
 
   # on even hour endtime, make longer movie also
   @ nowtime_t = $endtime_t / 3600
@@ -108,7 +112,8 @@ set echo
     @ nowtime_t = $endtime_t - $fourteen
     set nowtime = `time_convert zone=TAI s=$nowtime_t`
     set endtime = `time_convert zone=TAI s=$endtime_t`
-    /home/jsoc/pipeline/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/14dmovies/$Quant"_14d.mp4"
+#    /home/jsoc/pipeline/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$14dMOVIES/$Quant"_14d.mp4"
+    /home/jsoc/pipeline/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$D14dMOVIES/$Quant"_14d.mp4"
     cd $WORKBASE
     rm -rf $THISWORK
   endif
@@ -116,13 +121,8 @@ set echo
 end
 
 cd $HERE
-if ( -e 14dmovies/Ic_flat_14d.mp4 ) then
-  mv 14dmovies/Ic_flat_14d.mp4 /home/jsoc/hmi/movies/latest/
-endif
-if ( -e 14dmovies/M_14d.mp4 ) then
-  mv 14dmovies/M_14d.mp4 /home/jsoc/hmi/movies/latest/
-endif
-if ( -e 14dmovies ) then
-  rm -rf 14dmovies
-endif
+ls -l $D14dMOVIES/
+   mv $D14dMOVIES/Ic_flat_14d.mp4 $D14dMOVIES/M_14d.mp4 /home/jsoc/hmi/movies/latest/
+   mv $D14dMOVIES/M_color_14d.mp4 /home/jsoc/hmi/movies/latest/
+   rm -rf $D14dMOVIES
 

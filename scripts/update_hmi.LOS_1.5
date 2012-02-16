@@ -31,7 +31,8 @@ set camera = 1
 set nrt = 0
 set cadence = 45
 set input = hmi.lev1
-set otherargs = "levin="lev1" levout="lev15" wavelength=3"
+#set otherargs = "levin="lev1" levout="lev15" wavelength=3 dpath=/home/couvidat/cvs/JSOC/proj/lev1.5_hmi/apps"
+set otherargs = "levin="lev1" levout="lev15" wavelength=3 "
 
 # round times to a slot
 set indexlow = `index_convert ds=$product $key=$WANTLOW`

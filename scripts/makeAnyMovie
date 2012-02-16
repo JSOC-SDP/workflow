@@ -4,7 +4,7 @@
 
 # make movie of selected days at cadence cadence
 # choices 0f cadence must be multiple of 15m.
-# args are:  start  stop  cadence  quantity (Ic, Ic_flat, M), size (256,512,1k,4k)
+# args are:  start  stop  cadence  quantity (Ic, Ic_flat, M, M_color), size (256,512,1k,4k)
 # Defaults are 1k, M, 15m, last 2 days.  Leading args must be present.
 # An optional 6th arg is full path to optional movie name and location.
 # default is http://jsoc.stanford.edu/data/hmi/movies/special/ with file
@@ -49,10 +49,10 @@ endif
 
 if ($#argv > 0) then # get observable
   set want = $1
-  if ($want == Ic || $want == Ic_flat || $want == M) then
+  if ($want == Ic || $want == Ic_flat || $want == M || $want == M_color) then
     set Quant = $want
   else
-    echo Quantity must be one of Ic, Ic_flat, or M, NOT $want
+    echo Quantity must be one of Ic, Ic_flat, M, or M_color, NOT $want
     exit 1
   endif
   shift

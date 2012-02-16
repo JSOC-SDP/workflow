@@ -19,24 +19,34 @@ set product = `cat product`
 set key = `cat key`
 set low = `cat low`
 set high = `cat high`
+set keytype = `cat type`
 set nancount = 0
 
 # set echo
 
 if ($low == "NaN") then
     set nancount = 1
-    if (`show_info -cq $product` <= 0) then
+    if (`show_info -iq $product n=1 | wc -l` <= 0) then
         echo $0 $* status of $product Empty Series
         echo "-1" > low
         echo "-1" > high
         set STATUS = 0
         goto EXITPLACE
     endif
-    show_info -q  $product'[^]' key=$key > low
-    if ($?) then
-       echo $0 $* FAILED
-       set STATUS = 1
-       goto EXITPLACE
+    if ($keytype == time) then
+      show_info -q  $product'[? $key > 0 ?] n=1' key=$key > low
+      if ($?) then
+         echo $0 $* FAILED
+         set STATUS = 1
+         goto EXITPLACE
+      endif
+    else
+      show_info -q  $product'[^]' key=$key > low
+      if ($?) then
+         echo $0 $* FAILED
+         set STATUS = 1
+         goto EXITPLACE
+      endif
     endif
     set nlow = `wc -c <low`
     if ($nlow == 0) then # There are no records in the series

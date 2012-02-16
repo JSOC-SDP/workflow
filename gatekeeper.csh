@@ -17,6 +17,7 @@ else
 endif
 
 cd $WFDIR
+echo $$ >> restart.log
 
 echo $USER > Gatekeeper_owner
 echo $HOST'.'$$ > Keep_running
@@ -27,6 +28,7 @@ while ($keep_running > 0)
     echo " "
     echo " "
     echo " "
+    echo `/bin/date +%Y.%m.%d_%H:%M:%S`
     echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX "
 
     # gatekkeper run mode management
@@ -237,18 +239,34 @@ echo starting $gate
             # see if there is a ticket in this gate's actiontask done queue
             # get info about this ticket.
 	    if ($verbosemode) echo "GATEKEEPER look at done task $donetask"
+            set lookroot = $donetask:s/-/./:e
+            if ($lookroot == root) then
+               echo found done task for $actiontask
+               set root_done = 1
+            else
+               set root_done = 0
+	    endif 
 	    foreach key (TICKET GATE TASKID)
 		set setval = `grep $key $donetask/ticket`
-		set $setval
+                if ($#setval) then
+		    set $setval
+                else
+                    set $key = VOID
+	        endif
 	    end
-            set parenttask = `echo $TASKID | sed -e 's/-.*//'`
-            rm -f ../logs/$TICKET/manager.pid
+            if ($TASKID == VOID) then
+		set TASKID = $donetask
+	    endif
+	    # set parenttask = `echo $TASKID | sed -e 's/-.*//'`
+            set parenttask = $TASKID:s/-/./:r
+            if ($TICKET != VOID) rm -f ../logs/$TICKET/manager.pid
             if ($verbosemode) echo "GATEKEEPER parent task is $parenttask"
 	    ex - $donetask/ticket <<!
 /STATUS/d
 w
 q
 !
+if ($debugmode) ls -l $donetask/ticket
 	    set taskstate = `cat $donetask/state`
 	    if ($taskstate == 0) then
                 echo "STATUS=0" >> $donetask/ticket
@@ -256,18 +274,16 @@ q
 	    else 
                 echo "STATUS=5" >> $donetask/ticket
 		mv $donetask ../archive/failed
-#if ($debugmode) then
-echo " " >> $WFDIR/FAILED_TASKS
-echo -n "$actiontask FAILED for " >>$WFDIR/FAILED_TASKS
-echo -n `grep WANTLOW $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket` >> $WFDIR/FAILED_TASKS
-echo -n "  " >> $WFDIR/FAILED_TASKS
-echo -n   `grep WANTHIGH $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket` >> $WFDIR/FAILED_TASKS
-echo -n "  at " >> $WFDIR/FAILED_TASKS
-date >> $WFDIR/FAILED_TASKS
-echo "     See:" $WFDIR/tasks/$actiontask/archive/failed/$donetask >> $WFDIR/FAILED_TASKS
-#endif
+		echo " " >> $WFDIR/FAILED_TASKS
+		echo -n "$actiontask FAILED for " >>$WFDIR/FAILED_TASKS
+		echo -n `grep WANTLOW $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket` >> $WFDIR/FAILED_TASKS
+		echo -n "  " >> $WFDIR/FAILED_TASKS
+		echo -n   `grep WANTHIGH $WFDIR/tasks/$actiontask/archive/failed/$donetask/ticket` >> $WFDIR/FAILED_TASKS
+		echo -n "  at " >> $WFDIR/FAILED_TASKS
+		date >> $WFDIR/FAILED_TASKS
+		echo "     See:" $WFDIR/tasks/$actiontask/archive/failed/$donetask >> $WFDIR/FAILED_TASKS
 	    endif
-            mv ../logs/$TICKET ../archive/logs
+            if (-e ../logs/$TICKET) mv ../logs/$TICKET ../archive/logs
 if ($verbosemode) echo "GATEKEEPER done queue, move $GATE/active_tickets/$TICKET to /$parenttask/active/$TASKID/ticket_return"
             if (-e $WFDIR/gates/$GATE/active_tickets/$TICKET) then
 	      mv $WFDIR/gates/$GATE/active_tickets/$TICKET $WFDIR/tasks/$parenttask/active/$TASKID/ticket_return
@@ -275,11 +291,11 @@ if ($verbosemode) echo "GATEKEEPER done queue, move $GATE/active_tickets/$TICKET
             if (-e $WFDIR/tasks/$parenttask/active/$TASKID/pending_tickets/$TICKET) then
 	      rm $WFDIR/tasks/$parenttask/active/$TASKID/pending_tickets/$TICKET
             else if (-e $WFDIR/tasks/$parenttask/archive/ok/$TASKID/pending_tickets/$TICKET) then
-              rm $WFDIR/tasks/$parenttask/active/$TASKID/pending_tickets/$TICKET
+              # rm $WFDIR/tasks/$parenttask/active/$TASKID/pending_tickets/$TICKET
             else
 echo "GATEKEEPER done queue, FAILED to rm $WFDIR/tasks/$parenttask/active/$TASKID/pending_tickets/$TICKET"
             endif
-        end # processing this gate's action task done list
+        end # processing this gate's action task done list for donetask
 	cd $thisgatedir
 
 	if ($verbosemode) echo "GATEKEEPER DONE with done queue, start at $gate active_tickets"
@@ -430,4 +446,5 @@ ALL_GATES_DONE:
 end # keep_running loop
 
 echo Gate_Keeper Exit
+exit 0
 
