@@ -123,7 +123,7 @@ while ($iprod <= $nprod)
 end
 
 # get lookdata and exportdata responsiveness
-set webinfo = `tail -30 /home/jsoc/exports/fetch_log | awk 'BEGIN { min=100000; max=0} {for (i=1; i<NF; i++) if ($i ~ /lag=.*/) {sub(/lag=/,"",$i); lag=$i}} {sum += lag; n++; } lag<min{min=lag} lag>max{max=lag} END { avg = sum/n; print  sprintf("%0.3f",avg) " min=" min " max=" max }'`
+set webinfo = `tail -30 /home/jsoc/exports/logs/fetch_log | awk 'BEGIN { min=100000; max=0} {for (i=1; i<NF; i++) if ($i ~ /lag=.*/) {sub(/lag=/,"",$i); lag=$i}} {sum += lag; n++; } lag<min{min=lag} lag>max{max=lag} END { avg = sum/n; print  sprintf("%0.3f",avg) " min=" min " max=" max }'`
 echo '<TR><TD>&nbsp;<TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR>' >>$TMP
 echo -n '<TR><TD>web response</TD><TD' >>$TMP
 set lag=$webinfo[1]
