@@ -1,0 +1,78 @@
+#! /bin/csh -f
+#
+# these lines for all products
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_DATA
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+
+cd $WFDIR
+rm -f Keep_running
+while (-e GATEKEEPERBUSY)
+  echo waiting for gatekeeper to quit.
+  sleep 5
+  end
+
+# begin section for this product
+
+# make test gates and tasks for HMI line-of-sight observables
+# This includes the several input series.
+
+# remove prior versions
+
+cd $WFDIR/gates
+rm -rf aia.lev1 aia.lev0
+
+cd $WFDIR/tasks
+rm -rf update_aia.lev1 stage_aia.lev0
+
+# Make tasks and set preconditions
+
+# NOTE the "command" script used below must be available and executable when this script is run
+cd $WFDIR
+$WFCODE/maketask.csh task=update_aia.lev1 manager=taskmanager.csh target=aia.lev1 \
+		command=scripts/update_aia.lev1.csh maxrange=86400 parallelOK=5
+
+set PRECOND = $WFDIR/tasks/update_aia.lev1/preconditions
+
+# Use action=5 since the action task for lev0 wants a big range and will only stage
+# SUs that are offline.
+
+mkdir $PRECOND/aia.lev0
+cat > $PRECOND/aia.lev0/prepare_ticket <<STOP
+    set ACTION = 5
+    set prewanthigh_t = \`time_convert time=\$WANTHIGH\`
+    set prewantlow_t =  \`time_convert time=\$WANTLOW\`
+    set USELOW =  \`show_info -q key=FSN aia.lev0'[? T_OBS>='\$prewantlow_t' AND T_OBS<='\$prewanthigh_t' ?]' n=1\`
+    set USEHIGH = \`show_info -q key=FSN aia.lev0'[? T_OBS>='\$prewantlow_t' AND T_OBS<='\$prewanthigh_t' ?]' n=-1\`
+STOP
+
+# Prerequisite task is aia.lev0
+
+$WFCODE/maketask.csh task=stage_aia.lev0 manager=taskmanager.csh target=aia.lev0 \
+		command=scripts/stage_lev0_by_FSN.csh maxrange=86400 parallelOK=1
+
+
+# Now make gates.
+
+cd $WFDIR
+$WFCODE/makegate.csh gate_name=aia.lev1 product=aia.lev1 type=time key=T_REC project=AIA \
+		 actiontask=update_aia.lev1 statustask=scripts/status-general.csh
+
+# Prerequisite gates
+
+$WFCODE/makegate.csh gate_name=aia.lev0 product=aia.lev0 type=FSN key=FSN project=AIA \
+		 actiontask=stage_aia.lev0 statustask=scripts/status_aia.lev0.csh coverage_args=NEVER
+
+# initialize the gates
+show_info key=FSN -q aia.lev0'[^]'                          > $WFDIR/gates/aia.lev0/low
+show_info key=FSN -q aia.lev0'[? FSN<400000000 ?]' n=-1     > $WFDIR/gates/aia.lev0/high
+
+show_info key=T_REC -q aia.lev1'[? T_REC_index > 0 ?]' n=1  > $WFDIR/gates/aia.lev1/low
+show_info key=T_REC -q aia.lev1'[$]'                        > $WFDIR/gates/aia.lev1/high
+
+
+

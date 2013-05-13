@@ -1,0 +1,45 @@
+#! /bin/csh -f
+#
+# make test gates and tasks for HMI line-of-sight observables
+
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_DATA
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+
+# Stop the gatekeeper in case it is running.
+
+cd $WFDIR
+rm -f Keep_running
+while (-e GATEKEEPERBUSY)
+  echo waiting for gatekeeper to quit.
+  sleep 5
+  end
+
+# Make task
+
+cd $WFDIR
+$WFCODE/maketask.csh task=update_hmi.ME_720s \
+		manager=taskmanager.csh \
+		target=hmi.ME_720s \
+		command=scripts/update_hmi.ME_720s \
+		maxrange=86400 \
+		parallelOK=4
+set PRECOND = $WFDIR/tasks/update_hmi.ME_720s/preconditions/hmi.Vector
+mkdir $PRECOND
+echo "set ACTION = 3" > $PRECOND/prepare_ticket
+
+# Now make gate.
+
+cd $WFDIR
+$WFCODE/makegate.csh gate_name=hmi.ME_720s \
+		 product=hmi.ME_720s_e15w1332
+		 type=time \
+		 key=T_REC \
+		 project=HMI \
+		 actiontask=update_hmi.ME_720s \
+		 statustask=scripts/status-general.csh
+

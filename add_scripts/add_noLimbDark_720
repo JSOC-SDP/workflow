@@ -1,0 +1,54 @@
+#! /bin/csh -f
+#
+# make test gates and tasks for HMI limb dark removed 12m data
+
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_DATA
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+
+# Stop the gatekeeper in case it is running.
+
+cd $WFDIR
+rm -f Keep_running
+while (-e GATEKEEPERBUSY)
+  echo waiting for gatekeeper to quit.
+  sleep 5
+  end
+
+cd $WFDIR/gates
+rm -rf hmi.noLD_720
+
+cd $WFDIR/tasks
+rm -rf update_hmi.noLD_720
+
+# Make task
+
+cd $WFDIR
+$WFCODE/maketask.csh task=update_hmi.noLD_720 \
+		manager=taskmanager.csh \
+		target=hmi.noLD_720 \
+		command=scripts/update_hmi.Ic_noLimbDark \
+		maxrange=86400 \
+		parallelOK=5
+set PRECOND = $WFDIR/tasks/update_hmi.noLD_720/preconditions/hmi.Vector
+mkdir $PRECOND
+echo "set ACTION = 3" > $PRECOND/prepare_ticket
+
+# Now make gate.
+
+cd $WFDIR
+$WFCODE/makegate.csh gate_name=hmi.noLD_720 \
+		 product=hmi.Ic_noLimbDark_720s \
+		 type=time \
+		 key=T_REC \
+		 project=HMI \
+                 low=2011.03.24_TAI \
+                 high=2011.03.24_TAI \
+		 actiontask=update_hmi.noLD_720 \
+		 statustask=scripts/status-general.csh
+
+

@@ -7,14 +7,6 @@ set thiscmd = `basename $0`
 if ($thiscmd == checktasks.csh) set keep_watching = 0
 
 # monitor program, tasks only
-   set noglob
-   if ($#argv >= 1) then
-     set LIST = "*"$1"*"
-   else
-     set LIST = "*"
-   endif
-echo "$LIST"
-   unset noglob
 
 if ($?WORKFLOW_ROOT) then
   set WFDIR = $WORKFLOW_DATA
@@ -23,6 +15,15 @@ else
   echo Need WORKFLOW_ROOT variable to be set.
   exit 1
 endif
+
+   set noglob
+   if ($#argv >= 1) then
+     set LIST = `/bin/ls $WFDIR/tasks | grep -i $1`
+   else
+     set LIST = "*"
+   endif
+echo "$LIST"
+   unset noglob
 
 set nonomatch
 

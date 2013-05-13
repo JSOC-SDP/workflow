@@ -1,0 +1,28 @@
+#! /bin/csh -f
+
+#
+# WARNING - do not run this while gatekeeper is active
+
+set WFDIR = $WORKFLOW_DATA
+set WFCODE = $WORKFLOW_ROOT
+cd $WFDIR
+
+set NEWTASK = update_hmi.harp_nrt
+set NEWGATE = repeat_harp_nrt
+
+# remove prior test version
+
+if (-e tasks/$NEWTASK) rm -rf tasks/$NEWTASK
+if (-e gates/$NEWGATE) rm -rf gates/$NEWGATE
+
+# finally make task 
+$WFCODE/maketask.csh task=$NEWTASK manager=taskmanager.csh target=$NEWGATE maxrange=720 \
+                command=scripts/start_hmi_harp_nrt.csh
+
+
+$WFCODE/makegate.csh gate_name=$NEWGATE product=none type=time key=NA \
+	low=2010.03.24_00:00:00_TAI high=2010.03.24_00:00:00_TAI \
+	actiontask=$NEWTASK statustask=scripts/status_clock.csh
+
+# initialization ticket not needed. 
+
