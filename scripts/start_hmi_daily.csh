@@ -62,15 +62,18 @@ while ($WORKDAY_D <= $WANTHIGH_D)
   set LOSARGS = "gate=hmi.LOS       taskid=$TASKID wantlow=$LOSLOW wanthigh=$LOSHIGH action=5"
 # webImages runs with precondition for nrt data
   # set IMGARGS = "gate=hmi.webImages taskid=$TASKID wantlow=$LOSLOW wanthigh=$IMGHIGH action=5"
-  set VECARGS = "gate=hmi.Vector    taskid=$TASKID wantlow=$VECLOW wanthigh=$VECHIGH action=5"
+  set VECARGS = "gate=hmi.Vector taskid=$TASKID wantlow=$VECLOW wanthigh=$VECHIGH action=5"
+  set LIMBARGS = "gate=hmi.LimbFit taskid=$TASKID wantlow=$LOSLOW wanthigh=$IMGHIGH action=5"
 
   set LOS_TICKET = `$WFCODE/maketicket.csh $LOSARGS `
   set VEC_TICKET = `$WFCODE/maketicket.csh $VECARGS `
+#  set LIMB_TICKET = `$WFCODE/maketicket.csh $LIMBARGS `
   # set IMG_TICKET = `$WFCODE/maketicket.csh $IMGARGS `
   set IMG_TICKET = NOTYET
 
   cd pending_tickets
   while ((-e $LOS_TICKET || -e $IMG_TICKET || -e $VEC_TICKET))
+#  while ((-e $LOS_TICKET || -e $IMG_TICKET || -e $VEC_TICKET || -e $LIMB_TICKET))
      echo -n '.'
      sleep 3600
   end

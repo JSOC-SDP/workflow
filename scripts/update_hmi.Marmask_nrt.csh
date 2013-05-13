@@ -27,6 +27,7 @@ set key = `cat $WFDIR/gates/$GATE/key`
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
 
+
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
 
@@ -46,9 +47,11 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus=0' >>&$TEMPCMD
 
-foreach trec ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
-  echo "$HMI_segment xm=hmi.M_720s\["$trec"] xp=hmi.Ic_noLimbDark_720s\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s >>&$TEMPLOG" >>$TEMPCMD
+foreach trec ( `$SHOW_INFO -q hmi.M_720s_nrt'['$wantlow'-'$wanthigh']' key=t_rec` )
+  echo "$HMI_segment xm=hmi.M_720s_nrt\["$trec"] xp=hmi.Ic_noLimbDark_720s_nrt\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
 end
+
+#echo "$HMI_segment xm=hmi.M_720s_nrt\["$wantlow"-"$wanthigh"]" "xp=hmi.Ic_noLimbDark_720s_nrt\["$wantlow"-"$wanthigh"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus = $?' >>$TEMPCMD
 echo 'if ($SEGstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
@@ -56,7 +59,10 @@ echo 'echo $SEGstatus >retstatus' >>&$TEMPCMD
 
 # execute qsub script
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,p.q $TEMPCMD >> runlog
+qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,p.q $TEMPCMD 
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
+
+#set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+
 exit $retstatus

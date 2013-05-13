@@ -1,0 +1,125 @@
+#! /bin/csh -f
+# Make M_720s 1K fits files
+# 
+
+# set echo
+
+set wantlow = $1
+set wanthigh = $2
+
+echo Make images for $wantlow to $wanthigh
+
+# from here make script that can make fits files in standard place
+
+# start with hourly files
+set CADENCE = 60
+
+#set JSOC_REBIN = /home/phil/cvs/JSOC/bin/linux_x86_64/jsoc_rebin
+set JSOC_REBIN = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/jsoc_rebin
+set JSOC_AS_FITS = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/jsoc_export_as_fits
+
+set obslist = (M)
+set flaglist = (-c)
+
+set finalimagetime = NONE
+
+set isNRT = 0
+
+set wantlow_t = `time_convert time=$wantlow`
+set wanthigh_t = `time_convert time=$wanthigh`
+
+@ daylow = $wantlow_t / 86400
+@ dayhigh = $wanthigh_t / 86400
+
+set day = $daylow
+while ($day <= $dayhigh)
+  @ day_t = 86400 * $day
+  @ nextday_t = $day_t + 86400
+  @ last_t = $nextday_t - 45
+  if ($last_t > $wanthigh_t) set last_t = $wanthigh_t
+  set first_t = $day_t
+  if ($first_t < $wantlow_t) set first_t = $wantlow_t
+  @ cadence = $CADENCE * 60
+  @ first_mod_t = $first_t - 45
+  @ imglow_t = $first_mod_t / $cadence
+  @ imglow_t = $imglow_t + 1
+  @ first_t = $imglow_t * $cadence
+  set first = `time_convert s=$first_t zone=TAI`
+  @ last_mod_t = $last_t + $cadence
+  @ imghigh_t = $last_mod_t / $cadence
+  @ n_images = $imghigh_t - $imglow_t
+  if ($n_images < 0) set n_images = 0
+  if ($n_images == 0) then
+    @ day = $day + 1
+    continue
+  endif
+  @ n_minutes = $n_images * $CADENCE
+  set QRY = '['$first'/'$n_minutes'm@'$CADENCE'm]'
+  set yyyymmdd = `echo $first | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
+  set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
+  set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
+  set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
+
+  set IMGROOT = /home/jsoc/hmi/fits
+  set IMGPATH = $IMGROOT/$YEAR
+  if (!(-e $IMGPATH)) mkdir $IMGPATH
+  set IMGPATH = $IMGPATH/$MON
+  if (!(-e $IMGPATH)) mkdir $IMGPATH
+  set IMGPATH = $IMGPATH/$DAY
+  if (!(-e $IMGPATH)) mkdir $IMGPATH
+
+  cd $IMGPATH
+
+  set img = 1
+  while ($img <= $#obslist)
+    set obs = $obslist[$img]
+    if ($obs == M ) then
+        set in = hmi.M_720s
+        set out = $in'_resized'
+    else
+        echo No code for $obs
+        exit 1
+    endif
+    set n = `show_info -cq $in"$QRY"`
+    set inseries = $in
+    echo Use $inseries for "$QRY"
+
+set echo
+    $JSOC_REBIN $flaglist[$img] in=$inseries"$QRY" scale=0.25 out=$out
+    $JSOC_AS_FITS \
+        reqid='NA' \
+        expversion=0.5 \
+        rsquery=$out"$QRY" \
+        n=0 \
+        path=./ \
+        ffmt='hmi.M_720s.{T_REC:A}.fits' \
+        method='url' \
+        protocol='fits' \
+        cparms='compress Rice'
+    @ img = $img + 1
+    rm $IMGPATH/index.txt
+  end
+
+  @ day = $day + 1
+end
+
+foreach tobs ( `show_info -q "hmi.M_720s$QRY" key=t_obs` )
+  @ t = `time_convert time=$tobs`
+  @ t2 = $t + 20
+  set ds_tobs = `time_convert s=$t2 zone=TAI`
+  set year = `echo "$ds_tobs" | awk -F\. '{print $1}'`
+  set mo = `echo "$ds_tobs" | awk -F\. '{print $2}'` 
+  set dy = `echo "$ds_tobs" | awk -F\. '{print $3}' | awk -F\_ '{print $1}'` 
+  set hour = `echo "$ds_tobs" | awk -F\_ '{print $2}' | awk -F\: '{print $1}'` 
+  set nrt_file = $IMGPATH/hmi.M_720s_nrt.$year$mo$dy'_'$hour'0000_TAI.fits'
+  if ( -e $nrt_file ) then
+    rm $nrt_file
+  else 
+    echo "No nrt file to remove."
+  endif
+end
+
+set exitstatus = 0
+
+
+exit $exitstatus

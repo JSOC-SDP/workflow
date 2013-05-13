@@ -25,18 +25,18 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
+set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
 set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_IQUV_averaging
-
 set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
-
 set HMI_limbdark = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
-
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
-
 #set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_patch_module
 
-set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1_nrt quicklook=1"
-set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=0 cadence=720.0 lev1=hmi.lev1_nrt"
+#set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1_nrt quicklook=1"
+#set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=0 cadence=720.0 lev1=hmi.lev1_nrt"
+##  CHANGED arguments 2012.10.16 for Sebastien's new observables code
+set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1_nrt quicklook=1 linearity=1"
+set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=0 cadence=720.0 lev1=hmi.lev1_nrt smooth=1 linearity=1" 
 set LD_args = "-cnxf NONE"
 #set PATCH_args = "bb=hmi.Mpatch_720s_nrt"
 
@@ -60,12 +60,16 @@ set babble = $HERE/babble
 set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
+# check for eclipse quality bits to be set in lev1_nrt
+$ECLIPSEscript $wantlow $wanthigh nrt
+
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "setenv OMP_NUM_THREADS 8" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
+#echo "$ECLIPSEscript $wantlow $wanthigh nrt >>&$TEMPLOG" >>$TEMPCMD
 echo 'set IQUVstatus=0' >>&$TEMPCMD
 echo 'set OBSstatus=0' >>&$TEMPCMD
 #echo 'set PATstatus=0' >>&$TEMPCMD
@@ -77,7 +81,7 @@ echo 'if ($IQUVstatus) goto DONE' >>&$TEMPCMD
 echo "$HMIprogram begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set OBSstatus = $?' >>$TEMPCMD
 echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
-echo "$HMI_limbdark in=hmi.Ic_720s_nrt\["$wantlow"] out=hmi.Ic_noLimbDark_720s_nrt "$LD_args" >>&$TEMPLOG" >>$TEMPCMD
+echo "$HMI_limbdark in=hmi.Ic_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ic_noLimbDark_720s_nrt "$LD_args" >>&$TEMPLOG" >>$TEMPCMD
 echo 'set LDstatus = $?' >>$TEMPCMD
 echo 'if ($LDstatus) goto DONE' >>&$TEMPCMD
 
@@ -107,8 +111,10 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 
 # execute qsub script
 touch $HERE/qsub_running
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q p8.q,j8.q $TEMPCMD >> runlog
+set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
+qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q p8.q,j8.q $TEMPCMD 
 
+set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`

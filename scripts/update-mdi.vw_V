@@ -92,7 +92,8 @@ else
 
 	touch $HERE/qsubs_running/$INSTANCE
 	# qsub -e $HERE/$TEMPLOG -o $HERE/$TEMPLOG -q j.q $HERE/$TEMPCMD
-	qsub -sync yes -e $HERE/$TEMPLOG -o $HERE/$TEMPLOG -q j.q $HERE/$TEMPCMD
+        set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
+	qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,p.q $HERE/$TEMPCMD
 endif
 
 # while (`/bin/ls $HERE/qsubs_running/ | wc -l` > 0)

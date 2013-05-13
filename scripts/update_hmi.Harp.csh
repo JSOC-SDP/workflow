@@ -1,5 +1,5 @@
 #! /bin/csh -f
-# Script to make HMI Marmask - Mag Acrive Region Mask 720s
+# Script to make HMI HARPS 
 #
 
 # XXXXXXXXXX test
@@ -24,15 +24,26 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
+set HARPS = /home/jsoc/cvs/Development/JSOC/proj/mag/harp/scripts/track_and_ingest_mharp.sh
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
 
+# round times to a slot
+#set indexlow = `index_convert ds=$product $key=$WANTLOW`
+#set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+#@ indexhigh = $indexhigh - 1
+#set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
+#set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+#set timestr = `echo $wantlow  | sed -e 's/[._:]//g' -e 's/^.......//' -e 's/TAI//'`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
-set timename = MSK
+set timename = HARP
 set qsubname = $timename$timestr
+
+#if ($indexhigh < $indexlow) then
+#   echo No data to process, $WANTLOW to $WANTHIGH > $HERE/runlog
+#   exit 0
+#endif
 
 set TEMPLOG = $HERE/runlog
 set babble = $HERE/babble
@@ -44,15 +55,13 @@ echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
-echo 'set SEGstatus=0' >>&$TEMPCMD
+echo 'set HARPstatus=0' >>&$TEMPCMD
 
-foreach trec ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
-  echo "$HMI_segment xm=hmi.M_720s\["$trec"] xp=hmi.Ic_noLimbDark_720s\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s >>&$TEMPLOG" >>$TEMPCMD
-end
-echo 'set SEGstatus = $?' >>$TEMPCMD
-echo 'if ($SEGstatus) goto DONE' >>&$TEMPCMD
+echo "$HARPS /tmp22/HARPS/definitive 'hmi.Marmask_720s\["$wantlow"-"$wanthigh"]' hmi.Mharp_720s hmi.Mharp_log_720s >>&$TEMPLOG" >>$TEMPCMD
+echo 'set HARPstatus = $?' >>$TEMPCMD
+echo 'if ($HARPstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
-echo 'echo $SEGstatus >retstatus' >>&$TEMPCMD
+echo 'echo $HARPstatus >retstatus' >>&$TEMPCMD
 
 # execute qsub script
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`

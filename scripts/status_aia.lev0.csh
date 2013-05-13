@@ -1,6 +1,8 @@
 #! /bin/csh -f
 # set echo
 
+# this status task is designed for aia.lev0 and hmi.lev0 only
+
 # echo starting $0 $*
 
 if ($?WORKFLOW_ROOT) then
@@ -19,35 +21,25 @@ set product = `cat product`
 set key = `cat key`
 set low = `cat low`
 set high = `cat high`
-set keytype = `cat type`
 set nancount = 0
 
 # set echo
 
 if ($low == "NaN") then
     set nancount = 1
-    if (`show_info -iq $product n=1 | wc -l` <= 0) then
+    # 0X1C000000 == 469762048
+    if (`show_info -cq $product'[? FSN < 469762048 ?]'` <= 0) then
         echo $0 $* status of $product Empty Series
         echo "-1" > low
         echo "-1" > high
         set STATUS = 0
         goto EXITPLACE
     endif
-    if ($keytype == time) then
-#    show_info -q $product'[? $key > 0 ?]' n=1' key=$key > low
-      show_info -q  $product'[? '$key' > 0 ?]' n=1 key=$key | tail -1 > low
-      if ($?) then
-         echo $0 $* FAILED
-         set STATUS = 1
-         goto EXITPLACE
-      endif
-    else
-      show_info -q  $product'[^]' key=$key | tail -1 > low
-      if ($?) then
-         echo $0 $* FAILED
-         set STATUS = 1
-         goto EXITPLACE
-      endif
+    show_info -q  $product'[^]' key=$key > low
+    if ($?) then
+       echo $0 $* FAILED
+       set STATUS = 1
+       goto EXITPLACE
     endif
     set nlow = `wc -c <low`
     if ($nlow == 0) then # There are no records in the series
@@ -61,24 +53,12 @@ set low = `cat low`
 
 if ($high == "NaN") @ nancount = $nancount + 1
 
-show_info -q  $product'[$]' key=$key | tail -1 > high
+show_info -q  $product'[? FSN < 469762048 ?]' n=-1 key=$key > high
 if ($?) then
    echo $0 $* FAILED
    set STATUS = 1
    goto EXITPLACE
 endif
-
-# if ($#argv < 2) then
-#   set nhigh = `wc -c <high`
-#  if ($nhigh == 0) then # There are no records in the series
-#   echo #### SETTING -1 where product=$product and show_info call gives:
-#   show_info -q  $product'[$]' key=$key 
-#         echo "-1" > low
-#         echo "-1" > high
-#         set STATUS = 0
-#         goto EXITPLACE
-#   endif
-# endif
 
 set high = `cat high`
 

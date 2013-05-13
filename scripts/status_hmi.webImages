@@ -7,7 +7,8 @@ set LATESTLIST = $IMGROOT/image_times
 set prevd = 0
 set prevt = 0
 if (-e $LATESTLIST) then
-  set prevM = `grep M $LATESTLIST`
+  # set prevM = `grep M $LATESTLIST`
+  set prevM = `grep Time $LATESTLIST`
   set prevdt = $prevM[2]
   set prevd = `echo $prevdt | sed -e 's/_.*//'`
   set prevt = `echo $prevdt | sed -e 's/.*_//'`

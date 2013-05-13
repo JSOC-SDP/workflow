@@ -1,0 +1,28 @@
+#! /bin/csh -f
+
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
+set SHOW_COVERAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_coverage
+
+set now = `date -u +%Y.%m.%d_%H:%M:%S`
+set now_t = `$TIME_CONVERT time=$now`
+
+@ TenDaysAgo_t =  $now_t - 864000
+set TenDaysAgo = `$TIME_CONVERT s=$TenDaysAgo_t`
+@ ThreeDaysAgo_t = $now_t - 259200
+set ThreeDaysAgo = `$TIME_CONVERT s=$ThreeDaysAgo_t`
+
+
+echo "$now  $now_t  $TenDaysAgo  $TenDaysAgo_t $ThreeDaysAgo_t  $ThreeDaysAgo"
+set showCov = "/web/jsoc/htdocs/data/.showCov" 
+echo "$SHOW_COVERAGE ds=hmi.M_45s low=$TenDaysAgo high=$now | grep UNK > $showCov.tmp"
+
+set showCovNRT = "/web/jsoc/htdocs/data/.showCovNRT"
+echo "$SHOW_COVERAGE ds=hmi.V_720s_nrt low=$ThreeDaysAgo high=$now | grep UNK > $showCovNRT.tmp"
+
+set showCovAIA = "/web/jsoc/htdocs/data/.showCovAIA"
+echo "$SHOW_COVERAGE aia.lev1 low=$TenDaysAgo key=FSN | grep UNK > $showCovAIA.tmp"
+
+set showCovAIANRT = "/web/jsoc/htdocs/data/.showCovAIANRT"
+echo "$SHOW_COVERAGE aia.lev1_nrt2 low=$ThreeDaysAgo key=FSN | grep UNK > $showCovAIANRT.tmp"
+
+

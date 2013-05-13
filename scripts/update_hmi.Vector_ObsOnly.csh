@@ -89,6 +89,7 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 
 # execute qsub script
 touch $HERE/qsub_running
+set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j8.q $TEMPCMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`

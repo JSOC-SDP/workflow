@@ -41,7 +41,8 @@ echo "rm -f $HERE/qsub_running" >>$CMD
 
 # execute qsub script
 touch qsub_running
-qsub -e $LOG -o $LOG -q j.q $CMD
+set LOG = `echo $LOG | sed "s/^\/auto//"`
+qsub -e $LOG -o $LOG -q j.q,p.q $CMD
 
 set waitcount=0
 while (-e qsub_running)

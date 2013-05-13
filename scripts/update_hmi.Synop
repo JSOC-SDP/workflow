@@ -1,0 +1,86 @@
+#! /bin/csh -f
+
+# Actiontask for Carrington synoptip charts from HMI.
+
+# key type is CARROT so times are in Carrington rotation numbers.
+
+# all rotations wantlow through wanthigh inclusive will be generated.
+set echo
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_ROOT
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+
+set HMISYNOP = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmisynoptic
+set CTIMES = /home/wso/bin/_linux4/ctimes
+set TCONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
+
+set now = `date +%Y.%m.%d`
+@ tExpire_s = `$TCONVERT time=$now` + 3024000  # ticket expires in 35 days
+set tExpire = `$TCONVERT s=$tExpire_s`
+
+set wantlow = `cat wantlow`
+set wanthigh = `cat wanthigh`
+
+set HERE = $cwd
+set LOG = $HERE/runlog
+set CMD = $HERE/CR_$wantlow
+#set babble = $HERE/babble
+
+date >>& $LOG
+
+# make qsub script
+echo "#! /bin/csh -f " >$CMD
+echo "cd $HERE" >>$CMD
+echo "hostname >>& $LOG" >>$CMD
+echo "set nBAD = 0" >>$CMD
+
+set crot = $wantlow
+while ($crot <= $wanthigh)
+  set lowt = `$CTIMES -j  "CT"$crot":360"`
+  set lowT = `echo $lowt | awk -F\_ '{print $1}'` 
+  set hight = `$CTIMES -j "CT"$crot":0"`
+  @ highs = `$TCONVERT time=$hight` + 86400
+  set highT = `$TCONVERT s=$highs | awk -F\_ '{print $1}'`
+  echo "$HMISYNOP in=hmi.Ml_remap_720s\["$lowT"-"$highT"] out=hmi.Synoptic_Ml_720s smallsyn=hmi.Mlsynop_small_720s CR=$crot >>& $LOG" >>$CMD
+  echo "$HMISYNOP in=hmi.Mr_remap_720s\["$lowT"-"$highT"] out=hmi.Synoptic_Mr_720s smallsyn=hmi.Mrsynop_small_720s CR=$crot >>& $LOG" >>$CMD
+  echo 'set retstatus = $?' >>$CMD
+  echo 'echo '$crot' done, status = $retstatus >>& '$LOG >>$CMD
+  echo 'if ($retstatus) @ nBAD = $nBAD + 1' >>$CMD
+  @ crot = $crot + 1
+end
+
+echo 'echo $nBAD >retstatus' >>$CMD
+echo "rm -f $HERE/qsub_running" >>$CMD
+
+# execute qsub script
+touch qsub_running
+set LOG = `echo $LOG | sed "s/^\/auto//"`
+qsub -e $LOG -o $LOG -q j.q,p.q $CMD
+
+set waitcount=0
+while (-e qsub_running)
+    sleep 10
+    @ waitcount = $waitcount + 1
+    if ($waitcount > 720) then
+      echo "timed out after 2 hours" >FailMessage
+      set retstatus = 5
+      exit $retstatus
+    endif
+#    echo -n '+' >>$babble
+end
+
+set echo
+set retstatus = `cat $HERE/retstatus`
+#@ last_cr = `show_info -q hmi.Synoptic_Mr_720s n=-1 key=car_rot` - 1
+
+#if ( $crot > $last_cr) then
+#  NEXT_CR = `$WORKFLOW_ROOT/maketicket.csh gate=hmi.Synop wantlow=$crot wanthigh=$crot action=5 expire=$tExpire`
+#echo "$WORKFLOW_ROOT/maketicket.csh gate=hmi.Synop wantlow=$crot wanthigh=$crot action=5 expire=$tExpire"
+i#endif
+
+exit $retstatus
+~                                                                                                     

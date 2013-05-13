@@ -24,6 +24,7 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
+set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
 set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
@@ -32,7 +33,9 @@ set nrt = 0
 set cadence = 45
 set input = hmi.lev1
 #set otherargs = "levin="lev1" levout="lev15" wavelength=3 dpath=/home/couvidat/cvs/JSOC/proj/lev1.5_hmi/apps"
-set otherargs = "levin="lev1" levout="lev15" wavelength=3 "
+#set otherargs = "levin="lev1" levout="lev15" wavelength=3 "
+## CHANGED on 10/16/2012 for Sebastien's new observables code
+set otherargs = "levin="lev1" levout="lev15" wavelength=3 smooth=1 linearity=1 "
 
 # round times to a slot
 set indexlow = `index_convert ds=$product $key=$WANTLOW`
@@ -57,6 +60,10 @@ set babble = $HERE/babble
 set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
+# check for eclipse quality bits to be set in lev1_nrt
+#$ECLIPSEscript $wantlow $wanthigh
+
+
 set retstatus=0
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
@@ -70,6 +77,7 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 
 # execute qsub script
 touch $HERE/qsub_running
+set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j8.q $TEMPCMD >> runlog
 # qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q p8.q $TEMPCMD >> runlog
 

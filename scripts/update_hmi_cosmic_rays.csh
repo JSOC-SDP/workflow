@@ -207,6 +207,7 @@ ENDCAT
 end
 
 # qsub -q j.q -o $LOG -e $LOG -t 1-48 -sync yes $QSUBCMD
+set LOG = `echo $LOG | sed "s/^\/auto//"`
 qsub -q j8.q -o $LOG -e $LOG -sync yes $QSUBCMD
 # qsub -q p8.q -o $LOG -e $LOG -sync yes $QSUBCMD
 set QSUBSTATUS = $status
@@ -239,8 +240,8 @@ if (\$status) echo  "Cam1 error" >> $QSTAT
 $cosmic_ray_post -L input_series=su_production.cosmic_rays fsn_first=$FIRST_FSN fsn_last=$LAST_FSN camera=2 >>& $CRLOG/post.log
 if (\$status) echo  "Cam2 error" >> $QSTAT
 ENDCAT
-
-  qsub -q j.q -o $LOG -e $LOG -sync yes $QSUBCMD
+set LOG = `echo $LOG | sed "s/^\/auto//"`
+  qsub -q j.q,p.q -o $LOG -e $LOG -sync yes $QSUBCMD
 
   set QSTAT_errcnt = `wc -l < $QSTAT`
   if ($QSTAT_errcnt) then

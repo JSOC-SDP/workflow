@@ -1,0 +1,79 @@
+#! /bin/csh -f
+# Script to make HMI lev1.5 observables from HMI lev1 data
+#
+
+# XXXXXXXXXX test
+# set echo
+# XXXXXXXXXX test
+
+set HERE = $cwd 
+
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_DATA
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+
+foreach ATTR (WANTLOW GATE)
+   set ATTRTXT = `grep $ATTR ticket`
+   set $ATTRTXT
+end
+
+set product = `cat $WFDIR/gates/$GATE/product`
+set key = `cat $WFDIR/gates/$GATE/key`
+
+set VFISVprogram = "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/vfisv"
+
+set input = hmi.S_720s
+set in5 = hmi.M_720s
+set chi = 1e-15
+set otherargs = "-v"
+
+# round times to a slot
+set want1 = `echo $WANTLOW | cut -c1-10`_07:00:00_UTC
+set want2 = `echo $WANTLOW | cut -c1-10`_19:00:00_UTC
+
+
+# make qsub name from index from door opening
+set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
+set timename = ME
+set qsubname = $timename$timestr
+
+if ($indexhigh < $indexlow) then
+   echo No data to process, $WANTLOW to $WANTHIGH > $HERE/runlog
+   exit 0
+endif
+
+set TEMPLOG = $HERE/runlog
+set babble = $HERE/babble
+set TEMPCMD = $HERE/$qsubname
+echo 6 > $HERE/retstatus
+
+set retstatus=0
+# make qsub script
+echo "#! /bin/csh -f " >$TEMPCMD
+echo "setenv MPI_MAPPED_STACK_SIZE 100M" >>$TEMPCMD
+echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >>$TEMPCMD
+echo "setenv KMP_STACKSIZE 16M" >>$TEMPCMD
+echo "unlimit" >>$TEMPCMD
+echo "limit core 0" >>$TEMPCMD
+echo "mpdboot --ncpus=8" >>$TEMPCMD
+
+echo "cd $HERE" >>$TEMPCMD
+echo "hostname >>&$TEMPLOG" >>$TEMPCMD
+echo "/home/jsoc/mpich2/bin/mpiexec -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_2 in=$input\[$want1] in5=$in5\[$want1] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
+echo "/home/jsoc/mpich2/bin/mpiexec -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_2 in=$input\[$want2] in5=$in5\[$want2] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
+echo 'set retstatus = $?' >>$TEMPCMD
+echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
+echo "rm -f $HERE/qsub_running" >>$TEMPCMD
+echo "/home/jsoc/mpich2/bin/mpdexit localmpd" >>$TEMPCMD
+
+# execute qsub script
+touch $HERE/qsub_running
+set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
+qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j8.q $TEMPCMD >> runlog
+
+if (-e retstatus) set retstatus = `cat $HERE/retstatus`
+exit $retstatus
