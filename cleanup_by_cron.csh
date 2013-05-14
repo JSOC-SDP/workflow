@@ -1,12 +1,11 @@
 #! /bin/csh -f
 
-#source ~phil/.cshrc
-#source ~phil/.login
 source $HOME/.cshrc
 source $HOME/.login
 
 setenv WORKFLOW_DATA /home/jsoc/pipeline
-setenv WORKFLOW_ROOT /home/phil/jsoc/proj/workflow
+#setenv WORKFLOW_ROOT /home/phil/jsoc/proj/workflow
+setenv WORKFLOW_ROOT /home/jsoc/cvs/Development/JSOC/proj/workflow
 
 cd $WORKFLOW_DATA
 

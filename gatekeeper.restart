@@ -1,12 +1,11 @@
 #! /bin/csh -f
 
-#source ~phil/.cshrc
-#source ~phil/.login
 
 source $HOME/.cshrc
 source $HOME/.login
 setenv WORKFLOW_DATA /home/jsoc/pipeline
-setenv WORKFLOW_ROOT /home/phil/jsoc/proj/workflow
+#setenv WORKFLOW_ROOT /home/phil/jsoc/proj/workflow
+setenv WORKFLOW_ROOT /home/jsoc/cvs/Development/JSOC/proj/workflow
 
 cd $WORKFLOW_DATA
 # restart gatekeeper and put log in pipeline directory.
@@ -46,7 +45,8 @@ if ($gatekeeper_status || -e GATEKEEPERBUSY) then
   rm -f GATEKEEPERBUSY
   rm -f Keep_running
   echo "XXX force restart"
-  /home/phil/jsoc/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
+#  /home/phil/jsoc/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
+  /home/jsoc/cvs/Development/JSOC/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
 else
   echo -n Gatekeeper stopped by operator at " "
   date

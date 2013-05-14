@@ -20,7 +20,8 @@ if ( $user != 'jsocprod' ) then
 endif
 
 set WORKFLOW_DATA = /home/jsoc/pipeline
-set WORKFLOW_ROOT = /home/phil/jsoc/proj/workflow
+#set WORKFLOW_ROOT = /home/phil/jsoc/proj/workflow
+set WORKFLOW_ROOT = /home/jsoc/cvs/Development/JSOC/proj/workflow
 set TASKS = $WORKFLOW_DATA/tasks
 set GATES = $WORKFLOW_GATES/gates
 
@@ -88,7 +89,8 @@ end
 
 ##  7  ##
 
-/home/phil/jsoc/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
+#/home/phil/jsoc/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
+/home/jsoc/cvs/Development/JSOC/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
 
 
 echo "1. Check for bad low high times in gates (should be the last thing on the screen)."

@@ -14,17 +14,18 @@ echo Make images for $wantlow to $wanthigh
 
 set CADENCE = 15
 
-setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
-#set RENDER_IMAGE = /home/phil/jsoc/proj/workflow/bin/render_image
+set WF = /jsoc/cvs/Development/JSOC/proj/workflow
+#setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
+setenv RGBDEF $WF/scripts/rgb.txt
 set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
-#set HMI_LIMBDARK = /home/phil/jsoc/proj/workflow/bin/hmi_limbdark
 set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
 
 set obslist = (Ic Ic_flat M M_color)
 set minlist = (20000 0.3 -1500 -1500)
 set maxlist = (75000 1.2 1500 1500)
 set scalinglist = (minmaxgiven minmaxgiven mag minmaxgiven)
-set colorlist = (/home/phil/apps/heat.sao /home/phil/apps/heat.sao grey /home/priya/Colormaps/For_Todd/mag.lut)
+#set colorlist = (/home/phil/apps/heat.sao /home/phil/apps/heat.sao grey /home/priya/Colormaps/For_Todd/mag.lut)
+set colorlist = ($WF/apps/heat.sao $WF/apps/heat.sao grey $WF/apps/mag.lut)
 set namelist = (Continuum Continuum Magnetogram Magnetogram)
 set flaglist = ("" "" -c -c)
 

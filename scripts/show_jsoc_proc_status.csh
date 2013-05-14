@@ -9,8 +9,6 @@ set noglob
 unsetenv QUERY_STRING
 
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-#set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-#set SHOW_SERIES = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_series
 set SHOW_SERIES = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_series
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
 set ARITH = /home/phil/bin/_linux4/arith
@@ -197,7 +195,7 @@ echo "$count2"' </TD><TD>' $USERDB2'</TD></TR>' >>$TMP
 ### Look for missing HMI observables ###
 
 # these showCov files are generated every 30m by a cronjob
-# on n04 as jeneen: /home/phil/jsoc/proj/workflow/scripts/status_show_cov.csh
+# on n04 as jeneen: /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/status_show_cov.csh
 
 set showCov = "/web/jsoc/htdocs/data/.showCov"
 set showCovNRT = "/web/jsoc/htdocs/data/.showCovNRT" 

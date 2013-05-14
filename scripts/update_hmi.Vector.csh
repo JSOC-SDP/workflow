@@ -92,7 +92,8 @@ echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
 
 ## Remove limb darkening/create marmask
 
-echo "/home/phil/jsoc/bin/linux_x86_64/hmi_limbdark in=hmi.Ic_720s\["$wantlow"-"$wanthigh"]  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
+#echo "/home/phil/jsoc/bin/linux_x86_64/hmi_limbdark in=hmi.Ic_720s\["$wantlow"-"$wanthigh"]  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
+echo "/home/jsoc/cvs/Development/JSOC/_linux_x86_64/hmi_limbdark in=hmi.Ic_720s\["$wantlow"-"$wanthigh"]  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
 
 ## Remap/Resize mags for synoptic charts
 

@@ -11,7 +11,7 @@
 ### 4.  cp $dir/track-post.mat /surge40/jsocprod/HARPS/nrt/Tracks/jsoc/track-prior.mat
 ### 5.  rerun harps by hand to catch up:  /home/jeneen/campaigns/scripts/hmi/do_Mharps_by_hand.csh <START> <END>
 ###     example:  /home/jeneen/campaigns/scripts/hmi/do_Mharps_by_hand.csh 2012.03.01_10:12:00_TAI 2012.03.01_14:24:00_TAI 
-### 6.  restart NRT HARPs pipeline:  /home/phil/jsoc/proj/workflow/maketicket.csh gate=repeat_harps_nrt wantlow=<NEXT TREC> wanthigh=<NEXT TREC> action=5
+### 6.  restart NRT HARPs pipeline:  /home/jsoc/cvs/Development/JSOC/proj/workflow/maketicket.csh gate=repeat_harps_nrt wantlow=<NEXT TREC> wanthigh=<NEXT TREC> action=5
 ### 7.  Note that the <NEXT TREC> in #6 can be any date, since the script ignores that date so you can't accidentally make it do bad, out of order things.
 ###
 ### If things go REALLY bad and you want to scrap all existing harps and start over,
@@ -24,7 +24,7 @@
 ### 4.  run:  qsub -e turmon/old/nrt.elog -o turmon/old/nrt.olog -q o.q test_nrt.csh
 ### 5.  Note that the o.q in #5 is the only queue that has matlab, and so the only place you can run harp processing
 ### 4.  run by hand to catch up, if necessary:   /home/jeneen/campaigns/scripts/hmi/do_Mharps_by_hand.csh <START> <END>
-### 5.  restart pipeline:  /home/phil/jsoc/proj/workflow/maketicket.csh gate=repeat_harps_nrt wantlow=<NEXT TREC> wanthigh=<NEXT TREC> action=5
+### 5.  restart pipeline:  /home/jsoc/cvs/Development/JSOC/proj/workflow/maketicket.csh gate=repeat_harps_nrt wantlow=<NEXT TREC> wanthigh=<NEXT TREC> action=5
 ### 6.  Note that the <NEXT TREC> in #5 can be any date, since the script ignores that date so you can't accidentally make it do bad, out of order things.
 ###
 ### If the harps pipeline is running amok for some reason, shut down the gate:
