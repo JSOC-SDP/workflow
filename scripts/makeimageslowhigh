@@ -170,7 +170,8 @@ unset echo
 
 if ($end_movie_t > 0 && $isNRT ) then
   set end_movie = `time_convert s=$end_movie_t zone=TAI`
-  /home/jsoc/pipeline/scripts/makeIcmovie $end_movie
+#  /home/jsoc/pipeline/scripts/makeIcmovie $end_movie
+  /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/makeIcmovie $end_movie
   set exitstatus = $?
 endif
 
