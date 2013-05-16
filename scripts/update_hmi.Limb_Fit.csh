@@ -23,8 +23,8 @@ end
 
 
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-#set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp_tas
-set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp
+set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp_tas
+#set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp
 
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
@@ -42,8 +42,8 @@ set retstatus=0
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$Limbprogram tmpdir=/tmp22/jsocprod/lfwrp/ logdir=/tmp22/jsocprod/lfwrp/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit  >>&$TEMPLOG" >>$TEMPCMD
-#echo "$Limbprogram  bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit >>&$TEMPLOG" >>$TEMPCMD
+#echo "$Limbprogram tmpdir=/tmp22/jsocprod/lfwrp/ logdir=/tmp22/jsocprod/lfwrp/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit  >>&$TEMPLOG" >>$TEMPCMD
+echo "$Limbprogram tmpdir=/tmp22/jsocprod/lfwrp/ logdir=/tmp22/jsocprod/lfwrp/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit_tas >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
