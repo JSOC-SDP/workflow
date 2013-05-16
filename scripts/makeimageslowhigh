@@ -14,7 +14,7 @@ echo Make images for $wantlow to $wanthigh
 
 set CADENCE = 15
 
-set WF = /jsoc/cvs/Development/JSOC/proj/workflow
+set WF = /home/jsoc/cvs/Development/JSOC/proj/workflow
 #setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
 setenv RGBDEF $WF/scripts/rgb.txt
 set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
