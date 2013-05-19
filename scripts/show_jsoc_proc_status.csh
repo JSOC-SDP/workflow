@@ -157,6 +157,7 @@ else if ( ($db_diff >= 300) && ($db_diff < 900) ) then
   echo -n ' BGCOLOR="yellow">'  >>$TMP
 else
   echo -n ' BGCOLOR="#FF6666">' >>$TMP
+  set stat = RED
 endif
 echo "$db_diff"'s </TD><TD>Lag between hmidb and hmidb2</TD></TR>' >>$TMP
 
