@@ -113,7 +113,7 @@ set echo
     set nowtime = `time_convert zone=TAI s=$nowtime_t`
     set endtime = `time_convert zone=TAI s=$endtime_t`
 #    /home/jsoc/pipeline/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$14dMOVIES/$Quant"_14d.mp4"
-    /home/jsoc/pipeline/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$D14dMOVIES/$Quant"_14d.mp4"
+    /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$D14dMOVIES/$Quant"_14d.mp4"
     cd $WORKBASE
     rm -rf $THISWORK
   endif
