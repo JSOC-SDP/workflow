@@ -37,7 +37,7 @@ else
   if ( -e $showCovAIA'.tmp' ) then
     rm $showCovAIA'.tmp' 
   endif
-  rm $showCovAIA
+#  rm $showCovAIA
   touch $showCovAIA
 endif
 #$SHOW_COVERAGE aia.lev1 low=$TenDaysAgo key=FSN | grep UNK > $showCovAIA.tmp
@@ -45,7 +45,7 @@ endif
 
 set showCovAIANRT = "/web/jsoc/htdocs/data/.showCovAIANRT"
 #echo `date` > $showCovAIANRT.tmp
-$SHOW_COVERAGE aia.lev1_nrt2 low=$ThreeDaysAgo key=FSN | grep UNK > $showCovAIANRT.tmp
-mv $showCovAIANRT.tmp $showCovAIANRT
+#$SHOW_COVERAGE aia.lev1_nrt2 low=$ThreeDaysAgo key=FSN | grep UNK > $showCovAIANRT.tmp
+#mv $showCovAIANRT.tmp $showCovAIANRT
 
 
