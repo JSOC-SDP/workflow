@@ -107,7 +107,7 @@ while ($day <= $dayhigh)
     endif
 
 set echo
-    $RENDER_IMAGE $flaglist[$img] in=$inseries$QRY \
+    $RENDER_IMAGE n=0 $flaglist[$img] in=$inseries$QRY \
       pallette=$colorlist[$img] \
       min=$minlist[$img] \
       max=$maxlist[$img] \
