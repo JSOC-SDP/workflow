@@ -125,4 +125,5 @@ ls -l $D14dMOVIES/
    mv $D14dMOVIES/Ic_flat_14d.mp4 $D14dMOVIES/M_14d.mp4 /home/jsoc/hmi/movies/latest/
    mv $D14dMOVIES/M_color_14d.mp4 /home/jsoc/hmi/movies/latest/
    rm -rf $D14dMOVIES
+   rm -rf $WORK
 
