@@ -24,28 +24,31 @@ $SHOW_COVERAGE ds=hmi.V_720s_nrt low=$ThreeDaysAgo high=$now | grep UNK > $showC
 mv $showCovNRT'.tmp' $showCovNRT
 
 set showCovAIA = "/web/jsoc/htdocs/data/.showCovAIA"
-set fFSN = `$SHOW_INFO aia.lev1'['$TenDaysAgo'/5d]' n=1 key=FSN,t_obs -q`
-set lFSN = `$SHOW_INFO aia.lev1'[$][? FSN < 1000000000 ?][? T_REC_index > 0 ?]' key=FSN,t_obs -q`
-set have = `$SHOW_INFO aia.lev1'[]['$fFSN[1]'-'$lFSN[1]']' -cq`
-@ want = ($lFSN[1] - $fFSN[1]) + 1
-@ missing = $want - $have
-if ( $missing > 0 ) then
+#set fFSN = `$SHOW_INFO aia.lev1'['$TenDaysAgo'/5d]' n=1 key=FSN,t_obs -q`
+#set lFSN = `$SHOW_INFO aia.lev1'[$][? FSN < 1000000000 ?][? T_REC_index > 0 ?]' key=FSN,t_obs -q`
+#set have = `$SHOW_INFO aia.lev1'[]['$fFSN[1]'-'$lFSN[1]']' -cq`
+#@ want = ($lFSN[1] - $fFSN[1]) + 1
+#@ missing = $want - $have
+#if ( $missing > 0 ) then
 #  echo `date` > $showCovAIA'.tmp'
-  echo $fFSN[2] $lFSN[2] $missing > $showCovAIA'.tmp'
-  mv $showCovAIA'.tmp' $showCovAIA
-else
-  if ( -e $showCovAIA'.tmp' ) then
-    rm $showCovAIA'.tmp' 
-  endif
-  rm $showCovAIA
-  touch $showCovAIA
-endif
-#$SHOW_COVERAGE aia.lev1 low=$TenDaysAgo key=FSN | grep UNK > $showCovAIA.tmp
-#mv $showCovAIA.tmp $showCovAIA
+#  echo $fFSN[2] $lFSN[2] $missing > $showCovAIA'.tmp'
+#  mv $showCovAIA'.tmp' $showCovAIA
+#else
+#  if ( -e $showCovAIA'.tmp' ) then
+#    rm $showCovAIA'.tmp' 
+#  endif
+#  rm $showCovAIA
+#  touch $showCovAIA
+#endif
 
+$SHOW_COVERAGE aia.lev1 low=$TenDaysAgo high=$ThreeDaysAgo key=FSN | grep UNK > $showCovAIA.tmp
+mv $showCovAIA.tmp $showCovAIA
+
+set fFSN = `$SHOW_INFO aia.lev1_nrt2'['$ThreeDaysAgo'/1m]' n=1 key=FSN,t_obs -q`
+set lFSN = `$SHOW_INFO aia.lev1_nrt2'[]' n=-1 key=FSN,t_obs -q`
 set showCovAIANRT = "/web/jsoc/htdocs/data/.showCovAIANRT"
 #echo `date` > $showCovAIANRT.tmp
-#$SHOW_COVERAGE aia.lev1_nrt2 low=$ThreeDaysAgo key=FSN | grep UNK > $showCovAIANRT.tmp
-#mv $showCovAIANRT.tmp $showCovAIANRT
+$SHOW_COVERAGE aia.lev1_nrt2 low=$fFSN[1] high=$lFSN[1] key=FSN | grep UNK > $showCovAIANRT.tmp
+mv $showCovAIANRT.tmp $showCovAIANRT
 
 
