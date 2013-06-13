@@ -37,7 +37,7 @@ else
   if ( -e $showCovAIA'.tmp' ) then
     rm $showCovAIA'.tmp' 
   endif
-#  rm $showCovAIA
+  rm $showCovAIA
   touch $showCovAIA
 endif
 #$SHOW_COVERAGE aia.lev1 low=$TenDaysAgo key=FSN | grep UNK > $showCovAIA.tmp
