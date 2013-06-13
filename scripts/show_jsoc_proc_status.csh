@@ -23,7 +23,7 @@ set USERDB2=hmidb2
 
 # HMI products
 set hproduct = ( hmi.lev0a hmi.lev1_nrt hmi.V_45s_nrt hmi.V_720s_nrt hmi_images hmi.MHarp_720s_nrt hmi.lev1 hmi.cosmic_rays hmi.V_45s hmi.V_720s)
-set hgreen =  ( 2  5  30  65 47 90 $fivedays $fivedays $sixdays $sixdays)
+set hgreen =  ( 2  7  30  65 47 90 $fivedays $fivedays $sixdays $sixdays)
 set hyellow = ( 4  10  60  85 60 120 $fivedays $fivedays $sixdays $sixdays)
 set hred =    ( 8  20 120 150 150 150 $sixdays  $sixdays  $oneweek $oneweek) 
 
