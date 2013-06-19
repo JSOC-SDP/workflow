@@ -180,7 +180,7 @@ touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q o.q $CMD
 
-# submit next harp and VRISV tickets
+# submit next harp and VFISV tickets
 
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
