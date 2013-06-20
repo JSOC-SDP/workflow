@@ -178,7 +178,7 @@ echo "rm $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
 
 touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q o.q $CMD
+qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
 
 # submit next harp and VFISV tickets
 
