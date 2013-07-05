@@ -35,9 +35,9 @@ set ared    = (8  20 40 $sixdays )
 
 # IRIS products
 set iproduct = ( iris.lev0 )
-set igreen = ( 90 )
-set iyellow = ( 120 )
-set ired = ( 180 )
+set igreen = ( 120 )
+set iyellow = ( 240 )
+set ired = ( 420 )
 
 set product = ( $hproduct $aproduct $iproduct )
 set green = ($hgreen $agreen $igreen )
