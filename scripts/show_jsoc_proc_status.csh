@@ -33,10 +33,16 @@ set agreen = ( 3  5 15 $fivedays )
 set ayellow = ( 4  10 20 $fivedays )
 set ared    = (8  20 40 $sixdays )
 
-set product = ( $hproduct $aproduct )
-set green = ($hgreen $agreen)
-set yellow = ($hyellow $ayellow)
-set red = ($hred $ared)
+# IRIS products
+set iproduct = ( iris.lev0 )
+set igreen = ( 90 )
+set iyellow = ( 120 )
+set ired = ( 180 )
+
+set product = ( $hproduct $aproduct $iproduct )
+set green = ($hgreen $agreen $igreen )
+set yellow = ($hyellow $ayellow $iyellow )
+set red = ($hred $ared $ired )
 
 @ b = 0
 @ r = 0
@@ -272,7 +278,7 @@ if ( -z $showCovAIA ) then
   @ missingDefAIA = 0
 else
   #@ n = `wc -l $showCovAIA | awk '{print $1}'`
-  @ missingDefAIA = `awk '{print $3}' $showCovAIA`
+  @ missingDefAIA = `awk '{print $3}' $showCovAIA | head -1`
 endif
 
 #@ missingDefAIA = 0
