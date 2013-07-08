@@ -185,7 +185,7 @@ qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
   set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANTLOW wanthigh=$WANTHIGH action=5`
-  set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpimages_nrt wantlow=$WANTLOW wanthigh=$WANTHIGH action=5`
+  set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi_harpimages_nrt wantlow=$WANTLOW wanthigh=$WANTHIGH action=5`
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
   sleep 15
   set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
