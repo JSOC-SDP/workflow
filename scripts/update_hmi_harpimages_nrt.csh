@@ -43,8 +43,7 @@ rm -f $HERE/runlog
 # Create the qsub script
 echo "#! /bin/csh -f " >> $CMDFILE
 echo "cd $HERE" >> $CMDFILE
-echo -n "HOST is >>& $HERE/runlog" >> $CMDFILE
-echo "hostname >>& $HERE/runlog" >> $CMDFILE
+echo "HOST is $HOST >>& $HERE/runlog" >> $CMDFILE
 
 # Run Turmon's matlab stuff
 echo "$SRCTREE/$SCRIPT -f $MASKSERIES"\["$low-$high@1h"\]" $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE

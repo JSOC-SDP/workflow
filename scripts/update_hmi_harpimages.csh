@@ -2,8 +2,10 @@
 # This script creates the HARP 720s definitive web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
 
+set echo
+
 set HERE = $cwd
-set SCRTREE = /home/jsoc/cvs/Development/JSOC
+set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set MASKSERIES = hmi.Marmask_720s
 set HARPSERIES = hmi.Mharp_720
@@ -33,18 +35,17 @@ set low = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*(\d\d\d\d)
 
 set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)_(\d+)(.*)/) { my($pref) = sprintf("%4d", $1) . "\." . sprintf("%02d", $2) . "\." . sprintf("%02d", $3) . "_" . sprintf("%02d", $4); my($suff) = $5; my($tz) = ""; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } print "$pref:00:00$tz"; }'`
 
-set cmd = $SCRTREE'/'$SCRIPT -f $MASKSERIES'['$low'-'$high'@1h]' $HARPSERIES $OUTDIR
-
 set CMDFILE = $HERE/qsubscr
+rm -f $CMDFILE
+rm -f $HERE/runlog
 
 # Create the qsub script
 echo "#! /bin/csh -f " >> $CMDFILE
 echo "cd $HERE" >> $CMDFILE
-echo -n "HOST is >> $HERE/runlog" >> $CMDFILE
-echo "hostname >>& $HERE/runlog" >> $CMDFILE
+echo "HOST is $HOST >>& $HERE/runlog" >> $CMDFILE
 
 # The guts of this exercise
-echo "$cmd >>& $HERE/runlog" >> $CMDFILE
+echo "$SRCTREE/$SCRIPT -f $MASKSERIES"\["$low-$high@1h"\]" $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
 
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
@@ -53,7 +54,8 @@ echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
 # Execute the qsub script
 touch $HERE/qsub_running
 set log = `echo $HERE/runlog | sed "s/^\/auto//"`
-qsub -e $log -o $log -sync yes -q j.q $CMDFILE
+
+# qsub -e $log -o $log -sync yes -q j.q $CMDFILE
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
