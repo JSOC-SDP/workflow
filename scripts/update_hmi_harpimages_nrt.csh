@@ -1,13 +1,16 @@
 #! /bin/csh -f 
 # This script creates the HARP 720s nrt web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
+set echo
 
-set SCRTREE = /home/jsoc/cvs/Development/JSOC
+set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SHOWINFO = $SRCTREE'/'bin/linux_x86_64/show_info
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set MASKSERIES = hmi.Marmask_720s_nrt
 set HARPSERIES = hmi.Mharp_720_nrt
 set OUTDIR = /web/jsoc/htdocs/doc/data/hmi/harp/harp_nrt
+
+set HERE = $cwd
 
 # Must fetch low and high from the ticket used to start the data update
 foreach ATTR (WANTLOW WANTHIGH)
@@ -33,32 +36,32 @@ set low = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*(\d\d\d\d)
 
 set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)_(\d+)(.*)/) { my($pref) = sprintf("%4d", $1) . "\." . sprintf("%02d", $2) . "\." . sprintf("%02d", $3) . "_" . sprintf("%02d", $4); my($suff) = $5; my($tz) = ""; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } print "$pref:00:00$tz"; }'`
 
-set cmd = $SCRTREE'/'$SCRIPT -f $MASKSERIES'['$low'-'$high'@1h]' $HARPSERIES $OUTDIR
-
 set CMDFILE = $HERE/qsubscr
+rm $CMDFILE
+rm $HERE/runlog
 
 # Create the qsub script
 echo "#! /bin/csh -f " >> $CMDFILE
 echo "cd $HERE" >> $CMDFILE
-echo -n "HOST is >> $HERE/runlog" >> $CMDFILE
+echo -n "HOST is >>& $HERE/runlog" >> $CMDFILE
 echo "hostname >>& $HERE/runlog" >> $CMDFILE
 
 # Run Turmon's matlab stuff
-echo "$cmd >>& $HERE/runlog" >> $CMDFILE
+echo "$SRCTREE/$SCRIPT -f $MASKSERIES"\["$low-$high@1h"\]" $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
 
 # Now use Turmon's stuff to make other image files
 
 # Create some auxiliary images for the latest .png file
 echo "set CMD = show_info -q key=T_REC $HARPSERIES"\[\][\$\]" | uniq" >> $CMDFILE
-echo \`$CMD\` >> $CMDFILE
+echo set TREC = \`$CMD\` >> $CMDFILE
 
 # Identify the latest .png file
-echo "PNG = $OUTDIR/harp.$TREC.png" >> $CMDFILE
+echo "set PNG = $OUTDIR/harp."\$"TREC.png" >> $CMDFILE
 
 # Fancify latest .png file
-echo "set TMP = $OUTDIR/.latest_nrt.png" >> $CMDFILE
-echo "set PNGLATEST = $OUTDIR/latest_nrt.png" >> $CMDFILE
-echo "cp $PNG $TMP" >> $CMDFILE
+set TMP = $OUTDIR/.latest_nrt.png
+set PNGLATEST = $OUTDIR/latest_nrt.png
+echo "cp "\$"PNG $TMP" >> $CMDFILE
 echo "convert $TMP -fill white -gravity North -pointsize 36 -font Helvetica -annotate 0 'near real-time (nrt) data' $TMP" >> $CMDFILE
 echo "if ("\$"?) then" >> $CMDFILE
 echo "rm -f $TMP" >> $CMDFILE
@@ -67,9 +70,9 @@ echo "mv $TMP $PNGLATEST" >> $CMDFILE
 echo "endif" >> $CMDFILE
 
 # Create negative color image for nrt data visualization
-echo "set TMP = $OUTDIR/.latest.png" >> $CMDFILE
-echo "set NEG = $OUTDIR/latest.png" >> $CMDFILE
-echo "cp $PNG $TMP" >> $CMDFILE
+set TMP = $OUTDIR/.latest.png
+set NEG = $OUTDIR/latest.png
+echo "cp "\$"PNG $TMP" >> $CMDFILE
 echo "convert $TMP -negate $TMP" >> $CMDFILE
 echo "if ("\$"?) then" >> $CMDFILE
 echo "rm -f $TMP" >> $CMDFILE
@@ -78,9 +81,9 @@ echo "mv $TMP $NEG" >> $CMDFILE
 echo "endif" >> $CMDFILE
 
 # Create thumbnail
-echo "set TMP = $OUTDIR/.thumbnail.png" >> $CMDFILE
-echo "set THUMB = $OUTDIR/thumbnail.png" >> $CMDFILE
-echo "convert -define png:size=1024x1024 $PNG -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
+set TMP = $OUTDIR/.thumbnail.png
+set THUMB = $OUTDIR/thumbnail.png
+echo "convert -define png:size=1024x1024 "\$"PNG -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
 echo "if ("\$"?) then" >> $CMDFILE
 echo "rm -f $TMP" >> $CMDFILE
 echo "else" >> $CMDFILE
@@ -97,7 +100,7 @@ echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
 # Execute the qsub script
 touch $HERE/qsub_running
 set log = `echo $HERE/runlog | sed "s/^\/auto//"`
-qsub -e $log -o $log -sync yes -q j.q $CMDFILE
+# qsub -e $log -o $log -sync yes -q j.q $CMDFILE
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
