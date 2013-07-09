@@ -37,8 +37,8 @@ set low = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*(\d\d\d\d)
 set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)_(\d+)(.*)/) { my($pref) = sprintf("%4d", $1) . "\." . sprintf("%02d", $2) . "\." . sprintf("%02d", $3) . "_" . sprintf("%02d", $4); my($suff) = $5; my($tz) = ""; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } print "$pref:00:00$tz"; }'`
 
 set CMDFILE = $HERE/qsubscr
-rm $CMDFILE
-rm $HERE/runlog
+rm -f $CMDFILE
+rm -f $HERE/runlog
 
 # Create the qsub script
 echo "#! /bin/csh -f " >> $CMDFILE
@@ -53,7 +53,7 @@ echo "$SRCTREE/$SCRIPT -f $MASKSERIES"\["$low-$high@1h"\]" $HARPSERIES $OUTDIR >
 
 # Create some auxiliary images for the latest .png file
 echo "set CMD = show_info -q key=T_REC $HARPSERIES"\[\][\$\]" | uniq" >> $CMDFILE
-echo set TREC = \`$CMD\` >> $CMDFILE
+echo set TREC = \`\$"CMD"\` >> $CMDFILE
 
 # Identify the latest .png file
 echo "set PNG = $OUTDIR/harp."\$"TREC.png" >> $CMDFILE
