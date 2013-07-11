@@ -7,7 +7,8 @@ set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set MASKSERIES = hmi.Marmask_720s
 set HARPSERIES = hmi.Mharp_720s
-set OUTDIR = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
+#set OUTDIR = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
+set OUTDIR = /surge40/jsocprod/HARPS/defnitive
 
 # Must fetch low and high from the ticket used to start the data update
 foreach ATTR (WANTLOW WANTHIGH)
