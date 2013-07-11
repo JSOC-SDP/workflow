@@ -1,14 +1,14 @@
 #! /bin/csh -f 
 # This script creates the HARP 720s nrt web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
-set echo
 
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SHOWINFO = $SRCTREE'/'bin/linux_x86_64/show_info
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set MASKSERIES = hmi.Marmask_720s_nrt
 set HARPSERIES = hmi.Mharp_720s_nrt
-set OUTDIR = /web/jsoc/htdocs/doc/data/hmi/harp/harp_nrt
+#set OUTDIR = /web/jsoc/htdocs/doc/data/hmi/harp/harp_nrt
+set OUTDIR = /surge40/jsocprod/HARPS/nrt/images
 
 set HERE = $cwd
 
@@ -21,7 +21,8 @@ end
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
 #set timestr = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*\d\d\d\d\.\d+\.(\d+)(.*)/) { my($day) = $1; my($hr) = "00"; my($min) = "00"; my($suff) = $2; if ($suff =~ /_(\d+)(.*)/) { $hr = $1; $suff = $2; if ($suff =~ /:(\d+)(.*)/) { $min = $1; } } print "${day}_$hr$min"; }'`
-set timestr = `echo $WANTLOW | awk -F\. '{print $2$3}'`
+#set timestr = `echo $WANTLOW | awk -F\. '{print $2$3}'`
+set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set qsubscr = ABA$timestr
 
 echo wantlow is $wantlow >> $HERE/runlog
@@ -47,7 +48,7 @@ echo "cd $HERE" >> $CMDFILE
 echo "HOST is $HOST >>& $HERE/runlog" >> $CMDFILE
 
 # Run Turmon's matlab stuff
-echo "$SRCTREE/$SCRIPT -f $MASKSERIES"\["$low-$high@1h"\]" $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
+echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
 
 # Now use Turmon's stuff to make other image files
 
