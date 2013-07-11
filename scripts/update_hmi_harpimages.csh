@@ -19,7 +19,9 @@ end
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
 #set timestr = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*\d\d\d\d\.\d+\.(\d+)(.*)/) { my($day) = $1; my($hr) = "00"; my($min) = "00"; my($suff) = $2; if ($suff =~ /_(\d+)(.*)/) { $hr = $1; $suff = $2; if ($suff =~ /:(\d+)(.*)/) { $min = $1; } } print "${day}_$hr$min"; }'`
-set timestr = `echo $WANTLOW | awk -F\. '{print $2$3}'`
+#set timestr = `echo $WANTLOW | awk -F\. '{print $2$3}'`
+set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
+
 set qsubscr = ABA$timestr
 
 echo wantlow is $wantlow >> $HERE/runlog
