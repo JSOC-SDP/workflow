@@ -4,8 +4,6 @@
 # The general status script also writes out the coverage file, but I do not know what that file
 # is for - skipping for now.
 
-set HARPSERIES = hmi.Mharp_720_nrt
-
 if ($?WORKFLOW_ROOT) then
     set WFDIR = $WORKFLOW_DATA
     set WFCODE = $WORKFLOW_ROOT
@@ -14,27 +12,16 @@ else
     exit 1
 endif
 
-set gate = $1
+set imgDir = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
+
+set gate = hmi_harpimages
 cd $WFDIR/gates/$gate
 
-# Check for an empty series, then update the low and high state-file contents.
-if (`show_info -iq $HARPSERIES n=1 | wc -l` <= 0) then
-    echo $0 $* $HARPSERIES is an empty series
-    echo "-1" > low
-    echo "-1" > high
-else
-    show_info -q  $HARPSERIES'[][^]' key=T_REC | tail -1 > low
-    if ($?) then
-        echo Could not obtain $HARPSERIES time of first observation
-        exit 1
-    else
-        show_info -q  $HARPSERIES'[][$]' key=T_REC | tail -1 > high
-        if ($?) then
-            echo Could not obtain $HARPSERIES time of last observation
-            exit 1
-        endif
-    endif
-endif
+set low = `ls -1 $imgDir | grep png | head -1 | awk -F\. '{print $2"."$3"."$4}'`
+set high = `ls -1 $imgDir | grep png | tail -1 | awk -F\. '{print $2"."$3"."$4}'`
+
+echo $low > low
+echo $high > high
 
 # Update the lastupdate state-file content.
 set nowtxt = `date -u +%Y.%m.%d_%H:%M:%S`
