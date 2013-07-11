@@ -19,7 +19,8 @@ end
 
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
-set timestr = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*\d\d\d\d\.\d+\.(\d+)(.*)/) { my($day) = $1; my($hr) = "00"; my($min) = "00"; my($suff) = $2; if ($suff =~ /_(\d+)(.*)/) { $hr = $1; $suff = $2; if ($suff =~ /:(\d+)(.*)/) { $min = $1; } } print "${day}_$hr$min"; }'`
+#set timestr = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*\d\d\d\d\.\d+\.(\d+)(.*)/) { my($day) = $1; my($hr) = "00"; my($min) = "00"; my($suff) = $2; if ($suff =~ /_(\d+)(.*)/) { $hr = $1; $suff = $2; if ($suff =~ /:(\d+)(.*)/) { $min = $1; } } print "${day}_$hr$min"; }'`
+set timestr = `echo $WANTLOW | awk -F\. '{print $2$3}'`
 set qsubscr = ABA$timestr
 
 echo wantlow is $wantlow >> $HERE/runlog
@@ -35,7 +36,7 @@ set low = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*(\d\d\d\d)
 
 set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)(.*)/) { my($datestr) = $1 . "\." . $2 . "\." . $3; my($hrstr) = "_00"; my($suff) = $4; my($tz) = ""; if ($suff =~ /^_(\d+)(.*)$/) { $hrstr = "_$1"; $suff = $2; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } } elsif ($suff =~ /^_(.*)/) { $tz = "_$1"; } print "$datestr$hrstr:00:00$tz"; }'`
 
-set CMDFILE = $HERE/qsubscr
+set CMDFILE = $HERE/$qsubscr
 rm -f $CMDFILE
 rm -f $HERE/runlog
 
@@ -55,7 +56,7 @@ echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
 touch $HERE/qsub_running
 set log = `echo $HERE/runlog | sed "s/^\/auto//"`
 
-# qsub -e $log -o $log -sync yes -q j.q $CMDFILE
+qsub -e $log -o $log -sync yes -q j.q $CMDFILE
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
