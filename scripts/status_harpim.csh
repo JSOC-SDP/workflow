@@ -12,6 +12,9 @@ else
     exit 1
 endif
 
+set low = 2010.05.01
+set high = 2010.02.02
+
 set imgDir = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
 
 set gate = hmi_harpimages
@@ -25,7 +28,8 @@ echo $high > high
 
 # Update the lastupdate state-file content.
 set nowtxt = `date -u +%Y.%m.%d_%H:%M:%S`
-echo $nowtxt > lastupdate
+#echo "$nowtxt" > lastupdate
+echo 1886.05.07  > lastupdate
 
 rm -f statusbusy
 exit 0
