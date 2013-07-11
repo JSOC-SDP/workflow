@@ -2,8 +2,6 @@
 # This script creates the HARP 720s definitive web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
 
-set echo
-
 set HERE = $cwd
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
@@ -46,7 +44,7 @@ echo "cd $HERE" >> $CMDFILE
 echo "HOST is $HOST >>& $HERE/runlog" >> $CMDFILE
 
 # The guts of this exercise
-echo "$SRCTREE/$SCRIPT -f $MASKSERIES"\["$low-$high@1h"\]" $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
+echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
 
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
