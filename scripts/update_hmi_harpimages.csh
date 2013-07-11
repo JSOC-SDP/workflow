@@ -44,7 +44,9 @@ rm -f $HERE/runlog
 # Create the qsub script
 echo "#! /bin/csh -f " >> $CMDFILE
 echo "cd $HERE" >> $CMDFILE
-echo "HOST is $HOST >>& $HERE/runlog" >> $CMDFILE
+#echo "HOST is $HOST >>& $HERE/runlog" >> $CMDFILE
+echo "hostname >>&$log" >>$CMDFILE
+
 
 # The guts of this exercise
 echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
