@@ -20,7 +20,7 @@ end
 
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
-set timestr = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*\d\d\d\d\.\d\d\.(\d\d)_(\d\d):(\d\d)/) { print "$1_$2$3"; }'` 
+set timestr = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*\d\d\d\d\.\d+\.(\d+)(.*)/) { my($day) = $1; my($hr) = "00"; my($min) = "00"; my($suff) = $2; if ($suff =~ /_(\d+)(.*)/) { $hr = $1; $suff = $2; if ($suff =~ /:(\d+)(.*)/) { $min = $1; } } print "${day}_$hr$min"; }'`
 set qsubscr = ABA$timestr
 
 echo wantlow is $wantlow >> $HERE/runlog
@@ -32,9 +32,9 @@ echo 6 > $HERE/retstatus
 
 # Must round down to the nearest hour. I have no clue how you'd do this in csh, so I'm doing this in perl.
 # Assume that at least the hour field is present.
-set low = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)_(\d+)(.*)/) { my($pref) = sprintf("%4d", $1) . "\." . sprintf("%02d", $2) . "\." . sprintf("%02d", $3) . "_" . sprintf("%02d", $4); my($suff) = $5; my($tz) = ""; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } print "$pref:00:00$tz"; }'`
+set low = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)(.*)/) { my($datestr) = $1 . "\." . $2 . "\." . $3; my($hrstr) = "_00"; my($suff) = $4; my($tz) = ""; if ($suff =~ /^_(\d+)(.*)$/) { $hrstr = "_$1"; $suff = $2; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } } elsif ($suff =~ /^_(.*)/) { $tz = "_$1"; } print "$datestr$hrstr:00:00$tz"; }'`
 
-set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)_(\d+)(.*)/) { my($pref) = sprintf("%4d", $1) . "\." . sprintf("%02d", $2) . "\." . sprintf("%02d", $3) . "_" . sprintf("%02d", $4); my($suff) = $5; my($tz) = ""; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } print "$pref:00:00$tz"; }'`
+set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)(.*)/) { my($datestr) = $1 . "\." . $2 . "\." . $3; my($hrstr) = "_00"; my($suff) = $4; my($tz) = ""; if ($suff =~ /^_(\d+)(.*)$/) { $hrstr = "_$1"; $suff = $2; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } } elsif ($suff =~ /^_(.*)/) { $tz = "_$1"; } print "$datestr$hrstr:00:00$tz"; }'`
 
 set CMDFILE = $HERE/qsubscr
 rm -f $CMDFILE
