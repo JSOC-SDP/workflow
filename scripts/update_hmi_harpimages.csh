@@ -25,7 +25,7 @@ set wanthigh = $WANTHIGH
 #set timestr = `echo $WANTLOW | awk -F\. '{print $2$3}'`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 
-set qsubscr = ABA$timestr
+set qsubscr = HI$timestr
 
 echo wantlow is $wantlow >> $HERE/runlog
 echo wanthigh is $wanthigh >> $HERE/runlog
