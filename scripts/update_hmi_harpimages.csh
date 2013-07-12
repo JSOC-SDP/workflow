@@ -7,8 +7,11 @@ set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set MASKSERIES = hmi.Marmask_720s
 set HARPSERIES = hmi.Mharp_720s
-#set OUTDIR = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
-set OUTDIR = /surge40/jsocprod/HARPS/definitive/images
+set OUTDIR = /surge40/jsocprod/HARPS/definitive/tmp
+if ( ! -e $OUTDIR ) then
+  mkdir -p $OUTDIR
+endif
+
 
 # Must fetch low and high from the ticket used to start the data update
 foreach ATTR (WANTLOW WANTHIGH)
@@ -51,6 +54,14 @@ echo "hostname >>&$log" >>$CMDFILE
 
 # The guts of this exercise
 echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
+
+# move files to images dir
+foreach PNG ( `ls -1 $OUTDIR/harp*png` )
+  @ year = `echo $PNG | awk -F\. '{print $2}'`
+  set mo = `echo $PNG | awk -F\. '{print $3}'`
+  mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo
+  mv $PNG /surge40/jsocprod/HARPS/definitive/images/$year/$mo
+end
 
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
