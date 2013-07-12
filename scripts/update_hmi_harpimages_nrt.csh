@@ -8,13 +8,10 @@ set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set CONVERT = /usr/bin/convert
 set MASKSERIES = hmi.Marmask_720s_nrt
 set HARPSERIES = hmi.Mharp_720s_nrt
-<<<<<<< update_hmi_harpimages_nrt.csh
 
 set OUTDIR = /surge40/jsocprod/HARPS/nrt/images
-=======
-#set OUTDIR = /web/jsoc/htdocs/doc/data/hmi/harp/harp_nrt
+
 set OUTDIR = /surge40/jsocprod/HARPS/nrt/images
->>>>>>> 1.9
 
 set HERE = $cwd
 
@@ -26,17 +23,12 @@ end
 
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
-<<<<<<< update_hmi_harpimages_nrt.csh
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 
 set qsubscr = NHI$timestr
-=======
-#set timestr = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*\d\d\d\d\.\d+\.(\d+)(.*)/) { my($day) = $1; my($hr) = "00"; my($min) = "00"; my($suff) = $2; if ($suff =~ /_(\d+)(.*)/) { $hr = $1; $suff = $2; if ($suff =~ /:(\d+)(.*)/) { $min = $1; } } print "${day}_$hr$min"; }'`
-#set timestr = `echo $WANTLOW | awk -F\. '{print $2$3}'`
+
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
-set qsubscr = ABA$timestr
->>>>>>> 1.9
 
 echo wantlow is $wantlow >> $HERE/runlog
 echo wanthigh is $wanthigh >> $HERE/runlog
@@ -62,11 +54,8 @@ echo "cd $HERE" >> $CMDFILE
 echo "hostname >>&$LOG" >>$CMDFILE
 
 # Run Turmon's matlab stuff
-<<<<<<< update_hmi_harpimages_nrt.csh
-echo "$SRCTREE/$SCRIPT -f $MASKSERIES'["$low-$high@1h"]' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
-=======
+
 echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
->>>>>>> 1.9
 
 # Now use Turmon's stuff to make other image files
 
@@ -74,7 +63,6 @@ echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >
 
 # Identify the latest .png file
 set lastPNG = `ls -1 $OUTDIR/harp.*.png | tail -1`
-echo "$lastPNG"
 
 # Fancify latest .png file
 set TMP = $OUTDIR/.latest_nrt.png
@@ -108,12 +96,7 @@ echo "else" >> $CMDFILE
 echo "mv $TMP $THUMB" >> $CMDFILE
 echo "endif" >> $CMDFILE
 
-# Record latest img time for latest images web page:
-set lastTime = `ls -1 $OUTDIR/harp.*.png | tail -1 | cut -c6-21`
-echo $lastTime > /web/jsoc/htdocs/data/hmi/images/latest/harptime
-
 # Delete all .png files older than 60 days 
-#echo "find $OUTDIR/harp.*.png* -type f -atime +60 -exec rm -f {} \\;" >> $CMDFILE
 foreach oldFile ( `find $OUTDIR/harp.*.png* -type f -atime +60` )
   echo "rm $oldFile" >> $CMDFILE
 end
