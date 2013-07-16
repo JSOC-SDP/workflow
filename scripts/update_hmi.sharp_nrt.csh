@@ -53,7 +53,7 @@ echo "set echo" >>$CMD
 
 echo "set M2Mstatus = 0" >>&$CMD
 echo "set DISstatus = 0" >>&$CMD
-echo "set SHPstatus = 0" >>&$CMD
+#echo "set SHPstatus = 0" >>&$CMD
 
 set n = 1
 while ( $n <= $num )
@@ -67,10 +67,10 @@ while ( $n <= $num )
     echo 'set DISstatus = $?' >>$CMD
     echo 'if ($DISstatus) goto DONE' >>&$CMD
 #    echo "$SHARP mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' bharp=hmi.Bharp_720s_nrt'['$harps[$n]']['$times[$n]']' \\
-     dop=hmi.V_720s_nrt'['$times[$n]']' cont=hmi.Ic_720s_nrt'['$times[$n]']' \\
-     sharp_cea=hmi.sharp_cea_720s_nrt sharp_cut=hmi.sharp_720s_nrt" >>$CMD
-    echo 'set SHPstatus = $?' >>$CMD
-    echo 'if ($SHPstatus) goto DONE' >>&$CMD
+#     dop=hmi.V_720s_nrt'['$times[$n]']' cont=hmi.Ic_720s_nrt'['$times[$n]']' \\
+#     sharp_cea=hmi.sharp_cea_720s_nrt sharp_cut=hmi.sharp_720s_nrt" >>$CMD
+#    echo 'set SHPstatus = $?' >>$CMD
+#    echo 'if ($SHPstatus) goto DONE' >>&$CMD
     
     echo 'DONE:' >>$CMD
     echo 'echo $M2Mstatus >M2Mstatus' >>&$CMD
