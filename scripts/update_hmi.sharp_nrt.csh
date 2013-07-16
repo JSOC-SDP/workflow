@@ -76,7 +76,8 @@ while ( $n <= $num )
     echo 'echo $M2Mstatus >M2Mstatus' >>&$CMD
     echo 'echo $DISstatus >DISstatus' >>&$CMD
     echo 'echo $SHPstatus >SHPstatus' >>&$CMD
-    echo '@ retstatus = $M2Mstatus + $DISstatus + $SHPstatus' >>$CMD
+#    echo '@ retstatus = $M2Mstatus + $DISstatus + $SHPstatus' >>$CMD
+   echo '@ retstatus = $M2Mstatus + $DISstatus' >>$CMD
     echo 'echo $retstatus >retstatus' >>$CMD
   else
     echo "hmi.Mharp_720s'['$harps[$n]']['$times[$n] not processed because npix = $pix[$n]"
