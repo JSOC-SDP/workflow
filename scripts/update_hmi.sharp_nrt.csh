@@ -66,7 +66,7 @@ while ( $n <= $num )
 #    echo "date" >>$CMD
     echo 'set DISstatus = $?' >>$CMD
     echo 'if ($DISstatus) goto DONE' >>&$CMD
-    echo "$SHARP mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' bharp=hmi.Bharp_720s_nrt'['$harps[$n]']['$times[$n]']' \\
+#    echo "$SHARP mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' bharp=hmi.Bharp_720s_nrt'['$harps[$n]']['$times[$n]']' \\
      dop=hmi.V_720s_nrt'['$times[$n]']' cont=hmi.Ic_720s_nrt'['$times[$n]']' \\
      sharp_cea=hmi.sharp_cea_720s_nrt sharp_cut=hmi.sharp_720s_nrt" >>$CMD
     echo 'set SHPstatus = $?' >>$CMD
