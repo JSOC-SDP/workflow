@@ -75,7 +75,7 @@ while ( $n <= $num )
     echo 'DONE:' >>$CMD
     echo 'echo $M2Mstatus >M2Mstatus' >>&$CMD
     echo 'echo $DISstatus >DISstatus' >>&$CMD
-    echo 'echo $SHPstatus >SHPstatus' >>&$CMD
+#    echo 'echo $SHPstatus >SHPstatus' >>&$CMD
 #    echo '@ retstatus = $M2Mstatus + $DISstatus + $SHPstatus' >>$CMD
    echo '@ retstatus = $M2Mstatus + $DISstatus' >>$CMD
     echo 'echo $retstatus >retstatus' >>$CMD
