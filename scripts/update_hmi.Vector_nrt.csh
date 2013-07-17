@@ -98,7 +98,7 @@ echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/fdlos2radial in=hmi.M_720
 @ wanthigh_s = `$TIME_CONVERT time=$wanthigh` 
 @ diff = $wanthigh_s - $wantlow_s
 set t = $diff's'
-if ( $diff < 720s ) then
+if ( $diff < 720 ) then
   set t = 720s
 endif
 
