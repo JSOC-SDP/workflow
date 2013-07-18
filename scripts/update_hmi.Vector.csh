@@ -29,6 +29,8 @@ set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_IQUV_aver
 set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
 set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_patch_module
+set JV2TS = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/jv2ts
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
 
 #set IQUV_args = "-L wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1 quicklook=0"
 #set OBS_args = "-L levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1"
@@ -98,8 +100,20 @@ echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark in=hmi.Ic_72
 ## Remap/Resize mags for synoptic charts
 
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/fdlos2radial in=hmi.M_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_720s >>&$TEMPLOG" >>$TEMPCMD
-echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/mag2helio MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 RMAXFLAG=1 MCORLEV=1 in=hmi.M_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_hiresmap_720s >>&$TEMPLOG" >>$TEMPCMD
-echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/mag2helio MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 RMAXFLAG=1 in=hmi.Mr_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_hiresmap_720s >>&$TEMPLOG" >>$TEMPCMD
+#echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/mag2helio MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 RMAXFLAG=1 MCORLEV=1 in=hmi.M_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_hiresmap_720s >>&$TEMPLOG" >>$TEMPCMD
+#echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/mag2helio MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 RMAXFLAG=1 in=hmi.Mr_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_hiresmap_720s >>&$TEMPLOG" >>$TEMPCMD
+
+@ wantlow_s = `$TIME_CONVERT time=$wantlow`
+@ wanthigh_s = `$TIME_CONVERT time=$wanthigh`
+@ diff = $wanthigh_s - $wantlow_s
+set t = $diff's'
+if ( $diff < 720 ) then
+  set t = 720s
+endif
+
+echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=hmi.M_720s\["$wantlow"/"$t"] v2hout=hmi.Ml_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
+echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 in=hmi.Mr_720s\["$wantlow"/"$t"] v2hout=hmi.Mr_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
+
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/resizemappingmag in=hmi.Ml_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/resizemappingmag in=hmi.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 
