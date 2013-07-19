@@ -29,7 +29,7 @@ set hred =    ( 8  20 120 150 150 150 $sixdays  $sixdays  $oneweek $oneweek)
 
 # AIA products
 set aproduct = ( aia.lev0 aia.lev1_nrt2 aia_test.lev1p5 aia.lev1 )
-set agreen = ( 3  5 15 $fivedays )
+set agreen = ( 3  6 15 $fivedays )
 set ayellow = ( 4  10 20 $fivedays )
 set ared    = (8  20 40 $sixdays )
 
