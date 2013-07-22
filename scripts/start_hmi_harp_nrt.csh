@@ -1,5 +1,7 @@
 #! /bin/csh -f
 
+set echo
+
 ###
 ### MHarps MUST be processed in order.  It's OK to have a gap, but
 ### NOT OK to process them out of order.  If a problem arises, they
@@ -39,7 +41,6 @@ set HERE = $cwd
 set TEMPLOG = $HERE/runlog
 set CMD = $HERE/MHarp_nrt
 #echo 6 > $HERE/retstatus
-
 
 set WFDIR = $WORKFLOW_DATA
 set WFCODE = $WORKFLOW_ROOT
@@ -185,9 +186,12 @@ qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
   set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANTLOW wanthigh=$WANTHIGH action=5`
-  set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi_harpimages_nrt wantlow=$WANTLOW wanthigh=$WANTHIGH action=5`
+  set min = `echo $nextH | awk -F\: '{print $2}'`
+  if ( $min == "00" ) then
+    set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi_harpimages_nrt wantlow=$WANTLOW wanthigh=$WANTHIGH action=5`
+  endif
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
   sleep 15
-  set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
+#  set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
 endif
 
