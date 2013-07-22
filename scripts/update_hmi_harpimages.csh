@@ -69,7 +69,7 @@ qsub -e $log -o $log -sync yes -q j.q $CMDFILE
 foreach PNG ( `find $OUTDIR -mmin +2 | grep png` )
   @ year = `echo $PNG | awk -F\. '{print $2}'`
   set mo = `echo $PNG | awk -F\. '{print $3}'`
-  set dy = `echo $PNG | awk -F\. '{print $4}'`
+  set dy = `echo $PNG | awk -F\. '{print $4}' | awk -F\_ '{print $1}'`
   mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
   mv $PNG /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
 end
