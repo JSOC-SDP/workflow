@@ -55,14 +55,6 @@ echo "hostname >>&$log" >>$CMDFILE
 # The guts of this exercise
 echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
 
-# move files to images dir
-foreach PNG ( `ls -1 $OUTDIR/harp*png` )
-  @ year = `echo $PNG | awk -F\. '{print $2}'`
-  set mo = `echo $PNG | awk -F\. '{print $3}'`
-  mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo
-  mv $PNG /surge40/jsocprod/HARPS/definitive/images/$year/$mo
-end
-
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
 echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
@@ -72,6 +64,15 @@ touch $HERE/qsub_running
 set log = `echo $HERE/runlog | sed "s/^\/auto//"`
 
 qsub -e $log -o $log -sync yes -q j.q $CMDFILE
+
+# move files to images dir
+foreach PNG ( `find $OUTDIR -mmin +2 | grep png` )
+  @ year = `echo $PNG | awk -F\. '{print $2}'`
+  set mo = `echo $PNG | awk -F\. '{print $3}'`
+  set dy = `echo $PNG | awk -F\. '{print $4}'`
+  mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
+  mv $PNG /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
+end
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
