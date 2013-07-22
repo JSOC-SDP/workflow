@@ -23,8 +23,8 @@ end
 
 
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-#set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp_tas
-set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp
+set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp_tas
+#set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp
 
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
