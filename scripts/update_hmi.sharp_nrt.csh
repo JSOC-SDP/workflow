@@ -62,8 +62,7 @@ while ( $n <= $num )
     echo 'set M2Mstatus = $?' >>$CMD
     echo 'if ($M2Mstatus) goto DONE' >>&$CMD
 #    echo "$DISAMBIG in=hmi.MEharp_720s_nrt'['$harps[$n]']['$times[$n]']' out=hmi.Bharp_720s_nrt AMBGMTRY=1 AMBNEQ=20 -l" >>$CMD
-    echo "$DISAMBIG in=hmi.MEharp_720s_nrt'['$harps[$n]']['$times[$n]']' out=hmi.Bharp_720s_nrt AMBGMTRY=1 AMBNEQ=20 AMBTFCTR=0.99 OFFSET=20" >>$CMD
-#    echo "date" >>$CMD
+    echo "$DISAMBIG in=hmi.MEharp_720s_nrt'['$harps[$n]']['$times[$n]']' out=hmi.Bharp_720s_nrt AMBGMTRY=1 AMBNEQ=20 AMBTFCTR=0.99 OFFSET=20" AMBNPAD=50 >>$CMD
     echo 'set DISstatus = $?' >>$CMD
     echo 'if ($DISstatus) goto DONE' >>&$CMD
     echo "$SHARP mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' bharp=hmi.Bharp_720s_nrt'['$harps[$n]']['$times[$n]']' \\
