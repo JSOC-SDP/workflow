@@ -3,7 +3,7 @@
 # set echo
 
 set TARG = /web/jsoc/htdocs/data
-set TMP = $TARG/.jsoc_proc_status_jeneen.tmp.$$.test
+set TMP = $TARG/.jsoc_proc_status.tmp.$$
 
 set noglob
 unsetenv QUERY_STRING
@@ -56,9 +56,8 @@ set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set now_t = `$TIME_CONVERT time=$now`
 
 #echo "Content-type: text/html" >$TMP
-#echo "" >>$TMP
-#echo '<HTML><HEAD><TITLE>JSOC Processing Status</TITLE><META HTTP-EQUIV="Refresh" CONTENT="60"></HEAD><BODY>' >>$TMP
-echo '<HTML><HEAD><TITLE>JSOC Processing Status</TITLE><META HTTP-EQUIV="Refresh" CONTENT="60"></HEAD><BODY LINK=black>' >$TMP
+echo '<\!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">' >$TMP
+echo '<HTML><HEAD><TITLE>JSOC Processing Status</TITLE><META HTTP-EQUIV="Refresh" CONTENT="60"></HEAD><BODY LINK=black>' >>$TMP
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
 
