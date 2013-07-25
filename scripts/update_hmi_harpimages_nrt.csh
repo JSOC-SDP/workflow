@@ -63,8 +63,12 @@ echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >
 
 # Identify the latest .png file
 set lastPNG = `ls -1 $OUTDIR/harp.*.png | tail -1`
+echo "echo $lastPNG>>& $HERE/runlog" >> $CMDFILE
+sleep 60
+set lastPNG = `ls -1 $OUTDIR/harp.*.png | tail -1`
+echo "echo $lastPNG>>& $HERE/runlog" >> $CMDFILE
 
-# Fancify latest .png file
+# Fancify latest.png file
 set TMP = $OUTDIR/.latest_nrt.png
 set PNGLATEST = $OUTDIR/latest_nrt.png
 echo "cp $lastPNG $TMP" >> $CMDFILE
