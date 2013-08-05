@@ -60,39 +60,39 @@ echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >
 # Create some auxiliary images for the latest .png file
 
 # Identify the latest .png file
-set lastPNG = `ls -1 $OUTDIR/harp.*.png | tail -1`
-echo "echo $lastPNG>>& $HERE/runlog" >> $CMDFILE
+echo 'set lastPNG = `ls -1 $OUTDIR/harp.*.png | tail -1`' >> $CMDFILE
+echo 'echo $lastPNG >>& $HERE/runlog' >> $CMDFILE
 
 # Fancify latest.png file
-set TMP = $OUTDIR/.latest_nrt.png
-set PNGLATEST = $OUTDIR/latest_nrt.png
-echo "cp $lastPNG $TMP" >> $CMDFILE
-echo "$CONVERT $TMP -fill white -gravity North -pointsize 36 -font Helvetica -annotate 0 'near real-time (nrt) data' $TMP" >> $CMDFILE
+echo 'set TMP = $OUTDIR/.latest_nrt.png' >> $CMDFILE
+echo 'set PNGLATEST = $OUTDIR/latest_nrt.png' >> $CMDFILE
+echo 'cp $lastPNG $TMP' >> $CMDFILE
+echo '$CONVERT $TMP -fill white -gravity North -pointsize 36 -font Helvetica -annotate 0 'near real-time (nrt) data' $TMP' >> $CMDFILE
 #echo "if ("\$"?) then" >> $CMDFILE
 #echo "rm -f $TMP" >> $CMDFILE
 #echo "else" >> $CMDFILE
-echo "mv $TMP $PNGLATEST" >> $CMDFILE
+echo 'mv $TMP $PNGLATEST' >> $CMDFILE
 #echo "endif" >> $CMDFILE
 
 # Create negative color image for nrt data visualization
-set TMP = $OUTDIR/.latest.png
-set NEG = $OUTDIR/latest_negative.png
-echo "cp $lastPNG $TMP" >> $CMDFILE
-echo "$CONVERT $TMP -negate $TMP" >> $CMDFILE
+echo 'set TMP = $OUTDIR/.latest.png' >> $CMDFILE
+echo 'set NEG = $OUTDIR/latest_negative.png' >> $CMDFILE
+echo 'cp $lastPNG $TMP' >> $CMDFILE
+echo '$CONVERT $TMP -negate $TMP' >> $CMDFILE
 #echo "if ("\$"?) then" >> $CMDFILE
 #echo "rm -f $TMP" >> $CMDFILE
 #echo "else" >> $CMDFILE
-echo "mv $TMP $NEG" >> $CMDFILE
+echo 'mv $TMP $NEG' >> $CMDFILE
 #echo "endif" >> $CMDFILE
 
 # Create thumbnail
-set TMP = $OUTDIR/.thumbnail.png
-set THUMB = $OUTDIR/thumbnail.png
-echo "$CONVERT -define png:size=1024x1024 $lastPNG -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
+echo 'set TMP = $OUTDIR/.thumbnail.png' >> $CMDFILE
+echo 'set THUMB = $OUTDIR/thumbnail.png' >> $CMDFILE
+echo '$CONVERT -define png:size=1024x1024 $lastPNG -thumbnail 256x256 -unsharp 0x.5 $TMP' >> $CMDFILE
 #echo "if ("\$"?) then" >> $CMDFILE
 #echo "rm -f $TMP" >> $CMDFILE
 #echo "else" >> $CMDFILE
-echo "mv $TMP $THUMB" >> $CMDFILE
+echo 'mv $TMP $THUMB' >> $CMDFILE
 #echo "endif" >> $CMDFILE
 
 # Delete all .png files older than 60 days 
