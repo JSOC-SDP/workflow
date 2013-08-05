@@ -11,8 +11,6 @@ set HARPSERIES = hmi.Mharp_720s_nrt
 
 set OUTDIR = /surge40/jsocprod/HARPS/nrt/images
 
-set OUTDIR = /surge40/jsocprod/HARPS/nrt/images
-
 set HERE = $cwd
 
 # Must fetch low and high from the ticket used to start the data update
@@ -64,41 +62,38 @@ echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >
 # Identify the latest .png file
 set lastPNG = `ls -1 $OUTDIR/harp.*.png | tail -1`
 echo "echo $lastPNG>>& $HERE/runlog" >> $CMDFILE
-sleep 60
-set lastPNG = `ls -1 $OUTDIR/harp.*.png | tail -1`
-echo "echo $lastPNG>>& $HERE/runlog" >> $CMDFILE
 
 # Fancify latest.png file
 set TMP = $OUTDIR/.latest_nrt.png
 set PNGLATEST = $OUTDIR/latest_nrt.png
 echo "cp $lastPNG $TMP" >> $CMDFILE
 echo "$CONVERT $TMP -fill white -gravity North -pointsize 36 -font Helvetica -annotate 0 'near real-time (nrt) data' $TMP" >> $CMDFILE
-echo "if ("\$"?) then" >> $CMDFILE
-echo "rm -f $TMP" >> $CMDFILE
-echo "else" >> $CMDFILE
+#echo "if ("\$"?) then" >> $CMDFILE
+#echo "rm -f $TMP" >> $CMDFILE
+#echo "else" >> $CMDFILE
 echo "mv $TMP $PNGLATEST" >> $CMDFILE
-echo "endif" >> $CMDFILE
+#echo "endif" >> $CMDFILE
 
 # Create negative color image for nrt data visualization
 set TMP = $OUTDIR/.latest.png
 set NEG = $OUTDIR/latest_negative.png
 echo "cp $lastPNG $TMP" >> $CMDFILE
 echo "$CONVERT $TMP -negate $TMP" >> $CMDFILE
-echo "if ("\$"?) then" >> $CMDFILE
-echo "rm -f $TMP" >> $CMDFILE
-echo "else" >> $CMDFILE
+#echo "if ("\$"?) then" >> $CMDFILE
+#echo "rm -f $TMP" >> $CMDFILE
+#echo "else" >> $CMDFILE
 echo "mv $TMP $NEG" >> $CMDFILE
-echo "endif" >> $CMDFILE
+#echo "endif" >> $CMDFILE
 
 # Create thumbnail
 set TMP = $OUTDIR/.thumbnail.png
 set THUMB = $OUTDIR/thumbnail.png
 echo "$CONVERT -define png:size=1024x1024 $lastPNG -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
-echo "if ("\$"?) then" >> $CMDFILE
-echo "rm -f $TMP" >> $CMDFILE
-echo "else" >> $CMDFILE
+#echo "if ("\$"?) then" >> $CMDFILE
+#echo "rm -f $TMP" >> $CMDFILE
+#echo "else" >> $CMDFILE
 echo "mv $TMP $THUMB" >> $CMDFILE
-echo "endif" >> $CMDFILE
+#echo "endif" >> $CMDFILE
 
 # Delete all .png files older than 60 days 
 foreach oldFile ( `find $OUTDIR/harp.*.png* -type f -atime +60` )
