@@ -23,7 +23,7 @@ echo $USER > Gatekeeper_owner
 echo $HOST'.'$$ > Keep_running
 set keep_running = 1
 
-while ($keep_running > 0)
+while ($keep_running > 0) # KEEPRUNNING LOOP
 
     echo " "
     echo " "
@@ -62,12 +62,12 @@ while ($keep_running > 0)
 # echo set now = `time_convert time=$nowtxt`
 
    # inspect each gate and deal with all tickets at that gate
-   foreach gate (`/bin/ls gates`)
+foreach gate (`/bin/ls gates`) # GATE LOOP
 	cd $WFDIR/gates/$gate
         # get gate information attributes
         if (-e statusbusy) then
 		if ($verbosemode) echo "GATEKEEPER statustask running, skip gate for now"
-                continue
+continue # NEXT GATE 
         endif
         set nextupdate = `cat nextupdate`
         set updatedelta = `cat updatedelta`
@@ -78,7 +78,7 @@ while ($keep_running > 0)
         set statustask = `cat statustask`
         if ($gatestatus == "HOLD") then
             if ($verbosemode) echo "GATEKEEPER Gate: $gate on HOLD, skip this gate"
-            continue
+continue # NEXT GATE - This makes sense, since this gate is busy - go on to the next gate.
         endif
 echo starting $gate
         # Do general update if it is time
@@ -96,7 +96,8 @@ echo starting $gate
                         $WFCODE/$statustask $gate # do clock_gate inline
                 else
                         $WFCODE/$statustask $gate & 
-		        continue # stop with this gate until update is done
+continue # NEXT GATE 
+         # stop with this gate until update is done
                 endif
 	endif
         set low = `cat low`
@@ -106,7 +107,8 @@ echo starting $gate
 		if ($verbosemode) echo "GATEKEEPER Gate $gate not properly initialized, try to init"
 		touch statusbusy
                 $WFCODE/$statustask $gate & 
-		continue  # stop with this gate until update is done
+continue # NEXT GATE
+         # stop with this gate until update is done
 	endif
 # if ($low == -1) then
 # echo "GATEKEEPER DEBUG $gate low is -1, reset"
@@ -127,15 +129,15 @@ echo starting $gate
         endif
 
         # inspect all new tickets and disposition
-	foreach ticket (`/bin/ls new_tickets`)
+foreach ticket (`/bin/ls new_tickets`) # TICKET LOOP
                 if ($verbosemode) echo "GATEKEEPER Start processing new ticket $ticket"
                 echo $nowtxt > $WFDIR/LAST_NEWTICKET
                 # get ticket key values
-		foreach key (ACTION WANTLOW WANTHIGH EXPIRES)
+foreach key (ACTION WANTLOW WANTHIGH EXPIRES) # KEY LOOP
 			# set setval = `grep ^$key new_tickets/$ticket`
 			set setval = `grep $key new_tickets/$ticket`
                         if ($#setval == 1) set $setval
-		end
+end # KEY LOOP
 
         	if ($type == "time") then
 			set WANTLOW_t = `time_convert time=$WANTLOW`
@@ -154,7 +156,7 @@ echo starting $gate
                         if ($verbosemode) echo GATEKEEPER TIMEOUT of new ticket, $expirestime "<" $now
 			echo "STATUS=4" >> new_tickets/$ticket
 			mv new_tickets/$ticket active_tickets
-			continue
+continue # NEXT TICKET
 		endif
 
                 # disposition new tickets
@@ -218,7 +220,7 @@ echo starting $gate
                         $WFCODE/$statustask $gate low=$low high=$high &
 		endif
 		if ($verbosemode) echo GATEKEEPER moved new_tickets/$ticket to active_tickets with action=$ACTION
-	end # done with new tickets
+	end # TICKET LOOP
 
 		if ($verbosemode) echo GATEKEEPER done with new_tickets, examine this gates action task done list
 
@@ -235,7 +237,7 @@ echo starting $gate
 	set thisgatedir = $cwd
 	cd $WFDIR/tasks/$actiontask/done/
         if ($verbosemode) echo GATEKEEPER change to $cwd
-	foreach donetask ( `/bin/ls` )
+foreach donetask ( `/bin/ls` ) # DONE TASK LOOP
             # see if there is a ticket in this gate's actiontask done queue
             # get info about this ticket.
 	    if ($verbosemode) echo "GATEKEEPER look at done task $donetask"
@@ -246,14 +248,14 @@ echo starting $gate
             else
                set root_done = 0
 	    endif 
-	    foreach key (TICKET GATE TASKID)
+foreach key (TICKET GATE TASKID) # KEY LOOP
 		set setval = `grep $key $donetask/ticket`
                 if ($#setval) then
 		    set $setval
                 else
                     set $key = VOID
 	        endif
-	    end
+end # DONE KEY LOOP
             if ($TASKID == VOID) then
 		set TASKID = $donetask
 	    endif
@@ -295,19 +297,20 @@ if ($verbosemode) echo "GATEKEEPER done queue, move $GATE/active_tickets/$TICKET
             else
 echo "GATEKEEPER done queue, FAILED to rm $WFDIR/tasks/$parenttask/active/$TASKID/pending_tickets/$TICKET"
             endif
-        end # processing this gate's action task done list for donetask
+        end # DONE TASK
+            # processing this gate's action task done list for donetask
 	cd $thisgatedir
 
 	if ($verbosemode) echo "GATEKEEPER DONE with done queue, start at $gate active_tickets"
         # examine all existing tickets, examine status then do action
-	foreach ticket (`/bin/ls active_tickets`)
+foreach ticket (`/bin/ls active_tickets`) # TICKET LOOP
 		# get ticket attributes and check for timeout
 echo $gate existing ticket  $ticket
                 if ($verbosemode) echo "GATEKEEPER Start processing active ticket $ticket"
-		foreach key (ACTION STATUS TASKID EXPIRES WANTLOW WANTHIGH)
+foreach key (ACTION STATUS TASKID EXPIRES WANTLOW WANTHIGH) # KEY LOOP
 			set setval = `grep $key active_tickets/$ticket`
 			if ($#setval == 1) set $setval
-		end
+end # KEY LOOP
 		set EXPIRES_t = `time_convert time=$EXPIRES`
 # echo set EXPIRES_t = `time_convert time=$EXPIRES`
         	if ($type == "time") then
@@ -348,7 +351,7 @@ echo "GATEKEEPER can not do mv active_tickets/$ticket $WFDIR/tasks/$task/active/
 			if ($verbosemode) echo "GATEKEEPER STATUS is 2"
                         if (-e statusbusy) then
                                 if ($verbosemode) echo "GATEKEEPER StatusCommand is running"
-                                continue
+continue # NEXT TICKET
                         endif
 			set low = `cat low`
 if ($#low == 0) then
@@ -429,8 +432,10 @@ if ($verbosemode) echo "GATEKEEPER active ticket exam, move active_tickets/$tick
                         endif
 			mv active_tickets/$ticket $WFDIR/tickets_done
 		endif
-	end # done with process existing tickets
-    end # done with tour of all gates
+	end # TICKET LOOP
+        # done with process existing tickets
+    end # GATE LOOP
+        # done with tour of all gates
 
     # gatekeeper loop management
 ALL_GATES_DONE:
@@ -443,7 +448,7 @@ ALL_GATES_DONE:
         sleep $CADENCE
     endif
 
-end # keep_running loop
+end # KEEPRUNNING LOOP
 
 echo Gate_Keeper Exit
 exit 0
