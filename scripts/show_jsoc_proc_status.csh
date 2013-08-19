@@ -81,6 +81,8 @@ while ($iprod <= $nprod)
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then        
       set times = `$SHOW_INFO -q key=T_REC $prod'[][$]' n=-1`
     endif
+  else if ( $prod == iris.lev0 ) then
+    set times = `$SHOW_INFO -q key=t_obs iris.lev0'[? FSN != 8421504 ?]' n=-1 | sed s/-/./g | sed s/T/_/ | cut -c1-19`
   else
     set times = `$SHOW_INFO -q key=T_OBS $prod'[$]'`
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then       
