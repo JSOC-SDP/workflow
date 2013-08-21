@@ -5,6 +5,7 @@
 set HERE = $cwd
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
 set MASKSERIES = hmi.Marmask_720s
 set HARPSERIES = hmi.Mharp_720s
 set OUTDIR = /surge40/jsocprod/HARPS/definitive/tmp
@@ -21,8 +22,7 @@ end
 
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
-#set timestr = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*\d\d\d\d\.\d+\.(\d+)(.*)/) { my($day) = $1; my($hr) = "00"; my($min) = "00"; my($suff) = $2; if ($suff =~ /_(\d+)(.*)/) { $hr = $1; $suff = $2; if ($suff =~ /:(\d+)(.*)/) { $min = $1; } } print "${day}_$hr$min"; }'`
-#set timestr = `echo $WANTLOW | awk -F\. '{print $2$3}'`
+
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 
 set qsubscr = HI$timestr
@@ -51,9 +51,19 @@ echo "cd $HERE" >> $CMDFILE
 #echo "HOST is $HOST >>& $HERE/runlog" >> $CMDFILE
 echo "hostname >>&$log" >>$CMDFILE
 
-
-# The guts of this exercise
 echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
+foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
+  set file = $OUTDIR/harp.$trec.png
+  if ( -e $file ) then
+    @ year = `echo $trec | awk -F\. '{print $1}'`
+    set mo = `echo $trec | awk -F\. '{print $2}'`
+    set dy = `echo $trec | awk -F\. '{print $3}' | awk -F\_ '{print $1}'`
+    mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
+    echo "if ( -e $file ) then" >>$CMDFILE
+    echo "  mv $file /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy" >> $CMDFILE
+    echo "endif" >>$CMDFILE
+  endif
+end
 
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
@@ -64,15 +74,6 @@ touch $HERE/qsub_running
 set log = `echo $HERE/runlog | sed "s/^\/auto//"`
 
 qsub -e $log -o $log -sync yes -q j.q $CMDFILE
-
-# move files to images dir
-foreach PNG ( `find $OUTDIR -mmin +2 | grep png` )
-  @ year = `echo $PNG | awk -F\. '{print $2}'`
-  set mo = `echo $PNG | awk -F\. '{print $3}'`
-  set dy = `echo $PNG | awk -F\. '{print $4}' | awk -F\_ '{print $1}'`
-  mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
-  mv $PNG /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
-end
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
