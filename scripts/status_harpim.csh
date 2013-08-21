@@ -28,8 +28,8 @@ echo $high > high
 
 # Update the lastupdate state-file content.
 set nowtxt = `date -u +%Y.%m.%d_%H:%M:%S`
-#echo "$nowtxt" > lastupdate
-echo 1886.05.07  > lastupdate
+echo "$nowtxt" > lastupdate
+#echo 1886.05.07  > lastupdate
 
 rm -f statusbusy
 exit 0
