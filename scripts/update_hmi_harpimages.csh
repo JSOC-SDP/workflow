@@ -42,17 +42,16 @@ set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\
 
 set CMDFILE = $HERE/$qsubscr
 set log = $HERE/runlog
-rm -f $CMDFILE
-rm -f $HERE/runlog
 
 # Create the qsub script
 echo "#! /bin/csh -f " >> $CMDFILE
 echo "cd $HERE" >> $CMDFILE
-#echo "HOST is $HOST >>& $HERE/runlog" >> $CMDFILE
+#echo "HOST is $HOST >>& $log" >> $CMDFILE
 echo "hostname >>&$log" >>$CMDFILE
 
-echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
+echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $log" >> $CMDFILE
 foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
+  echo $trec
   set file = $OUTDIR/harp.$trec.png
   if ( -e $file ) then
     @ year = `echo $trec | awk -F\. '{print $1}'`
@@ -71,9 +70,9 @@ echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
 
 # Execute the qsub script
 touch $HERE/qsub_running
-set log = `echo $HERE/runlog | sed "s/^\/auto//"`
+set log = `echo $log | sed "s/^\/auto//"`
 
-qsub -e $log -o $log -sync yes -q j.q $CMDFILE
+qsub -e $log -o $log -sync yes -q j.q $CMDFILE &
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
