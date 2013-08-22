@@ -2,6 +2,8 @@
 # This script creates the HARP 720s definitive web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
 
+#set echo
+
 set HERE = $cwd
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
@@ -22,14 +24,12 @@ end
 
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
+#set wantlow=2011.03.26
+#set wanthigh=2011.03.26_03
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 
 set qsubscr = HI$timestr
-
-echo wantlow is $wantlow >> $HERE/runlog
-echo wanthigh is $wanthigh >> $HERE/runlog
-echo qsubscr is $qsubscr >> $HERE/runlog
 
 # Initialize the retstatus state file to what I guess is a bad value
 echo 6 > $HERE/retstatus
@@ -53,15 +53,13 @@ echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >
 foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
   echo $trec
   set file = $OUTDIR/harp.$trec.png
-  if ( -e $file ) then
-    @ year = `echo $trec | awk -F\. '{print $1}'`
-    set mo = `echo $trec | awk -F\. '{print $2}'`
-    set dy = `echo $trec | awk -F\. '{print $3}' | awk -F\_ '{print $1}'`
-    mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
-    echo "if ( -e $file ) then" >>$CMDFILE
-    echo "  mv $file /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy" >> $CMDFILE
-    echo "endif" >>$CMDFILE
-  endif
+  @ year = `echo $trec | awk -F\. '{print $1}'`
+  set mo = `echo $trec | awk -F\. '{print $2}'`
+  set dy = `echo $trec | awk -F\. '{print $3}' | awk -F\_ '{print $1}'`
+  mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
+  echo "if ( -e $file ) then" >>$CMDFILE
+  echo "  mv $file /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy" >> $CMDFILE
+  echo "endif" >> $CMDFILE
 end
 
 # Set the real return status
@@ -72,7 +70,7 @@ echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
 touch $HERE/qsub_running
 set log = `echo $log | sed "s/^\/auto//"`
 
-qsub -e $log -o $log -sync yes -q j.q $CMDFILE &
+qsub -e $log -o $log -sync yes -q j.q $CMDFILE 
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
