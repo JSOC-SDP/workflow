@@ -85,9 +85,9 @@ echo "$CONVERT -define png:size=1024x1024 $TMP -thumbnail 256x256 -unsharp 0x.5 
 echo "mv $TMP $THUMB" >> $CMDFILE
 
 # Delete all .png files older than 60 days 
-foreach oldFile ( `find $OUTDIR/harp.*.png* -type f -atime +60` )
-  echo "rm $oldFile" >> $CMDFILE
-end
+echo "foreach oldFile ( `find $OUTDIR/harp.*.png* -type f -atime +60` )" >>$CMDFILE
+echo "  rm $oldFile" >> $CMDFILE
+echo "end" >>$CMDFILE
 
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
