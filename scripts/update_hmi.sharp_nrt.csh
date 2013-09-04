@@ -57,7 +57,8 @@ echo "set SHPstatus = 0" >>&$CMD
 
 set n = 1
 while ( $n <= $num )
-  if ( ($pix[$n] >= 2000) && ($pix[$n] <= 400000) ) then
+#  if ( ($pix[$n] >= 2000) && ($pix[$n] <= 400000) ) then    ### Removed high pixel restriction on 2013.09.04
+  if ( $pix[$n] >= 2000 ) then
     echo "$CUTOUT mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' me=hmi.ME_720s_fd10_nrt meharp=hmi.MEharp_720s_nrt" >> $CMD
     echo 'set M2Mstatus = $?' >>$CMD
     echo 'if ($M2Mstatus) goto DONE' >>&$CMD
