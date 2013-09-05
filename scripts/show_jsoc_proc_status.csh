@@ -99,7 +99,7 @@ while ($iprod <= $nprod)
   else if ( ($lags <= $yellow[$iprod]) && ($prod != iris.lev0) ) then
     set stat = YELLOW
     @ y = 1
-  else if ($prod != iris.lev0) ) then
+  else if ($prod != iris.lev0) then
     set stat = RED
     @ r = 1
   endif
