@@ -96,7 +96,7 @@ while ($iprod <= $nprod)
   if ($lags <= $green[$iprod]) then
     set stat = GREEN
     @ g = 1
-  else if ($lags <= $yellow[$iprod]) then
+  else if ( ($lags <= $yellow[$iprod]) && ($prod != iris.lev0) ) then
     set stat = YELLOW
     @ y = 1
   else
