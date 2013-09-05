@@ -96,12 +96,16 @@ while ($iprod <= $nprod)
   if ($lags <= $green[$iprod]) then
     set stat = GREEN
     @ g = 1
-  else if ( ($lags <= $yellow[$iprod]) && ($prod != iris.lev0) ) then
+  else if ($lags <= $yellow[$iprod]) then
     set stat = YELLOW
-    @ y = 1
-  else if ($prod != iris.lev0) then
+    if ($prod != iris.lev0) then
+      @ y = 1
+    endif
+  else 
     set stat = RED
-    @ r = 1
+    if ( $prod != iris.lev0) then
+      @ r = 1
+    endif
   endif
   if ($lags < 60) then
     set lag = "$lags minutes"
