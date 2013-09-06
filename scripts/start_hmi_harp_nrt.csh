@@ -85,18 +85,18 @@ set echo
 
 # Look for harps that need to be processed
 
-set last_mask = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[\$] key=t_obs`
+set last_mask = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[\$] key=t_rec`
 @ last_mask_s = `$TIME_CONVERT time=$last_mask`
 
 # Check to make sure there is good M record
 
-set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
+set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_rec`
 @ maskMag_s = `$TIME_CONVERT time=$maskMag`
 @ i = 1
 while ( $i < 12 )
   while ( $maskMag_s < 0 )
     sleep 900
-    set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
+    set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_rec`
     @ maskMag_s = `$TIME_CONVERT time=$maskMag`
   end
   @ i++
