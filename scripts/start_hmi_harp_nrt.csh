@@ -114,11 +114,13 @@ set last_good_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' key=t_rec
 
 while ( ($harp_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) || ($mag_lag > 0) )
   if ( $harp_lag < 1440) then
-    touch $HERE/WAITING_HARP_LAG
+#    touch $HERE/WAITING_HARP_LAG
+    echo $harp_lag > $HERE/WAITING_HARP_LAG
   else if ( -e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) then
     touch $HERE/WAITING_QSUB_RUNNING
   else if ( $mag_lag > 0 ) then
-    touch $HERE/WAITING_MAG_LAG
+#    touch $HERE/WAITING_MAG_LAG
+    echo $mag_lag > $HERE/WAITING_MAG_LAG
   endif
   sleep 120
   set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1`
