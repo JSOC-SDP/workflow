@@ -15,7 +15,7 @@ foreach ticket ( $WORKFLOW_DATA/tasks/*/active/*$YEAR*/ticket )
 
 end
 
-foreach low ( `ls -1 $WORKFLOW_DATA/gates/*/low | grep -v lev0 | grep -v Synop` )
+foreach low ( `ls -1 $WORKFLOW_DATA/gates/*/low | grep -v lev0 | grep -v Synop | grep -v Limb` )
   @ lines = `wc -l $low | awk '{print $1}'`
   if ( $lines < 1 ) then
      echo ""
@@ -33,7 +33,7 @@ foreach low ( `ls -1 $WORKFLOW_DATA/gates/*/low | grep -v lev0 | grep -v Synop` 
   endif
 end
 
-foreach high ( `ls -1 $WORKFLOW_DATA/gates/*/high | grep -v lev0 | grep -v Synop` )
+foreach high ( `ls -1 $WORKFLOW_DATA/gates/*/high | grep -v lev0 | grep -v Synop | grep -v Limb` )
   @ lines = `wc -l $high | awk '{print $1}'`
   if ( $lines < 1 ) then
      echo ""
