@@ -204,14 +204,13 @@ qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
 
 sleep 15
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
-@ num_harps = `$SHOW_INFO hmi.mharps_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -c`
-echo "number of harps:  $num_harps" >> /home/jsocprod/nrt_harps
+@ num_harps = `$SHOW_INFO hmi.mharps_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
+echo "number of harps:  $num_harps" >> $TEMPLOG
 
 if ( ($retstatus == 0) && ($num_harps > 0) ) then
   @ i = 1
   while ( $i <= $num_harps )
     set WANT = $Htimes[$i]
-    echo "making hmi.ME_720s_fd10_nrt for $WANT" >> /home/jsocprod/nrt_harps
     set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
     set min = `echo $want | awk -F\: '{print $2}'`
     if ( $min == "00" ) then
