@@ -169,6 +169,7 @@ echo "set echo" >>$CMD
 
 echo "setenv TMPDIR /surge40/jsocprod/HARPS/nrt/" >>$CMD
 echo "set MHarpstatus = 0" >>&$CMD
+set Htimes
 
 while ( $nextH_s < $last_mask_s )
   set nextH = `$TIME_CONVERT s=$nextH_s zone=TAI`
@@ -179,8 +180,10 @@ while ( $nextH_s < $last_mask_s )
     echo "no Mask data for $nextH"
     @ nextH_s = $nextH_s + 720 
   else
+    set Htimes = ($Htimes $nextH)
     echo "touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
     echo "$MHarp -n /surge40/jsocprod/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] hmi.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
+    echo "/home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/harp_nrt_movies.csh" >> $CMD
     echo 'set MHarpstatus = $?' >> $CMD
     echo 'if ($MHarpstatus) goto DONE' >>&$CMD
     @ nextH_s = $nextH_s + 720
@@ -188,7 +191,7 @@ while ( $nextH_s < $last_mask_s )
 end
 echo 'DONE:' >>$CMD
 #echo "/home/jsoc/pipeline/scripts/harp_nrt_movies.csh" >> $CMD
-echo "/home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/harp_nrt_movies.csh" >> $CMD
+#echo "/home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/harp_nrt_movies.csh" >> $CMD
 echo 'echo $MHarpstatus >retstatus' >>$CMD
 echo "rm $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
 
@@ -202,12 +205,19 @@ qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
 # submit next harp and VFISV tickets
 
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
-if ( $retstatus == 0 ) then
-  set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANTLOW wanthigh=$WANTHIGH action=5`
-  set min = `echo $nextH | awk -F\: '{print $2}'`
-  if ( $min == "00" ) then
-    set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi_harpimages_nrt wantlow=$WANTLOW wanthigh=$WANTHIGH action=5`
-  endif
+@ num_harps = `$SHOW_INFO hmi.mharps_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -c`
+
+if ( ($retstatus == 0) && ($num_harps > 0) ) then
+  @ i = 1
+  while ( $i <= $num_harps )
+    set WANT = $Htimes[$i]
+    set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
+    set min = `echo $want | awk -F\: '{print $2}'`
+    if ( $min == "00" ) then
+      set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi_harpimages_nrt wantlow=$WANT wanthigh=$WANT action=5`
+    endif
+    @ i++
+  end
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
   sleep 15
   set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
