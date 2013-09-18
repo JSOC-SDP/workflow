@@ -116,12 +116,10 @@ set last_good_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' key=t_rec
 
 while ( ($harp_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) || ($mag_lag > 0) )
   if ( $harp_lag < 1440) then
-#    touch $HERE/WAITING_HARP_LAG
     echo $harp_lag > $HERE/WAITING_HARP_LAG
   else if ( -e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) then
     touch $HERE/WAITING_QSUB_RUNNING
   else if ( $mag_lag > 0 ) then
-#    touch $HERE/WAITING_MAG_LAG
     echo $mag_lag > $HERE/WAITING_MAG_LAG
   endif
   sleep 120
@@ -207,11 +205,13 @@ qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
 sleep 15
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 @ num_harps = `$SHOW_INFO hmi.mharps_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -c`
+echo "number of harps:  $num_harps" >> $TEMPLOG
 
 if ( ($retstatus == 0) && ($num_harps > 0) ) then
   @ i = 1
   while ( $i <= $num_harps )
     set WANT = $Htimes[$i]
+    echo "making hmi.ME_720s_fd10_nrt for $WANT" >> $TEMPLOG
     set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
     set min = `echo $want | awk -F\: '{print $2}'`
     if ( $min == "00" ) then
