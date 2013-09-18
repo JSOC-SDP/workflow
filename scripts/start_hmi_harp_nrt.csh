@@ -204,7 +204,7 @@ qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
 
 sleep 15
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
-@ num_harps = `$SHOW_INFO hmi.mharps_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
+@ num_harps = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
 echo "number of harps:  $num_harps" >> $TEMPLOG
 
 if ( ($retstatus == 0) && ($num_harps > 0) ) then
