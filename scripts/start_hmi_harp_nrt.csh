@@ -209,7 +209,7 @@ echo "number of harps:  $num_harps" >> $TEMPLOG
 
 if ( ($retstatus == 0) && ($num_harps > 0) ) then
   @ i = 1
-  while ( $i <= $num_harps )
+  while ( $i <= $#Htimes )
     set WANT = $Htimes[$i]
     set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
     set min = `echo $WANT | awk -F\: '{print $2}'`
