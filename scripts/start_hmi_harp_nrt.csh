@@ -93,15 +93,17 @@ set last_mask = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[\$] key=t_rec`
 set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_rec`
 @ maskMag_s = `$TIME_CONVERT time=$maskMag`
 @ i = 1
-while ( $i < 12 )
+while ( $i < 36 )  # 9 hours, allowing for long maneuvers 
   while ( $maskMag_s < 0 )
     sleep 900
+    touch $HERE/NO_GOOD_MAG
     set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_rec`
     @ maskMag_s = `$TIME_CONVERT time=$maskMag`
   end
   @ i++
 end
 
+rm $HERE/NO_GOOD_MAG
 
 set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1` 
 @ last_harp_s = `$TIME_CONVERT time=$last_harp`
