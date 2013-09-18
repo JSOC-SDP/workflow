@@ -204,6 +204,7 @@ qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
 
 # submit next harp and VFISV tickets
 
+sleep 15
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 @ num_harps = `$SHOW_INFO hmi.mharps_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -c`
 
@@ -218,8 +219,10 @@ if ( ($retstatus == 0) && ($num_harps > 0) ) then
     endif
     @ i++
   end
+endif
+
+if ($retstatus == 0) then
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
-  sleep 15
   set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
 endif
 
