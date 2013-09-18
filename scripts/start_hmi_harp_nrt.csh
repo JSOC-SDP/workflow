@@ -1,5 +1,5 @@
 #! /bin/csh -f
-
+set echo
 ###
 ### MHarps MUST be processed in order.  It's OK to have a gap, but
 ### NOT OK to process them out of order.  If a problem arises, they
@@ -212,7 +212,7 @@ if ( ($retstatus == 0) && ($num_harps > 0) ) then
   while ( $i <= $num_harps )
     set WANT = $Htimes[$i]
     set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
-    set min = `echo $want | awk -F\: '{print $2}'`
+    set min = `echo $WANT | awk -F\: '{print $2}'`
     if ( $min == "00" ) then
       set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi_harpimages_nrt wantlow=$WANT wanthigh=$WANT action=5`
     endif
