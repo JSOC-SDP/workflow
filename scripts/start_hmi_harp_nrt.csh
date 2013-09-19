@@ -1,5 +1,5 @@
 #! /bin/csh -f
-set echo
+
 ###
 ### MHarps MUST be processed in order.  It's OK to have a gap, but
 ### NOT OK to process them out of order.  If a problem arises, they
@@ -153,9 +153,11 @@ if ( $harp_lag >= 3600 ) then
   set WANTLOW = $t
   set WANTHIGH = $last_mask
   set nextH = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[$t'-'$last_mask] key=t_rec n=1`
-  @ nextH_s = `$TIME_CONVERT time=$nextH` + 720
+#  @ nextH_s = `$TIME_CONVERT time=$nextH` + 720
+  @ nextH_s = `$TIME_CONVERT time=$nextH
 else
-  @ nextH_s = $last_harp_s + 720
+#  @ nextH_s = $last_harp_s + 720
+   @ nextH_s = $last_harp_s
 endif
 
 # make qsub script
