@@ -90,7 +90,7 @@ set last_mask = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[\$] key=t_rec`
 
 # Check to make sure there is good M record
 
-set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_rec`
+set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
 @ maskMag_s = `$TIME_CONVERT time=$maskMag`
 @ i = 1
 while ( $i < 36 )  # 9 hours, allowing for long maneuvers 
