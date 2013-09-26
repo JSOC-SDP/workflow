@@ -142,7 +142,7 @@ if ( $harp_lag >= 3600 ) then
   @ check_next_s = $last_mask_s - 3600
   while ( $check_next_s <= $last_mask_s )
     set check_next = `$TIME_CONVERT zone=tai s=$check_next_s`
-    @ check_next_count = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[$check_next]' -c`
+    @ check_next_count = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[$check_next] -c`
     if ( $check_next_count == 1 ) then
       set t = $check_next
       @ check_next_s = $last_mask_s + 1
