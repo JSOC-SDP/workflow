@@ -17,9 +17,9 @@
 ###
 ###########################################################################################################
 
-$TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert;
-$SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info;
-$SET_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/set_info;
+$TIME_CONVERT = "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert";
+$SHOW_INFO = "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info";
+$SET_INFO = "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/set_info";
 
 ### mask to compare against existing quality bits
 $M = "00002000";    
