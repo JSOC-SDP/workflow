@@ -155,7 +155,8 @@ if ($finalimagetime != NONE) then
   endif
   if ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss > $prevt) ) then
     set imagepath = http://jsoc.stanford.edu/data/hmi/images/$YEAR/$MON/$DAY
-    set latest = $yyyymmdd'_'$hhmmss
+    set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
+#    set latest = $yyyymmdd'_'$hhmmss
     echo "Time    " $latest >  $LATESTLIST
     echo '{"first":"20100501_000000","last":"'$latest'"}' > $IMGROOT/image_times.json
     set img = 1
