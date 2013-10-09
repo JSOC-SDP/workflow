@@ -126,7 +126,7 @@ set echo
     type=jpg \
     outname=$obs \
     out='| ppmlabel -color white -size {%0.75:5} -x 15 -y {%98} -text "SDO/HMI '"$msg$namelist[$img]"': {ID}" | pnmtojpeg -quality=95'
-    set finalimagetime = `show_info -q $inseries"$QRY" n=-1 key=T_REC`
+    set finalimagetime = `show_info -q $inseries"$QRY" n=-1 key=T_OBS`
 unset echo
     @ img = $img + 1
   end
