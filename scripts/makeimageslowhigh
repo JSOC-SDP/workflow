@@ -66,7 +66,7 @@ while ($day <= $dayhigh)
   endif
   set end_movie_t = $last_t
   @ n_minutes = $n_images * $CADENCE
-  set QRY = '['$first'/'$n_minutes'm@'$CADENCE'm][? QUALITY > 0 ?]'
+  set QRY = '['$first'/'$n_minutes'm@'$CADENCE'm]'
   set yyyymmdd = `echo $first | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
   set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
   set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
@@ -126,7 +126,7 @@ set echo
     type=jpg \
     outname=$obs \
     out='| ppmlabel -color white -size {%0.75:5} -x 15 -y {%98} -text "SDO/HMI '"$msg$namelist[$img]"': {ID}" | pnmtojpeg -quality=95'
-    set finalimagetime = `show_info -q $inseries"$QRY" n=-1 key=T_OBS`
+    set finalimagetime = `show_info -q $inseries"$QRY" n=-1 key=T_REC`
 unset echo
     @ img = $img + 1
   end
@@ -161,6 +161,7 @@ if ($finalimagetime != NONE) then
     set img = 1
     while ($img <= $#obslist)
       set obs = $obslist[$img]
+      set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*$obs'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
       echo "$obs " $imagepath/$latest"_"$obs >> $LATESTLIST
       @ img = $img + 1
     end
