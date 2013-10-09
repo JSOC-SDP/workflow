@@ -17,7 +17,8 @@ set CADENCE = 15
 set WF = /home/jsoc/cvs/Development/JSOC/proj/workflow
 #setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
 setenv RGBDEF $WF/scripts/rgb.txt
-set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
+#set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
+set RENDER_IMAGE = /home/jeneen/cvs/JSOC/bin/linux_x86_64/render_image
 set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
 
 set obslist = (Ic Ic_flat M M_color)
@@ -65,7 +66,7 @@ while ($day <= $dayhigh)
   endif
   set end_movie_t = $last_t
   @ n_minutes = $n_images * $CADENCE
-  set QRY = '['$first'/'$n_minutes'm@'$CADENCE'm]'
+  set QRY = '['$first'/'$n_minutes'm@'$CADENCE'm][? QUALITY > 0 ?]'
   set yyyymmdd = `echo $first | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
   set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
   set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
