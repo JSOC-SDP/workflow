@@ -343,6 +343,10 @@ endif
 
 echo '<TR><TD>&nbsp;<TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR>' >>$TMP
 
+if ( -e /tmp/camera_anomaly ) then
+  rm /tmp/camera_anomaly
+endif
+
 ### Look for Bit Flip Anomaly in AIA
 
 #@ fsn0 = `$SHOW_INFO -q key=fsn aia.lev0 n=-2 | head -1` - 3999
@@ -370,15 +374,19 @@ else
   echo "$totalBF"' </TD><TD> ' >>$TMP 
   if ( $BF1 > 0 ) then
     echo "AIA Camera 1: $BF1    ">>$TMP
+    echo "Camera Anomaly for AIA Camera 1" >> /tmp/camera_anomaly
   endif
   if ( $BF2 > 0 ) then
     echo "AIA Camera 2: $BF2    " >>$TMP
+    echo "Camera Anomaly for AIA Camera 2" >> /tmp/camera_anomaly
   endif
   if ( $BF3 > 0 ) then
     echo "AIA Camera 3: $BF3    " >>$TMP
+    echo "Camera Anomaly for AIA Camera 3" >> /tmp/camera_anomaly
   endif
   if ( $BF4 > 0 ) then
     echo "AIA Camera 4: $BF4    " >>$TMP
+    echo "Camera Anomaly for AIA Camera 4" >> /tmp/camera_anomaly
   endif
   echo "</TD></TR>" >>$TMP
 endif
@@ -400,14 +408,15 @@ if ( $totalBF < 100 ) then
   echo "No HMI Camera Anomalies (last 600s)"'</TD></TR>' >> $TMP
 else
   @ b = 1
-#  echo -n ' BGCOLOR="#FF6666">' >>$TMP
   echo -n ' BGCOLOR="blue">' >>$TMP
   echo "$totalBF"' </TD><TD> ' >>$TMP
   if ( $BF1 > 0 ) then
     echo "HMI Camera 1: $BF1    ">>$TMP
+    echo "Camera Anomaly for HMI Camera 1" >> /tmp/camera_anomaly
   endif
   if ( $BF2 > 0 ) then
     echo "HMI Camera 2: $BF2    " >>$TMP
+    echo "Camera Anomaly for HMI Camera 2" >> /tmp/camera_anomaly
   endif
   echo "</TD></TR>" >>$TMP
 endif
@@ -425,6 +434,10 @@ echo '<P>' >>$TMP
 if ($b == 1) then
   set favicon = blue_sq.gif 
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh blue
+  if ( ! -e /home/jeneen/CAMERA_ANOMALY.lock ) then
+    /usr/bin/Mail -s 'Important:  Camera Anomaly' jsoc_ops < /tmp/camera_anomaly
+    touch /home/jeneen/CAMERA_ANOMALY.lock
+  endif
 else if ($r == 1) then
   set favicon = red_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh red
