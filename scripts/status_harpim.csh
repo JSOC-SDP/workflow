@@ -15,7 +15,11 @@ endif
 set low = 2010.05.01
 set high = 2010.02.02
 
-set imgDir = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
+set dir = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
+set last_year = `ls -1d /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive/20* | tail -1`
+set last_month = `ls -1d /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive/$last_year | tail -1`
+set last_day = `ls -1d /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive/$last_year/$last_month | tail -1`
+set imgDir = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive/$last_year/$last_month/$last_day
 
 set gate = hmi_harpimages
 cd $WFDIR/gates/$gate
