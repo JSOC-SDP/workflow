@@ -26,7 +26,7 @@ set imgDir = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive/$last_year/$last
 set gate = hmi_harpimages
 cd $WFDIR/gates/$gate
 
-set low = `ls -1 $imgDir | grep png | head -1 | awk -F\. '{print $2"."$3"."$4}'`
+#set low = `ls -1 $imgDir | grep png | head -1 | awk -F\. '{print $2"."$3"."$4}'`
 set high = `ls -1 $imgDir | grep png | tail -1 | awk -F\. '{print $2"."$3"."$4}'`
 
 echo $low > low
