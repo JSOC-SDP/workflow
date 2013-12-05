@@ -35,9 +35,12 @@ set ared    = (8  20 40 $sixdays )
 
 # IRIS products
 set iproduct = ( iris.lev0 )
-set igreen = ( 720 )
-set iyellow = ( 10080 )
-set ired = ( 1000000 )
+#set igreen = ( 720 )
+set igreen = ( 1920 )
+#set iyellow = ( 10080 )
+set iyellow = ( 2880 )
+#set ired = ( 1000000 )
+set ired = ( 4320 )
 
 set product = ( $hproduct $aproduct $iproduct )
 set green = ($hgreen $agreen $igreen )
@@ -80,6 +83,32 @@ while ($iprod <= $nprod)
     endif
   else if ( $prod == iris.lev0 ) then
     set times = `$SHOW_INFO -q key=t_obs iris.lev0'[? FSN != 8421504 ?][? t_obs > 0 ?]' n=-1 | sed s/-/./g | sed s/T/_/ | cut -c1-19`
+    set iris_proc_time = `$SHOW_INFO -q iris.lev0'[:#$]' key=date`
+    set iris_proc_time_utc = `$TIME_CONVERT time=$iris_proc_time zone=UTC o=cal | awk -F\_ '{print $1"_"$2}'`_UTC
+    @ iris_proc_time_s = `$TIME_CONVERT time=$iris_proc_time_utc`
+    @ iris_diff = $now_t - $iris_proc_time_s 
+    if ($iris_diff < 60) then
+      @ iris_sec = "$lags seconds"
+    else if ($iris_diff < 3600) then
+      set iris_min = `$ARITH $iris_diff / 60`
+      set iris_lag = "$iris_min minutes"
+    else if ( $iris_diff < 86400) then
+      set iris_hr = `$ARITH $iris_diff / 3600`
+      set iris_lag = "$iris_hr hours"
+    else
+      set iris_days = `$ARITH $iris_diff / 86400`
+      set iris_lag = "$iris_days days"
+    endif
+    if ( $iris_diff <= 21600 ) then
+      set iris_stat = GREEN
+      @ g = 1
+    else if ( $iris_diff <= 43200 ) then
+      set iris_stat = YELLOW
+      @ y = 1
+    else
+      set iris_stat = RED
+      @ r = 1
+    endif
   else
     set times = `$SHOW_INFO -q key=T_OBS $prod'[$]'`
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then       
@@ -93,19 +122,15 @@ while ($iprod <= $nprod)
   endif
   set times_t = `$TIME_CONVERT time=$times[1]`
   @  lags = ( $now_t - $times_t ) / 60
-  if ($lags <= $green[$iprod]) then
+  if ( $lags <= $green[$iprod]) then
     set stat = GREEN
     @ g = 1
   else if ($lags <= $yellow[$iprod]) then
     set stat = YELLOW
-    if ($prod != iris.lev0) then
-      @ y = 1
-    endif
+    @ y = 1
   else 
     set stat = RED
-    if ( $prod != iris.lev0) then
-      @ r = 1
-    endif
+    @ r = 1
   endif
   if ($lags < 60) then
     set lag = "$lags minutes"
@@ -135,6 +160,17 @@ while ($iprod <= $nprod)
     echo -n ' BGCOLOR="#FF6666">' >>$TMP
   endif
   echo "$lag"'</TD><TD>'"$note"'</TD></TR>' >>$TMP
+  if ( $prod == 'iris.lev0' ) then
+    echo -n '<TR><TD>iris processing time</TD><TD' >>$TMP
+    if ($iris_stat == GREEN) then
+      echo -n ' BGCOLOR="#66FF66">' >>$TMP
+    else if ($iris_stat == YELLOW) then
+      echo -n ' BGCOLOR="yellow">' >>$TMP
+    else
+      echo -n ' BGCOLOR="#FF6666">' >>$TMP
+    endif
+    echo "$iris_lag"'</TD><TD>'"$iris_proc_time_utc"'</TD></TR>' >>$TMP
+  endif
   @ iprod = $iprod + 1
 end
 
@@ -452,4 +488,4 @@ echo '</BODY>' >>$TMP
 echo '<HEAD><link rel="stat icon" href="http://jsoc.stanford.edu/data/tmp/'$favicon'"></HEAD>' >>$TMP
 echo '</HTML>' >>$TMP
 
-mv $TMP $TARG/jsoc_proc_status.html
+mv $TMP $TARG/jsoc_proc_status2.html
