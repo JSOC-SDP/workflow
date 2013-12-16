@@ -58,6 +58,7 @@ set now_t = `$TIME_CONVERT time=$now`
 #echo "Content-type: text/html" >$TMP
 echo '<\!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">' >$TMP
 echo '<HTML><HEAD><TITLE>JSOC Processing Status</TITLE><META HTTP-EQUIV="Refresh" CONTENT="60"></HEAD><BODY LINK=black>' >>$TMP
+echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> $TMP
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
 
