@@ -489,4 +489,4 @@ echo '</BODY>' >>$TMP
 echo '<HEAD><link rel="stat icon" href="http://jsoc.stanford.edu/data/tmp/'$favicon'"></HEAD>' >>$TMP
 echo '</HTML>' >>$TMP
 
-mv $TMP $TARG/jsoc_proc_status2.html
+mv $TMP $TARG/jsoc_proc_status.html
