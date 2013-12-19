@@ -3,7 +3,7 @@
 # set echo
 
 set TARG = /web/jsoc/htdocs/data
-set TMP = $TARG/.jsoc_proc_status.tmp.$$
+set TMP = $TARG/.jsoc_proc_status.tmp.jeneen
 
 set noglob
 unsetenv QUERY_STRING
@@ -62,7 +62,7 @@ echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> 
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
 
-echo '<P><TABLE>' >>$TMP
+echo '<P><TABLE WIDTH=600>' >>$TMP
 echo '<TR><TD>Product</TD><TD>Lag</TD><TD>Note</TD></TR>' >>$TMP
 
 set nprod = $#product
@@ -489,4 +489,4 @@ echo '</BODY>' >>$TMP
 echo '<HEAD><link rel="stat icon" href="http://jsoc.stanford.edu/data/tmp/'$favicon'"></HEAD>' >>$TMP
 echo '</HTML>' >>$TMP
 
-mv $TMP $TARG/jsoc_proc_status.html
+mv $TMP $TARG/jsoc_proc_status2.html
