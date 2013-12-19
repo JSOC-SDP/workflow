@@ -62,7 +62,7 @@ echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> 
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
 
-echo '<P><TABLE WIDTH=900>' >>$TMP
+echo '<P><TABLE WIDTH=800>' >>$TMP
 echo '<TR><TD>Product</TD><TD>Lag</TD><TD>Note</TD></TR>' >>$TMP
 
 set nprod = $#product
