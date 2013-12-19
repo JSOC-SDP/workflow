@@ -62,7 +62,7 @@ echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> 
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
 
-echo '<P><TABLE WIDTH=800>' >>$TMP
+echo '<P><TABLE WIDTH=750>' >>$TMP
 echo '<TR><TD>Product</TD><TD>Lag</TD><TD>Note</TD></TR>' >>$TMP
 
 set nprod = $#product
@@ -90,8 +90,9 @@ while ($iprod <= $nprod)
     @ iris_diff = $now_t - $iris_proc_time_s 
     if ($iris_diff < 60) then
       @ iris_sec = "$lags seconds"
+      set iris_lag = "$iris_sec seconds"
     else if ($iris_diff < 3600) then
-      set iris_min = `$ARITH $iris_diff / 60`
+      set iris_min = `$ARITH $iris_diff / 60 | awk -F\. '{print $1}'`
       set iris_lag = "$iris_min minutes"
     else if ( $iris_diff < 86400) then
       set iris_hr = `$ARITH $iris_diff / 3600`
