@@ -153,19 +153,19 @@ if ($finalimagetime != NONE) then
     set prevd = `echo $prevdt | sed -e 's/_.*//'`
     set prevt = `echo $prevdt | sed -e 's/.*_//'`
   endif
-  if ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss > $prevt) ) then
-    set imagepath = http://jsoc.stanford.edu/data/hmi/images/$YEAR/$MON/$DAY
-    set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
-#    set latest = $yyyymmdd'_'$hhmmss
-    echo "Time    " $latest >  $LATESTLIST
-    echo '{"first":"20100501_000000","last":"'$latest'"}' > $IMGROOT/image_times.json
-    set img = 1
-    while ($img <= $#obslist)
-      set obs = $obslist[$img]
-      set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*$obs'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
-      echo "$obs " $imagepath/$latest"_"$obs >> $LATESTLIST
-      @ img = $img + 1
-    end
+  if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss > $prevt)) && (-e /surge40/jsoc/hmi/images/$YEAR/$MON/$DAY) ) then
+      set imagepath = http://jsoc.stanford.edu/data/hmi/images/$YEAR/$MON/$DAY
+      set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
+#     set latest = $yyyymmdd'_'$hhmmss
+      echo "Time    " $latest >  $LATESTLIST
+      echo '{"first":"20100501_000000","last":"'$latest'"}' > $IMGROOT/image_times.json
+      set img = 1
+      while ($img <= $#obslist)
+        set obs = $obslist[$img]
+        set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*$obs'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
+        echo "$obs " $imagepath/$latest"_"$obs >> $LATESTLIST
+        @ img = $img + 1
+      end
   endif
 endif
 
