@@ -35,11 +35,8 @@ set ared    = (8  20 40 $sixdays )
 
 # IRIS products
 set iproduct = ( iris.lev0 )
-#set igreen = ( 720 )
 set igreen = ( 1920 )
-#set iyellow = ( 10080 )
 set iyellow = ( 2880 )
-#set ired = ( 1000000 )
 set ired = ( 4320 )
 
 set product = ( $hproduct $aproduct $iproduct )
@@ -101,10 +98,12 @@ while ($iprod <= $nprod)
       set iris_days = `$ARITH $iris_diff / 86400`
       set iris_lag = "$iris_days days"
     endif
-    if ( $iris_diff <= 21600 ) then
+#    if ( $iris_diff <= 21600 ) then
+    if ( $iris_diff <= 43200 )
       set iris_stat = GREEN
       @ g = 1
-    else if ( $iris_diff <= 43200 ) then
+#    else if ( $iris_diff <= 43200 ) then
+    else if ( $iris_diff <= 54000 ) then
       set iris_stat = YELLOW
       @ y = 1
     else
