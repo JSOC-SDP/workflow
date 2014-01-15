@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# set echo
+ set echo
 
 set TARG = /web/jsoc/htdocs/data
 set TMP = $TARG/.jsoc_proc_status.tmp
@@ -99,7 +99,7 @@ while ($iprod <= $nprod)
       set iris_lag = "$iris_days days"
     endif
 #    if ( $iris_diff <= 21600 ) then
-    if ( $iris_diff <= 43200 )
+    if ( $iris_diff <= 43200 ) then
       set iris_stat = GREEN
       @ g = 1
 #    else if ( $iris_diff <= 43200 ) then
