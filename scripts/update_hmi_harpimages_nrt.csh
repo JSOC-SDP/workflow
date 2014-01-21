@@ -53,7 +53,7 @@ echo "hostname >>&$LOG" >>$CMDFILE
 
 # Run Turmon's matlab stuff
 set echo
-echo "$SRCTREE/$SCRIPT -f $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
+echo "$SRCTREE/$SCRIPT -fE $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
 
 # Now use Turmon's stuff to make other image files
 
