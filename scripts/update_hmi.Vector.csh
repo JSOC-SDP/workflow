@@ -79,29 +79,13 @@ echo "$HMIprogram begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$T
 echo 'set OBSstatus = $?' >>$TEMPCMD
 echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
 
-### Launch tickets to make 1k fits files
+# Remove limb darkening/create marmask
 
-#@ t1 = `time_convert time=$WANTLOW`
-#@ t2 = `time_convert time=$WANTHIGH`
-#@ t = $t1
-#while ( $t <= $t2 ) 
-#  @ end = $t + 3600
-#  set WLO = `time_convert s=$t zone=tai`
-#  set WHI = `time_convert s=$end zone=tai`
-#  set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits wantlow=$WLO wanthigh=$WHI action=5`
-#  @ t = $end + 1
-#end
-
-## Remove limb darkening/create marmask
-
-#echo "/home/phil/jsoc/bin/linux_x86_64/hmi_limbdark in=hmi.Ic_720s\["$wantlow"-"$wanthigh"]  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark in=hmi.Ic_720s\["$wantlow"-"$wanthigh"]  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
 
-## Remap/Resize mags for synoptic charts
+# Remap/Resize mags for synoptic charts
 
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/fdlos2radial in=hmi.M_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_720s >>&$TEMPLOG" >>$TEMPCMD
-#echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/mag2helio MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 RMAXFLAG=1 MCORLEV=1 in=hmi.M_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_hiresmap_720s >>&$TEMPLOG" >>$TEMPCMD
-#echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/mag2helio MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 RMAXFLAG=1 in=hmi.Mr_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_hiresmap_720s >>&$TEMPLOG" >>$TEMPCMD
 
 @ wantlow_s = `$TIME_CONVERT time=$wantlow`
 @ wanthigh_s = `$TIME_CONVERT time=$wanthigh`
@@ -113,6 +97,7 @@ endif
 
 echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=hmi.M_720s\["$wantlow"/"$t"] v2hout=hmi.Ml_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
 echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 in=hmi.Mr_720s\["$wantlow"/"$t"] v2hout=hmi.Mr_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
+echo "$JV2TS MAPMMAX=1800 SINBDIVS=720 LGSHIFT=3 CARRSTRETCH=1 in=hmi.Ic_noLimbDark_720s\["$wantlow"/"$t"] v2hout='hmi.Ic_noLimbDark_remap_720s' histlink=none TSTART=$wantlow TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90. MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1
 
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/resizemappingmag in=hmi.Ml_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/resizemappingmag in=hmi.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
