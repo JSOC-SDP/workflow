@@ -38,7 +38,7 @@ set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
 #set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=0 cadence=720.0 lev1=hmi.lev1_nrt"
 ##  CHANGED arguments 2012.10.16 for Sebastien's new observables code
 set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1_nrt quicklook=1 linearity=1"
-set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=0 cadence=720.0 lev1=hmi.lev1_nrt smooth=1 linearity=1" 
+set OBS_args = "-V levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=0 cadence=720.0 lev1=hmi.lev1_nrt smooth=1 linearity=1" 
 set LD_args = "-cnxf NONE"
 #set PATCH_args = "bb=hmi.Mpatch_720s_nrt"
 
