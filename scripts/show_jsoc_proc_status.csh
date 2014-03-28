@@ -125,10 +125,10 @@ while ($iprod <= $nprod)
       set iris1_days = `$ARITH $iris1_diff / 86400` 
       set iris1_lag = "$iris1_days days" 
     endif 
-    if ( $iris1_diff <= 900 ) then 
+    if ( $iris1_diff <= 43200 ) then 
       set iris1_stat = GREEN 
       @ g = 1 
-    else if ( $iris1_diff <= 1800 ) then 
+    else if ( $iris1_diff <= 54000 ) then 
       set iris1_stat = YELLOW 
       @ y = 1 
     else 
