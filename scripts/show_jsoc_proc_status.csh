@@ -113,12 +113,12 @@ while ($iprod <= $nprod)
     set iris1_proc_time_utc = `$TIME_CONVERT time=$iris1_proc_time zone=UTC o=cal | awk -F\_ '{print $1"_"$2}'`_UTC 
     @ iris1_proc_time_s = `$TIME_CONVERT time=$iris1_proc_time_utc` 
     @ iris1_diff = $now_t - $iris1_proc_time_s 
-    if ($iris1_diff < 660) then 
+    if ($iris1_diff < 60) then 
       set iris1_lag = "$iris1_diff seconds" 
-    else if ($iris1_diff < 4200) then 
+    else if ($iris1_diff < 3600) then 
       set iris1_min = `$ARITH $iris1_diff / 60 | awk -F\. '{print $1}'` 
       set iris1_lag = "$iris1_min minutes" 
-    else if ( $iris1_diff < 87000) then 
+    else if ( $iris1_diff < 86400) then 
       set iris1_hr = `$ARITH $iris1_diff / 3600` 
       set iris1_lag = "$iris1_hr hours" 
     else 
