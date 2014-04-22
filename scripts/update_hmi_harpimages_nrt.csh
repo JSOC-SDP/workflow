@@ -8,6 +8,7 @@ set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set CONVERT = /usr/bin/convert
 set MASKSERIES = hmi.Marmask_720s_nrt
 set HARPSERIES = hmi.Mharp_720s_nrt
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
 
 set OUTDIR = /surge40/jsocprod/HARPS/nrt/images
 
@@ -19,14 +20,9 @@ foreach ATTR (WANTLOW WANTHIGH)
   set $ATTRTXT
 end
 
-set wantlow = $WANTLOW
-set wanthigh = $WANTHIGH
-
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 
 set qsubscr = NHI$timestr
-
-set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 
 echo wantlow is $wantlow >> $HERE/runlog
 echo wanthigh is $wanthigh >> $HERE/runlog
@@ -37,9 +33,9 @@ echo 6 > $HERE/retstatus
 
 # Must round down to the nearest hour. I have no clue how you'd do this in csh, so I'm doing this in perl.
 # Assume that at least the hour field is present.
-set low = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)(.*)/) { my($datestr) = $1 . "\." . $2 . "\." . $3; my($hrstr) = "_00"; my($suff) = $4; my($tz) = ""; if ($suff =~ /^_(\d+)(.*)$/) { $hrstr = "_$1"; $suff = $2; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } } elsif ($suff =~ /^_(.*)/) { $tz = "_$1"; } print "$datestr$hrstr:00:00$tz"; }'`
+set low = `$TIME_CONVERT time=$wantlow zone=UTC o=cal | cut -c1-13`:00_TAI
 
-set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)(.*)/) { my($datestr) = $1 . "\." . $2 . "\." . $3; my($hrstr) = "_00"; my($suff) = $4; my($tz) = ""; if ($suff =~ /^_(\d+)(.*)$/) { $hrstr = "_$1"; $suff = $2; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } } elsif ($suff =~ /^_(.*)/) { $tz = "_$1"; } print "$datestr$hrstr:00:00$tz"; }'`
+set high = `$TIME_CONVERT time=$wanthigh zone=UTC o=cal | cut -c1-13`:00_TAI
 
 set CMDFILE = $HERE/$qsubscr
 set LOG = $HERE/runlog
@@ -84,10 +80,15 @@ echo 'cp $lastPNG '$TMP >> $CMDFILE
 echo "$CONVERT -define png:size=1024x1024 $TMP -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
 echo "mv $TMP $THUMB" >> $CMDFILE
 
+# Find the date/time of the latest image
+
+echo "set latestHarpImg = `ls -1 $OUTDIR/harp*png | tail -1`" >> $CMDFILE
+echo "set latestHarpImgTime = `echo $latestHarpImg | awk -F\. '{print $2"."$3"."$4}'`" >> $CMDFILE
+echo "set latestHarpImgUTC = `$TIME_CONVERT time=$latestHarpImgTime o=cal zone=utc`" >> $CMDFILE
+echo "echo $latestHarpImgUTC > $OUTDIR/latest_harp_time" >> $CMDFILE
+
 # Delete all .png files older than 60 days 
-foreach oldFile ( `find $OUTDIR/harp.*.png* -type f -atime +60` )
-  rm $oldFile
-end
+find $OUTDIR/harp.*.png* -type f -mtime +60 -print0 | xargs -0 rm -f
 
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
