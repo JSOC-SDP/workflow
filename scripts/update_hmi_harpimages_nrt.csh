@@ -81,7 +81,7 @@ echo "$CONVERT -define png:size=1024x1024 $TMP -thumbnail 256x256 -unsharp 0x.5 
 echo "mv $TMP $THUMB" >> $CMDFILE
 
 # get latest Harp image time
-/home/jeneen/latestHMI/getHarpTime.csh
+echo "/home/jeneen/latestHMI/getHarpTime.csh" >> $CMDFILE 
 
 # Delete all .png files older than 60 days 
 find $OUTDIR/harp.*.png* -type f -mtime +60 -print0 | xargs -0 rm -f
