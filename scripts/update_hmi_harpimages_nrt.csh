@@ -80,13 +80,6 @@ echo 'cp $lastPNG '$TMP >> $CMDFILE
 echo "$CONVERT -define png:size=1024x1024 $TMP -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
 echo "mv $TMP $THUMB" >> $CMDFILE
 
-# Find the date/time of the latest image
-
-echo "set latestHarpImg = `ls -1 $OUTDIR/harp*png | tail -1`" >> $CMDFILE
-echo "set latestHarpImgTime = `echo $latestHarpImg | awk -F\. '{print $2"."$3"."$4}'`" >> $CMDFILE
-echo "set latestHarpImgUTC = `$TIME_CONVERT time=$latestHarpImgTime o=cal zone=utc`" >> $CMDFILE
-echo "echo $latestHarpImgUTC > /web/jsoc/htdocs/data/hmi/images/latest/harptime" >> $CMDFILE
-
 # Delete all .png files older than 60 days 
 find $OUTDIR/harp.*.png* -type f -mtime +60 -print0 | xargs -0 rm -f
 
