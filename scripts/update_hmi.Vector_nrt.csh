@@ -30,7 +30,6 @@ set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_IQUV_aver
 set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
 set HMI_limbdark = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_segment_module
-#set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_patch_module
 set JV2TS = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/jv2ts
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
 
@@ -74,7 +73,6 @@ echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 #echo "$ECLIPSEscript $wantlow $wanthigh nrt >>&$TEMPLOG" >>$TEMPCMD
 echo 'set IQUVstatus=0' >>&$TEMPCMD
 echo 'set OBSstatus=0' >>&$TEMPCMD
-#echo 'set PATstatus=0' >>&$TEMPCMD
 echo 'set LDstatus=0' >>&$TEMPCMD
 
 echo "$IQUVprogram begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
@@ -91,8 +89,6 @@ echo 'if ($LDstatus) goto DONE' >>&$TEMPCMD
 ## Remap/Resize mags for synoptic charts
 
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/fdlos2radial in=hmi.M_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
-#echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/mag2helio MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 RMAXFLAG=1 MCORLEV=1 in=hmi.M_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ml_hiresmap_720s_nrt >>&$TEMPLOG" >> $TEMPCMD
-#echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/mag2helio MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 RMAXFLAG=1 in=hmi.Mr_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_hiresmap_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
 
 @ wantlow_s = `$TIME_CONVERT time=$wantlow`
 @ wanthigh_s = `$TIME_CONVERT time=$wanthigh` 
@@ -102,16 +98,12 @@ if ( $diff < 720 ) then
   set t = 720s
 endif
 
-echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=hmi.M_720s_nrt\["$wantlow"/"$t"] v2hout=hmi.Ml_hiresmap_720s_nrt histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 >>&$TEMPLOG" >>$TEMPCMD
+echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=2 in=hmi.M_720s_nrt\["$wantlow"/"$t"] v2hout=hmi.Ml_hiresmap_720s_nrt histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 >>&$TEMPLOG" >>$TEMPCMD
+
 echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 in=hmi.Mr_720s_nrt\["$wantlow"/"$t"] v2hout=hmi.Mr_hiresmap_720s_nrt histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 >>&$TEMPLOG" >>$TEMPCMD
 
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/resizemappingmag in=hmi.Ml_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 echo "/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/resizemappingmag in=hmi.Mr_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
-
-
-# echo "$HMI_patch x=hmi.Marmask_720s_nrt["$wantlow"-"$wanthigh"]" "$PATCH_args" ">>&$TEMPLOG" >>$TEMPCMD
-# echo 'set PATstatus = $?' >>$TEMPCMD
-# echo 'if ($PATstatus) goto DONE' >>&$TEMPCMD
 
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $IQUVstatus >IQUVstatus' >>&$TEMPCMD
