@@ -18,6 +18,7 @@ set CADENCE = 60
 set JSOC_REBIN = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/jsoc_rebin
 set JSOC_AS_FITS = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/jsoc_export_as_fits
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
 
 set obslist = (M)
 set flaglist = (-c)
@@ -81,7 +82,7 @@ while ($day <= $dayhigh)
         echo No code for $obs
         exit 1
     endif
-    set n_nrt = `show_info -cq $in_nrt"$QRY"`
+    set n_nrt = `$SHOW_INFO -cq $in_nrt"$QRY"`
     set inseries = $in_nrt
     echo Use $inseries for "$QRY"
 
@@ -107,7 +108,7 @@ end
 set exitstatus = 0
 set IMGROOT = /home/jsoc/hmi/fits
 set LATESTLIST = $IMGROOT/latest_fits_time
-set last_fits_t = `show_info -q hmi.M_720s_nrt_resized n=-1 key=t_obs`
+set last_fits_t = `$SHOW_INFO -q hmi.M_720s_nrt_resized n=-1 key=t_obs`
 @ s = `$TIME_CONVERT time=$last_fits_t` + 30
 set real_t = `$TIME_CONVERT s=$s zone=tai`
 set last_fits_y = `echo $real_t | awk -F\. '{print $1}'`
