@@ -25,12 +25,14 @@ set wanthigh="NOT_SPECIFIED"
 set action = 4
 set special = NONE
 
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
+
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
-set nowt = `/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert time=$now`
+set nowt = `$TIME_CONVERT time=$now`
 # @ expiret = $nowt + 86400
 # change to 3 days default
 @ expiret = $nowt + 259200
-set expire = `/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert s=$expiret`
+set expire = `$TIME_CONVERT s=$expiret`
 
 while ( $#argv > 0)
   foreach keyname (taskid gate wantlow wanthigh action special expire)
@@ -61,8 +63,8 @@ cd $WFDIR/gates/$gate
 # but only if gate key type is time
 set keytype = `cat type`
 if ($keytype == time) then
-   set wantlow_t = `/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert time=$wantlow`
-   set wanthigh_t = `i/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert time=$wanthigh`
+   set wantlow_t = `$TIME_CONVERT time=$wantlow`
+   set wanthigh_t = `$TIME_CONVERT time=$wanthigh`
    set project = `cat project`
    if ( $project == HMI || $project == AIA ) then
       set oklow = 1996.01.01
@@ -73,7 +75,7 @@ if ($keytype == time) then
    else
       set oklow = 1601.01.02
    endif
-   set oklow_t = `/home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert time=$oklow`
+   set oklow_t = `$TIME_CONVERT time=$oklow`
    if ($wantlow_t < $oklow_t) then
       echo "*** wantlow $wantlow is not valid for $project" 
       exit 1
