@@ -20,6 +20,7 @@ setenv RGBDEF $WF/scripts/rgb.txt
 #set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
 set RENDER_IMAGE = /home/jeneen/cvs/JSOC/bin/linux_x86_64/render_image
 set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
 
 set obslist = (Ic Ic_flat M M_color)
 set minlist = (20000 0.3 -1500 -1500)
@@ -36,8 +37,8 @@ set isNRT = 1
 
 set end_movie_t = 0
 
-set wantlow_t = `time_convert time=$wantlow`
-set wanthigh_t = `time_convert time=$wanthigh`
+set wantlow_t = `$TIME_CONVERT time=$wantlow`
+set wanthigh_t = `$TIME_CONVERT time=$wanthigh`
 
 @ daylow = $wantlow_t / 86400
 @ dayhigh = $wanthigh_t / 86400
@@ -55,7 +56,7 @@ while ($day <= $dayhigh)
   @ imglow_t = $first_mod_t / $cadence
   @ imglow_t = $imglow_t + 1
   @ first_t = $imglow_t * $cadence
-  set first = `time_convert s=$first_t zone=TAI`
+  set first = `$TIME_CONVERT s=$first_t zone=TAI`
   @ last_mod_t = $last_t + $cadence
   @ imghigh_t = $last_mod_t / $cadence
   @ n_images = $imghigh_t - $imglow_t
@@ -172,7 +173,7 @@ endif
 unset echo
 
 if ($end_movie_t > 0 && $isNRT ) then
-  set end_movie = `time_convert s=$end_movie_t zone=TAI`
+  set end_movie = `$TIME_CONVERT s=$end_movie_t zone=TAI`
 #  /home/jsoc/pipeline/scripts/makeIcmovie $end_movie
   /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/makeIcmovie $end_movie
   set exitstatus = $?
