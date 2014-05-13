@@ -21,6 +21,7 @@ setenv RGBDEF $WF/scripts/rgb.txt
 set RENDER_IMAGE = /home/jeneen/cvs/JSOC/bin/linux_x86_64/render_image
 set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
 
 set obslist = (Ic Ic_flat M M_color)
 set minlist = (20000 0.3 -1500 -1500)
@@ -87,8 +88,8 @@ while ($day <= $dayhigh)
   while ($img <= $#obslist)
     set obs = $obslist[$img]
     if ($obs == Ic_flat) then
-      set n_source = `show_info -cq $inseries"$QRY"`  # use inseries from Ic pass through this loop
-      set n_dest = `show_info -cq 'hmi.Ic_noLimbDark_45s'"$QRY"`
+      set n_source = `$SHOW_INFO -cq $inseries"$QRY"`  # use inseries from Ic pass through this loop
+      set n_dest = `$SHOW_INFO -cq 'hmi.Ic_noLimbDark_45s'"$QRY"`
       if ($n_source > 0 && $n_dest < $n_source) then
         $HMI_LIMBDARK in=$inseries"$QRY" out=hmi.Ic_noLimbDark_45s -nf
       endif
@@ -101,8 +102,8 @@ while ($day <= $dayhigh)
         set in_final = hmi.$obs'_45s'
         set in_nrt = hmi.$obs'_45s_nrt'
       endif
-      set n_final = `show_info -cq $in_final"$QRY"`
-      set n_nrt = `show_info -cq $in_nrt"$QRY"`
+      set n_final = `$SHOW_INFO -cq $in_final"$QRY"`
+      set n_nrt = `$SHOW_INFO -cq $in_nrt"$QRY"`
       set inseries = $in_nrt
       if ($n_final >= $n_nrt) then
       #  if ($n_final > 0) then
@@ -127,7 +128,7 @@ set echo
     type=jpg \
     outname=$obs \
     out='| ppmlabel -color white -size {%0.75:5} -x 15 -y {%98} -text "SDO/HMI '"$msg$namelist[$img]"': {ID}" | pnmtojpeg -quality=95'
-    set finalimagetime = `show_info -q $inseries"$QRY" n=-1 key=T_REC`
+    set finalimagetime = `$SHOW_INFO -q $inseries"$QRY" n=-1 key=T_REC`
 unset echo
     @ img = $img + 1
   end
