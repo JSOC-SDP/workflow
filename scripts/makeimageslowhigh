@@ -17,8 +17,7 @@ set CADENCE = 15
 set WF = /home/jsoc/cvs/Development/JSOC/proj/workflow
 #setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
 setenv RGBDEF $WF/scripts/rgb.txt
-#set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
-set RENDER_IMAGE = /home/jeneen/cvs/JSOC/bin/linux_x86_64/render_image
+set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
 set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
