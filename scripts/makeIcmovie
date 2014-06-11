@@ -94,7 +94,7 @@ foreach Quant (Ic_flat M M_color)
 
 set echo   
   cd $WORKBASE
-  rm -rf $THISWORK
+  rm -rf $WORK
 
 #  set 14dMOVIES = .14dmovies
 #  set D14dMOVIES = /tmp/14dmovies
@@ -117,7 +117,7 @@ set echo
 #    /home/jsoc/pipeline/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$14dMOVIES/$Quant"_14d.mp4"
     /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$D14dMOVIES/$Quant"_14d.mp4"
     cd $WORKBASE
-    rm -rf $THISWORK
+    rm -rf $WORK
   endif
 
 end
