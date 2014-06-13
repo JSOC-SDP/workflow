@@ -28,7 +28,6 @@ set minFileSize = 50000
 set BASE = /home/jsoc/hmi/images
 set WORKBASE = /home/jsoc/hmi/movies
 
-#foreach Quant (Ic_flat M)
 foreach Quant (Ic_flat M M_color)
 
   set THISWORK = $Quant'_movies'.$$
@@ -69,14 +68,11 @@ foreach Quant (Ic_flat M M_color)
     @ imgtime_t = $imgtime_t + $cadence
   end
   
-#  set HERE = $cwd
   set HERE = /home/jsoc/hmi/movies/
   ls -ld $WORK/frames
   cd $WORK/frames
   
   echo Movie making place is $cwd
-  
- #set echo
   
   set MOVIE = $WORK/$Quant'_2d'.mpg
   ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE 
@@ -87,16 +83,15 @@ foreach Quant (Ic_flat M M_color)
   
   set MOVIE = $WORK/$Quant'_2d'.mp4
   ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE
+  set echo
   if ($status == 0) then
       cp $MOVIE $Imgpath
       mv $MOVIE /home/jsoc/hmi/movies/latest
+      rm -rf $WORK
   endif
+  unset echo
 
-set echo   
   cd $WORKBASE
-
-#  set 14dMOVIES = .14dmovies
-#  set D14dMOVIES = /tmp/14dmovies
   set D14dMOVIES = .14dmovies
   if (!(-e $D14dMOVIES)) mkdir $D14dMOVIES
 
@@ -113,17 +108,16 @@ set echo
     @ nowtime_t = $endtime_t - $fourteen
     set nowtime = `$TIME_CONVERT zone=TAI s=$nowtime_t`
     set endtime = `$TIME_CONVERT zone=TAI s=$endtime_t`
-#    /home/jsoc/pipeline/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$14dMOVIES/$Quant"_14d.mp4"
     /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$D14dMOVIES/$Quant"_14d.mp4"
     cd $WORKBASE
+    rm -rf $WORK
+  else
+    rm -rf $WORK
   endif
-  rm -rf $WORK
 end
 
 cd $HERE
 ls -l $D14dMOVIES/
-   mv $D14dMOVIES/Ic_flat_14d.mp4 $D14dMOVIES/M_14d.mp4 /home/jsoc/hmi/movies/latest/
-   mv $D14dMOVIES/M_color_14d.mp4 /home/jsoc/hmi/movies/latest/
-   rm -rf $D14dMOVIES
-   rm -rf $WORK
-
+mv $D14dMOVIES/Ic_flat_14d.mp4 $D14dMOVIES/M_14d.mp4 /home/jsoc/hmi/movies/latest/
+mv $D14dMOVIES/M_color_14d.mp4 /home/jsoc/hmi/movies/latest/
+rm -rf $D14dMOVIES
