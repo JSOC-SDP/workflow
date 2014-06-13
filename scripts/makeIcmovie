@@ -87,8 +87,8 @@ foreach Quant (Ic_flat M M_color)
   if ($status == 0) then
       cp $MOVIE $Imgpath
       mv $MOVIE /home/jsoc/hmi/movies/latest
-      rm -rf $WORK
   endif
+  rm -rf $WORK
   unset echo
 
   cd $WORKBASE
