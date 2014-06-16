@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
 # optional arg is start_time
-# set echo
+ set echo
 
 # make movie of last days days at cadence cadence
 # choices if cadence must be multiple of 15m.
@@ -83,14 +83,13 @@ foreach Quant (Ic_flat M M_color)
   
   set MOVIE = $WORK/$Quant'_2d'.mp4
   ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE
-  set echo
   if ($status == 0) then
       cp $MOVIE $Imgpath
       mv $MOVIE /home/jsoc/hmi/movies/latest
   endif
   cd $HERE
+  pwd
   rm -rf $WORK
-  unset echo
 
   cd $WORKBASE
   set D14dMOVIES = .14dmovies
@@ -111,9 +110,11 @@ foreach Quant (Ic_flat M M_color)
     set endtime = `$TIME_CONVERT zone=TAI s=$endtime_t`
     /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$D14dMOVIES/$Quant"_14d.mp4"
     cd $HERE
+    pwd
     rm -rf $WORK
   else
     cd $HERE
+    pwd
     rm -rf $WORK
   endif
 end
