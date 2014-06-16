@@ -87,8 +87,6 @@ foreach Quant (Ic_flat M M_color)
       cp $MOVIE $Imgpath
       mv $MOVIE /home/jsoc/hmi/movies/latest
   endif
-  cd /home/jsoc/hmi/movies/
-  rm -rf $WORK
 
   cd $WORKBASE
   set D14dMOVIES = .14dmovies
@@ -108,11 +106,6 @@ foreach Quant (Ic_flat M M_color)
     set nowtime = `$TIME_CONVERT zone=TAI s=$nowtime_t`
     set endtime = `$TIME_CONVERT zone=TAI s=$endtime_t`
     /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $HERE/$D14dMOVIES/$Quant"_14d.mp4"
-    cd /home/jsoc/hmi/movies/
-    rm -rf $WORK
-  else
-    cd /home/jsoc/hmi/movies/
-    rm -rf $WORK
   endif
 end
 
