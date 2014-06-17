@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
 # optional arg is start_time
- set echo
+# set echo
 
 # make movie of last days days at cadence cadence
 # choices if cadence must be multiple of 15m.
