@@ -449,19 +449,19 @@ else
   echo "$totalBF"' </TD><TD> ' >>$TMP 
   if ( $BF1 > 0 ) then
     echo "AIA Camera 1: $BF1    ">>$TMP
-    echo "Camera Anomaly for AIA Camera 1" >> /tmp/camera_anomaly
+    echo "Bit Flip Camera Anomaly for AIA Camera 1" >> /tmp/camera_anomaly
   endif
   if ( $BF2 > 0 ) then
     echo "AIA Camera 2: $BF2    " >>$TMP
-    echo "Camera Anomaly for AIA Camera 2" >> /tmp/camera_anomaly
+    echo "Bit Flip Camera Anomaly for AIA Camera 2" >> /tmp/camera_anomaly
   endif
   if ( $BF3 > 0 ) then
     echo "AIA Camera 3: $BF3    " >>$TMP
-    echo "Camera Anomaly for AIA Camera 3" >> /tmp/camera_anomaly
+    echo "Bit Flip Camera Anomaly for AIA Camera 3" >> /tmp/camera_anomaly
   endif
   if ( $BF4 > 0 ) then
     echo "AIA Camera 4: $BF4    " >>$TMP
-    echo "Camera Anomaly for AIA Camera 4" >> /tmp/camera_anomaly
+    echo "Bit Flip Camera Anomaly for AIA Camera 4" >> /tmp/camera_anomaly
   endif
   echo "</TD></TR>" >>$TMP
 endif
@@ -487,11 +487,11 @@ else
   echo "$totalBF"' </TD><TD> ' >>$TMP
   if ( $BF1 > 0 ) then
     echo "HMI Camera 1: $BF1    ">>$TMP
-    echo "Camera Anomaly for HMI Camera 1" >> /tmp/camera_anomaly
+    echo "Bit Flip Camera Anomaly for HMI Camera 1" >> /tmp/camera_anomaly
   endif
   if ( $BF2 > 0 ) then
     echo "HMI Camera 2: $BF2    " >>$TMP
-    echo "Camera Anomaly for HMI Camera 2" >> /tmp/camera_anomaly
+    echo "Bit Flip Camera Anomaly for HMI Camera 2" >> /tmp/camera_anomaly
   endif
   echo "</TD></TR>" >>$TMP
 endif
