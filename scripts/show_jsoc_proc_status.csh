@@ -59,7 +59,7 @@ echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> 
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
 
-echo '<P><TABLE WIDTH=750>' >>$TMP
+echo '<P><TABLE WIDTH=800>' >>$TMP
 echo '<TR><TD>Product</TD><TD>Lag</TD><TD>Note</TD></TR>' >>$TMP
 
 set nprod = $#product
@@ -220,6 +220,8 @@ echo -n '<TR><TD>web response</TD><TD' >>$TMP
 set lag=$webinfo[1]
 
 set mslag = `echo $lag | sed -e "s/\.//" -e "s/^0*//"`
+set lastReqId = `grep JSOC /home/jsoc/exports/RequestID`
+echo $lastReqId
 if ($mslag < 5000) then
   echo -n ' BGCOLOR="#66FF66">' >>$TMP
 else if ($mslag < 20000) then
@@ -227,7 +229,8 @@ else if ($mslag < 20000) then
 else
   echo -n ' BGCOLOR="#FF6666">' >>$TMP
 endif
-echo "$lag"'s</TD><TD>'$webinfo[2]'s, '$webinfo[3]'s, lookdata, exportdata response</TD></TR>' >>$TMP
+#echo "$lag"'s</TD><TD>'$webinfo[2]'s, '$webinfo[3]'s, lookdata, exportdata response</TD></TR>' >>$TMP
+echo "$lag"'s</TD><TD>'$webinfo[2]'s, '$webinfo[3]'s, last ReqID: '$lastReqId' </TD></TR>' >>$TMP
 
 ### Added 9/7/12 for monitoring lag between hmidb and hmidb2
 
