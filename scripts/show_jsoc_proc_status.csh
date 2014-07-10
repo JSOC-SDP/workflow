@@ -499,6 +499,33 @@ else
   echo "</TD></TR>" >>$TMP
 endif
 
+### Look for Bit Flip Anomaly in IRIS
+
+@ BF1 = `$SHOW_INFO -cq "iris.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=1?]"`
+@ BF2 = `$SHOW_INFO -cq "iris.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=2?]"`
+
+@ totalBF = $BF1 + $BF2
+
+echo -n '<TR><TD>Datamin = 0</TD><TD' >> $TMP
+if ( $totalBF < 100 ) then
+  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo "$totalBF"' </TD><TD> ' >>$TMP
+  echo "No IRIS Camera Anomalies (last 600s)"'</TD></TR>' >> $TMP
+else
+  @ b = 1
+  echo -n ' BGCOLOR="blue">' >>$TMP
+  echo "$totalBF"' </TD><TD> ' >>$TMP
+  if ( $BF1 > 0 ) then
+    echo "IRIS Camera 1: $BF1    ">>$TMP
+    echo "Bit Flip Camera Anomaly for IRIS Camera 1" >> /tmp/camera_anomaly
+  endif
+  if ( $BF2 > 0 ) then
+    echo "IRIS Camera 2: $BF2    " >>$TMP
+    echo "Bit Flip Camera Anomaly for IRIS Camera 2" >> /tmp/camera_anomaly
+  endif
+  echo "</TD></TR>" >>$TMP
+endif
+
 
 echo '</TABLE>' >>$TMP
 echo '<P>' >>$TMP
