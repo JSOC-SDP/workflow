@@ -516,7 +516,7 @@ echo -n '<TR><TD>Datamin = 0</TD><TD' >> $TMP
 if ( $totalBF < 100 ) then
   echo -n ' BGCOLOR="#66FF66">' >>$TMP
   echo "$totalBF"' </TD><TD> ' >>$TMP
-  echo "No IRIS Camera Anomalies (last 600s)"'</TD></TR>' >> $TMP
+  echo "No IRIS Camera Anomalies (last 600 FSNs)"'</TD></TR>' >> $TMP
 else
   @ b = 1
   echo -n ' BGCOLOR="blue">' >>$TMP
