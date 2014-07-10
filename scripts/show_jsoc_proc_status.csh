@@ -501,8 +501,14 @@ endif
 
 ### Look for Bit Flip Anomaly in IRIS
 
-@ BF1 = `$SHOW_INFO -cq "iris.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=1?]"`
-@ BF2 = `$SHOW_INFO -cq "iris.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=2?]"`
+set t_last = `$SHOW_INFO -q iris.lev0'[$]' key=t_obs`
+@ s_last = `$TIME_CONVERT time=$t_last`
+@ s_first = $s_last - 600
+set t1 = `$TIME_CONVERT s=$s_first | awk -F\_ '{print $1"_"$2}'`
+set t2 = `$TIME_CONVERT s=$s_last | awk -F\_ '{print $1"_"$2}'`
+
+@ BF1 = `$SHOW_INFO -cq "iris.lev0[$t1'-'$t2][?datamin=0?][?camera=1?]"`
+@ BF2 = `$SHOW_INFO -cq "iris.lev0[$t1'-'$t2][?datamin=0?][?camera=2?]"`
 
 @ totalBF = $BF1 + $BF2
 
