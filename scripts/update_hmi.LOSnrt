@@ -27,7 +27,7 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
-set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
+set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/$MACHINE/HMI_observables
 set MAKEIMAGES = "$WFCODE/scripts/makeimageslowhigh"
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
