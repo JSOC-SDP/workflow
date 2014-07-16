@@ -18,6 +18,14 @@ else
   exit 1
 endif
 
+if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = p8.q,j8.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = a8.q,b8.q
+  set QSUB = qsub2
+endif
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
@@ -79,7 +87,7 @@ echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 # execute qsub script
 touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-qsub -e $TEMPLOG -o $TEMPLOG -sync yes -q p8.q,j8.q $TEMPCMD
+$QSUB -e $TEMPLOG -o $TEMPLOG -sync yes -q $QUE $TEMPCMD
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
