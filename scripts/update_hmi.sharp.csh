@@ -8,11 +8,18 @@ echo 6 > $HERE/retstatus
 
 set WFDIR = $WORKFLOW_DATA
 set WFCODE = $WORKFLOW_ROOT
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-set CUTOUT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/m2meharp
-set DISAMBIG = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/disambig_v3
-set SHARP = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/sharp
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
+set CUTOUT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/m2meharp
+set DISAMBIG = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig_v3
+set SHARP = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/sharp
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
@@ -116,7 +123,7 @@ if ( $goodData == 1 ) then
 # execute qsub script
 
   set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-  qsub -sync yes -l h_rt=900:00:00 -e $TEMPLOG -o $TEMPLOG -q j.q $CMD >> runlog
+  $QSUB -sync yes -l h_rt=900:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD >> runlog
 #  /SGE/bin/lx24-amd64/qsub2 -sync yes -l h_rt=900:00:00 -e $TEMPLOG -o $TEMPLOG -q a.q $CMD >> runlog
 else
   touch $HERE/NoGoodData

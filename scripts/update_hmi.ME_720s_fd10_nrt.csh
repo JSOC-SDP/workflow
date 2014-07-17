@@ -16,6 +16,14 @@ else
   exit 1
 endif
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = p8.q,j8.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = a8.q,b8.q
+  set QSUB = qsub2
+endif
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
@@ -24,8 +32,8 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set VFISV = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/vfisv_harp
-set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/linux_x86_64/show_info
+set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv_harp
+set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/$JSOC_MACHINE/show_info
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
@@ -97,7 +105,7 @@ echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
 # execute qsub script
 
 
-qsub -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q j8.q $TEMPCMD
+$QSUB -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`

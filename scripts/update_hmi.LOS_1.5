@@ -16,6 +16,14 @@ else
   exit 1
 endif
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j8.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = a8.q,b8.q
+  set QSUB = qsub2
+endif
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
@@ -25,7 +33,7 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
-set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/HMI_observables
+set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
 set camera = 1
@@ -78,8 +86,7 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 # execute qsub script
 touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j8.q $TEMPCMD >> runlog
-# qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q p8.q $TEMPCMD >> runlog
+$QUE -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 # set waitcount=0
 # while (-e $HERE/qsub_running)

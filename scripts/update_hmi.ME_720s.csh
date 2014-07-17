@@ -10,6 +10,14 @@ else
   exit 1
 endif
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j8.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b8.q
+  set QSUB = qsub2
+endif
+
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
 
@@ -30,8 +38,7 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 # execute qsub script
 touch qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.8 $TEMPCMD
-#qsub2 -pe smp 8 -e $TEMPLOG -o $TEMPLOG 
+$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 #if ( $retstatus == 0 ) then

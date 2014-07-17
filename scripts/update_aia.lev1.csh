@@ -16,6 +16,14 @@ else
   exit 1
 endif
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = p.q,j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = a.q,b.q
+  set QSUB = qsub2
+endif
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
@@ -24,8 +32,8 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set AIA_makelev1 = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/build_lev1_aia
-# set AIA_makelev1 = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/build_lev1_aia
+set AIA_makelev1 = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/build_lev1_aia
+# set AIA_makelev1 = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/build_lev1_aia
 
 # Make name for qsub and get times rounded to slot
 set indexlow = `index_convert ds=$product $key=$WANTLOW`
@@ -65,7 +73,7 @@ echo 'set RETSTATUS = $?' >>$TEMPCMD
 echo 'echo $RETSTATUS >retstatus' >>&$TEMPCMD
 
 # execute qsub script
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,p.q $TEMPCMD >> runlog
+$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus

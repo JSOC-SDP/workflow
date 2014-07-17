@@ -18,15 +18,23 @@ else
   exit 1
 endif
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
 end
 
-# set CoefProgram = /home/couvidat/cvs/JSOC/bin/linux_x86_64/correction_velocities
+# set CoefProgram = /home/couvidat/cvs/JSOC/bin/$JSOC_MACHINE/correction_velocities
 # copied 29 Oct 2010 2:00 PM
 #set CoefProgram = $WFCODE/bin/correction_velocities
-set CoefProgram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/correction_velocities
+set CoefProgram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/correction_velocities
 
 # verify that there is at least one V_drift record within 24 hours
 # both before and after both the first and last record to be processed.

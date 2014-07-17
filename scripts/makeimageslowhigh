@@ -15,12 +15,11 @@ echo Make images for $wantlow to $wanthigh
 set CADENCE = 15
 
 set WF = /home/jsoc/cvs/Development/JSOC/proj/workflow
-#setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
 setenv RGBDEF $WF/scripts/rgb.txt
-set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
-set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
+set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/render_image
+set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_limbdark
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 
 set obslist = (Ic Ic_flat M M_color)
 set minlist = (20000 0.3 -1500 -1500)

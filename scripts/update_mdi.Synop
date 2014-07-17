@@ -6,7 +6,16 @@
 
 # all rotations wantlow through wanthigh inclusive will be generated.
 
-set MAGSYNOP = /home/phil/cvs/JSOC/bin/linux_x86_64/magsynop_jsoc
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
+
+
+set MAGSYNOP = /home/phil/cvs/JSOC/bin/$JSOC_MACHINE/magsynop_jsoc
 set CTIMES = /home/wso/bin/_linux4/ctimes
 
 set wantlow = `cat wantlow`
@@ -42,7 +51,7 @@ echo "rm -f $HERE/qsub_running" >>$CMD
 # execute qsub script
 touch qsub_running
 set LOG = `echo $LOG | sed "s/^\/auto//"`
-qsub -e $LOG -o $LOG -q j.q,p.q $CMD
+$QSUB -e $LOG -o $LOG -q $QUE $CMD
 
 set waitcount=0
 while (-e qsub_running)

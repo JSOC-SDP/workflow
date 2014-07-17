@@ -14,8 +14,8 @@ echo Make images for $wantlow to $wanthigh
 # start with hourly files
 set CADENCE = 60
 
-set JSOC_REBIN = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/jsoc_rebin
-set JSOC_AS_FITS = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/jsoc_export_as_fits
+set JSOC_REBIN = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jsoc_rebin
+set JSOC_AS_FITS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jsoc_export_as_fits
 
 set obslist = (M)
 set flaglist = (-c)

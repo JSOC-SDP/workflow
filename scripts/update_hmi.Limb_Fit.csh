@@ -16,15 +16,23 @@ else
   exit 1
 endif
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
 end
 
 
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp_tas
-#set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/lfwrp
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
+set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/lfwrp_tas
+#set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/lfwrp
 
 set TMPDIR = /surge40/jsocprod/lfwrp
 
@@ -54,7 +62,7 @@ echo "rm -f /home/jsoc/pipeline/tasks/update_hmi.Limb_Fit/qsub_running" >>$TEMPC
 touch $HERE/qsub_running
 touch /home/jsoc/pipeline/tasks/update_hmi.Limb_Fit/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,p.q $TEMPCMD >> runlog
+$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`

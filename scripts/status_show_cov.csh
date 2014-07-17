@@ -1,9 +1,9 @@
 #! /bin/csh -f
 
 #set echo
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
-set SHOW_COVERAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_coverage
-set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/linux_x86_64/show_info
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
+set SHOW_COVERAGE = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_coverage
+set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/$JSOC_MACHINE/show_info
 
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set now_t = `$TIME_CONVERT time=$now`

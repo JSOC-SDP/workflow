@@ -2,8 +2,16 @@
 # This script creates the HARP 720s nrt web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = p.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = a.q
+  set QSUB = qsub2
+endif
+
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
-set SHOWINFO = $SRCTREE'/'bin/linux_x86_64/show_info
+set SHOWINFO = $SRCTREE'/'bin/$JSOC_MACHINE/show_info
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set CONVERT = /usr/bin/convert
 set MASKSERIES = hmi.Marmask_720s_nrt
@@ -97,7 +105,7 @@ echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
 # Execute the qsub script
 touch $HERE/qsub_running
 #set log = `echo $HERE/runlog | sed "s/^\/auto//"`
-qsub -e $LOG -o $LOG -sync yes -q j.q $CMDFILE
+$QSUB -e $LOG -o $LOG -sync yes -q $QUE $CMDFILE
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus

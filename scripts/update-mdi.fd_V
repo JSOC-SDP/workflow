@@ -19,6 +19,14 @@ set NEW_SER = mdi.fd_V_lev18
 set INGESTMAP = /home/phil/apps/fd_V_01h/fd_V.map
 set TEMP = temp.DIRS
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
+
 set HERE = $cwd
 set babble = $HERE/babble
 mkdir $HERE/qsubs_running
@@ -91,7 +99,7 @@ else
       
       touch $HERE/qsubs_running/$INSTANCE
       set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-      qsub -sync yes -e $HERE/$TEMPLOG -o $HERE/$TEMPLOG -q j.q,p.q $HERE/$TEMPCMD
+      $QSUB -sync yes -e $HERE/$TEMPLOG -o $HERE/$TEMPLOG -q $QUE $HERE/$TEMPCMD
 endif
 
 # while (`/bin/ls $HERE/qsubs_running/ | wc -l` > 0)

@@ -40,10 +40,18 @@ set TEMPLOG = $HERE/runlog
 set CMD = $HERE/MHarp_nrt
 #echo 6 > $HERE/retstatus
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = p.q,j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = a.q,b.q
+  set QSUB = qsub2
+endif
+
 set WFDIR = $WORKFLOW_DATA
 set WFCODE = $WORKFLOW_ROOT
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set MHarp = /home/jsoc/cvs/Development/JSOC/proj/mag/harp/scripts/track_and_ingest_mharp.sh
 
 # Make sure there isn't a runaway process happening.  There should NEVER be more than one
@@ -202,7 +210,7 @@ echo "rm $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
 
 touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,o.q $CMD
+$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
 
 # submit next harp and VFISV tickets
 

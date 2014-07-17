@@ -3,6 +3,14 @@
 set first = `cat wantlow`
 set last = `cat wanthigh`
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
+
 set HERE = $cwd
 set LOG = $HERE/runlog
 set CMD = $HERE/MDIremap
@@ -30,7 +38,7 @@ echo "rm -f $HERE/qsub_running" >>$CMD
 # execute qsub script
 touch $HERE/qsub_running
 set LOG = `echo $LOG | sed "s/^\/auto//"`
-qsub -e $LOG -o $LOG -q j.q,p.q $CMD
+$QSUB -e $LOG -o $LOG -q $QUE $CMD
 
 set waitcount=0
 while (-e $HERE/qsub_running)

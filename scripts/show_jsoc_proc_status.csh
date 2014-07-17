@@ -8,11 +8,11 @@ set TMP = $TARG/.jsoc_proc_status.tmp
 set noglob
 unsetenv QUERY_STRING
 
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-set SHOW_SERIES = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_series
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
+set SHOW_SERIES = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_series
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 set ARITH = /home/phil/bin/_linux4/arith
-set SHOW_COVERAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_coverage
+set SHOW_COVERAGE = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_coverage
 set USERDB=hmidb
 set USERDB2=hmidb2
 

@@ -14,9 +14,17 @@ else
   exit 1
 endif
 
-set HMISYNOP = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmisynoptic
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = a.q
+  set QSUB = qsub2
+endif
+
+set HMISYNOP = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmisynoptic
 set CTIMES = /home/wso/bin/_linux4/ctimes
-set TCONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
+set TCONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 
 set now = `date +%Y.%m.%d`
 @ tExpire_s = `$TCONVERT time=$now` + 3024000  # ticket expires in 35 days
@@ -59,7 +67,7 @@ echo "rm -f $HERE/qsub_running" >>$CMD
 # execute qsub script
 touch qsub_running
 set LOG = `echo $LOG | sed "s/^\/auto//"`
-qsub -e $LOG -o $LOG -q j.q,p.q $CMD
+$QSUB -e $LOG -o $LOG -q $QUE $CMD
 
 set waitcount=0
 while (-e qsub_running)

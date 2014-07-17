@@ -17,8 +17,8 @@ set CADENCE = 45
 set WF = /jsoc/cvs/Development/JSOC/proj/workflow
 #setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
 setenv RGBDEF $WF/scripts/rgb.txt
-set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/render_image
-set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/hmi_limbdark
+set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/render_image
+set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_limbdark
 
 set obslist = (Ic Ic_flat M)
 set minlist = (20000 0.3 -1500)

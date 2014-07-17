@@ -4,10 +4,18 @@
 
 #set echo
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
+
 set HERE = $cwd
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set MASKSERIES = hmi.Marmask_720s
 set HARPSERIES = hmi.Mharp_720s
 set OUTDIR = /surge40/jsocprod/HARPS/definitive/tmp
@@ -70,7 +78,7 @@ echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
 touch $HERE/qsub_running
 set log = `echo $log | sed "s/^\/auto//"`
 
-qsub -e $log -o $log -sync yes -q j.q $CMDFILE 
+$QSUB -e $log -o $log -sync yes -q $QUE $CMDFILE 
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus

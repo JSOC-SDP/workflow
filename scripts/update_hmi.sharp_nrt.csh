@@ -7,13 +7,21 @@ set TEMPLOG = $HERE/runlog
 set CMD = $HERE/SHP_nrt
 echo 6 > $HERE/retstatus
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = p.q,j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = a.q,b.q
+  set QSUB = qsub2
+endif
+
 set WFDIR = $WORKFLOW_DATA
 set WFCODE = $WORKFLOW_ROOT
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/show_info
-set CUTOUT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/m2meharp
-#set DISAMBIG = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/disambig
-set DISAMBIG = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/disambig_v3
-set SHARP = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/sharp
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
+set CUTOUT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/m2meharp
+#set DISAMBIG = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig
+set DISAMBIG = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig_v3
+set SHARP = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/sharp
 
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -91,7 +99,7 @@ end
 # execute qsub script
 
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q,p.q $CMD >> runlog
+$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus

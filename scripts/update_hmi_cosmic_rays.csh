@@ -19,6 +19,14 @@ set DO_POST = 0
 
 date > $LOG
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
+
 if ($?WORKFLOW_ROOT) then
   set WFDIR = $WORKFLOW_DATA
   set WFCODE = $WORKFLOW_ROOT
@@ -153,9 +161,9 @@ set mmdd = `echo $yyyymmdd | sed -e "s/.....//" -e "s/://" `
 
 mkdir CRlogs
 set CRLOG = $HERE/CRlogs
-# set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/module_flatfield
-set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/module_flatfield
-set cosmic_ray_post = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/cosmic_ray_post
+# set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/module_flatfield
+set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/module_flatfield
+set cosmic_ray_post = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/cosmic_ray_post
 
 set QSUBCMD = CRY_$mmdd
 set QSTAT = $HERE/CRY_status
@@ -206,10 +214,8 @@ ENDCAT
   @ ID = $ID + 1
 end
 
-# qsub -q j.q -o $LOG -e $LOG -t 1-48 -sync yes $QSUBCMD
 set LOG = `echo $LOG | sed "s/^\/auto//"`
-qsub -q j8.q -o $LOG -e $LOG -sync yes $QSUBCMD
-# qsub -q p8.q -o $LOG -e $LOG -sync yes $QSUBCMD
+$QSUB -q $QUE -o $LOG -e $LOG -sync yes $QSUBCMD
 set QSUBSTATUS = $status
 if ($QSUBSTATUS) then
   echo qsub failed with exit status $QSUBSTATUS >>$LOG
@@ -241,7 +247,7 @@ $cosmic_ray_post -L input_series=su_production.cosmic_rays fsn_first=$FIRST_FSN 
 if (\$status) echo  "Cam2 error" >> $QSTAT
 ENDCAT
 set LOG = `echo $LOG | sed "s/^\/auto//"`
-  qsub -q j.q,p.q -o $LOG -e $LOG -sync yes $QSUBCMD
+  $QSUB -q $QUE -o $LOG -e $LOG -sync yes $QSUBCMD
 
   set QSTAT_errcnt = `wc -l < $QSTAT`
   if ($QSTAT_errcnt) then

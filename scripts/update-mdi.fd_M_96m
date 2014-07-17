@@ -18,6 +18,15 @@ set INGESTMAP =  /home/phil/jsoc/proj/myproj/apps/fd_M_96m/fd_M_96m.map
 
 set TEMP = temp.DIRS
 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  set QUE = j.q
+  set QSUB = qsub
+else if ( $JSOC_MACHINE == "linux_avx" ) then
+  set QUE = b.q
+  set QSUB = qsub2
+endif
+
+
 set WANTLOW = `cat wantlow`
 set WANTLOW_t = `time_convert time=$WANTLOW`
 set WANTLOW = `time_convert zone=TAI s=$WANTLOW_t`
@@ -89,7 +98,7 @@ else
       
       touch $HERE/qsubs_running/$INSTANCE
       set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-      qsub -sync yes -e $HERE/$TEMPLOG -o $HERE/$TEMPLOG -q j.q,p.q $HERE/$TEMPCMD
+      $QSUB -sync yes -e $HERE/$TEMPLOG -o $HERE/$TEMPLOG -q $QUE $HERE/$TEMPCMD
 endif
 
 # while (`/bin/ls $HERE/qsubs_running/ | wc -l` > 0)
