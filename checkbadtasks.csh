@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/time_convert
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 @ YEAR = `date +%Y`
 set bad = 0
 
