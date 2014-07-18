@@ -1,7 +1,7 @@
 #! /bin/csh -f
 
- set echo
-
+set echo
+source /home/jsoc/.setJSOCenv
 set TARG = /web/jsoc/htdocs/data
 set TMP = $TARG/.jsoc_proc_status.tmp
 
