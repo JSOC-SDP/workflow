@@ -61,9 +61,8 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 echo "rm -f /home/jsoc/pipeline/tasks/update_hmi.Limb_Fit/qsub_running" >>$TEMPCMD
 
 # execute qsub script
-touch $HERE/qsub_running
-touch /home/jsoc/pipeline/tasks/update_hmi.Limb_Fit/qsub_running
-set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
+/bin/touch $HERE/qsub_running
+set TEMPLOG = `echo $TEMPLOG | /bin/sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 
