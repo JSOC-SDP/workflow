@@ -38,8 +38,8 @@ set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/lfwrp_tas
 
 set TMPDIR = /surge40/jsocprod/lfwrp
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `/bin/cat $WFDIR/gates/$GATE/product`
+set key = `/bin/cat $WFDIR/gates/$GATE/key`
 
 set qsubname = LIMB$WANTLOW
 set TEMPLOG = $HERE/runlog
@@ -66,6 +66,6 @@ set TEMPLOG = `echo $TEMPLOG | /bin/sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 
-if (-e retstatus) set retstatus = `cat $HERE/retstatus`
+if (-e retstatus) set retstatus = `/bin/cat $HERE/retstatus`
 exit $retstatus
 echo $?
