@@ -8,8 +8,6 @@
 
 set HERE = $cwd 
 
-source /home/jsocprod/.setJSOCenv
-
 if ($?WORKFLOW_ROOT) then
   set WFDIR = $WORKFLOW_DATA
   set WFCODE = $WORKFLOW_ROOT
