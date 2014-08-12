@@ -70,9 +70,11 @@ echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >> $TEMPCMD
 echo "setenv KMP_STACKSIZE 16M" >> $TEMPCMD
 echo "unlimit" >> $TEMPCMD
 echo "limit core 0" >> $TEMPCMD
-echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD
+endif
 echo "/home/jsoc/mpich2/bin/mpiexec -n 8 $VFISV out=hmi.ME_720s_fd10 in=hmi.S_720s\["$wantlow"-"$wanthigh"] in5=hmi.M_720s\["$wantlow"-"$wanthigh"] -v chi2_stop=1e-15" >>&$TEMPLOG" >>$TEMPCMD
-echo "/home/jsoc/mpich2/bin/mpdexit " >> $TEMPCMD
+#echo "/home/jsoc/mpich2/bin/mpdexit " >> $TEMPCMD
 echo 'set VFISVstatus = $?' >>$TEMPCMD
 echo 'if ($VFISVstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
