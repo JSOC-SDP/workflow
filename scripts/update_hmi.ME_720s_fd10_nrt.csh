@@ -74,9 +74,9 @@ echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >> $TEMPCMD
 echo "setenv KMP_STACKSIZE 16M" >> $TEMPCMD
 echo "unlimit" >> $TEMPCMD
 echo "limit core 0" >> $TEMPCMD
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD 
-endif
+#if ( $JSOC_MACHINE == "linux_x86_64" ) then
+#  echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD 
+#endif
 echo "sleep 10" >> $TEMPCMD
 
 echo 'set VFnrtstatus=0' >>&$TEMPCMD
