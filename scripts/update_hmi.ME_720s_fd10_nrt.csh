@@ -6,6 +6,8 @@
  set echo
 # XXXXXXXXXX test
 
+source /home/jsoc/.setJSOCenv
+
 set HERE = $cwd 
 
 if ($?WORKFLOW_ROOT) then
