@@ -19,9 +19,11 @@ endif
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = p8.q,j8.q
   set QSUB = qsub
+  set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
 else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QUE = a8.q,b8.q
   set QSUB = qsub2
+  set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -70,7 +72,9 @@ echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >> $TEMPCMD
 echo "setenv KMP_STACKSIZE 16M" >> $TEMPCMD
 echo "unlimit" >> $TEMPCMD
 echo "limit core 0" >> $TEMPCMD
-echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD 
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD 
+endif
 echo "sleep 10" >> $TEMPCMD
 
 echo 'set VFnrtstatus=0' >>&$TEMPCMD
@@ -92,7 +96,7 @@ foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s_nrt['$wantlow'-'$want
     echo 'if ($VFnrtstatus) goto DONE' >>&$TEMPCMD
   else  
     echo "date" >>$TEMPCMD
-    echo "/home/jsoc/mpich2/bin/mpiexec -n 8 $VFISV out=hmi.ME_720s_fd10_nrt in=hmi.S_720s_nrt\["$T"] in3=hmi.MHarp_720s_nrt'[]['"$T"']' in5=hmi.M_720s_nrt\["$T"] -v" >>$TEMPCMD
+    echo "$MPIEXEC -n 8 $VFISV out=hmi.ME_720s_fd10_nrt in=hmi.S_720s_nrt\["$T"] in3=hmi.MHarp_720s_nrt'[]['"$T"']' in5=hmi.M_720s_nrt\["$T"] -v" >>$TEMPCMD
     echo "date" >>$TEMPCMD
   endif
 end
