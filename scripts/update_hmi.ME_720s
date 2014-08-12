@@ -67,7 +67,10 @@ echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >>$TEMPCMD
 echo "setenv KMP_STACKSIZE 16M" >>$TEMPCMD
 echo "unlimit" >>$TEMPCMD
 echo "limit core 0" >>$TEMPCMD
-echo "mpdboot --ncpus=8" >>$TEMPCMD
+
+if ( $JSOC_MACHINE == "linux_x86_64" ) then
+  echo "mpdboot --ncpus=8" >>$TEMPCMD
+endif
 
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
@@ -76,7 +79,7 @@ echo "/home/jsoc/mpich2/bin/mpiexec -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
-echo "/home/jsoc/mpich2/bin/mpdexit localmpd" >>$TEMPCMD
+#echo "/home/jsoc/mpich2/bin/mpdexit localmpd" >>$TEMPCMD
 
 # execute qsub script
 touch $HERE/qsub_running
