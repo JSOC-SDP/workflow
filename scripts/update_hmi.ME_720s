@@ -19,9 +19,11 @@ endif
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j8.q
   set QSUB = qsub
+  set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
 else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QUE = b8.q
   set QSUB = qsub2
+  set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
 endif
 
 foreach ATTR (WANTLOW GATE)
@@ -74,8 +76,8 @@ endif
 
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "/home/jsoc/mpich2/bin/mpiexec -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_2 in=$input\[$want1] in5=$in5\[$want1] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
-echo "/home/jsoc/mpich2/bin/mpiexec -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_2 in=$input\[$want2] in5=$in5\[$want2] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
+echo "$MPIEXEC -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_2 in=$input\[$want1] in5=$in5\[$want1] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
+echo "$MPIEXEC -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_2 in=$input\[$want2] in5=$in5\[$want2] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
