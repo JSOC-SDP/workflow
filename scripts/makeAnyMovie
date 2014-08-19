@@ -135,21 +135,31 @@ echo $WORK
 @ mins = $cadence / 60
 
 cd $WORK/frames
+if ( $JSOC_MACHINE == 'linux_avx' ) then
+  set mpg_opts = "-qscale 5 -r 20 -b:v 9600"
+  set mp4_opts = "-qscale 5 -r 20 -b 9600 -c mpeg4"
+else
+  set mpg_opts = "-qscale 5 -r 20 -b 9600"
+  set mp4_opts = "-qscale 5 -r 20 -b 9600"
+endif
 
 if ($path_given == 0) then
   set MOVIE = $WORK/$Quant'_'$Size'_'$Startname'-'$Endname'_'$mins'm'
 
-  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mpg 
+#  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mpg 
+  ffmpeg $mpg_opts -i %04d.$Type $MOVIE.mpg
   if ($status == 0) then
       mv $MOVIE.mpg /home/jsoc/hmi/movies/special
   endif
 
-  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mp4 
+#  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mp4 
+  ffmpeg $mp4_opts -i %04d.$Type $MOVIE.mp4
   if ($status == 0) then
       mv $MOVIE.mp4 /home/jsoc/hmi/movies/special
   endif
 else
-  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $specified_path
+#  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $specified_path
+  ffmpeg $mp4_opts -i %04d.$Type $specified_path
 endif
 
 rm -rf $WORK
