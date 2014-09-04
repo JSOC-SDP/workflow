@@ -20,7 +20,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j8.q
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = b8.q
+  set QUE = p.q
   set QSUB = qsub2
 endif
 
@@ -72,7 +72,8 @@ echo 6 > $HERE/retstatus
 
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
-echo "setenv OMP_NUM_THREADS 8" >>$TEMPCMD
+#echo "setenv OMP_NUM_THREADS 8" >>$TEMPCMD
+echo "setenv OMP_NUM_THREADS 1" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
