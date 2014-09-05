@@ -21,7 +21,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = p8.q,j8.q
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a8.q,b8.q
+  set QUE = p.q,a.q
   set QSUB = qsub2
 endif
 
@@ -74,7 +74,7 @@ $ECLIPSEscript $wantlow $wanthigh nrt
 
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
-echo "setenv OMP_NUM_THREADS 8" >>$TEMPCMD
+echo "setenv OMP_NUM_THREADS 1" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
