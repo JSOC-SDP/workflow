@@ -17,10 +17,10 @@ else
 endif
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j8.q
+  set QUE = j.q
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a8.q,b8.q
+  set QUE = a.q,p.q
   set QSUB = qsub2
 endif
 
@@ -75,7 +75,7 @@ echo 6 > $HERE/retstatus
 set retstatus=0
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
-echo "setenv OMP_NUM_THREADS 8" >>$TEMPCMD
+echo "setenv OMP_NUM_THREADS 1" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "$HMIprogram -L lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
