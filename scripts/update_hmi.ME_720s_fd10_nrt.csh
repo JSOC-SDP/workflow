@@ -23,7 +23,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QSUB = qsub
   set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a8.q,b8.q
+  set QUE = a8.q
   set QSUB = qsub2
   set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
 endif
