@@ -21,7 +21,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = p8.q,j8.q
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = p.q,a.q
+  set QUE = a.q
   set QSUB = qsub2
 endif
 
