@@ -73,7 +73,7 @@ echo 6 > $HERE/retstatus
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
 #echo "setenv OMP_NUM_THREADS 8" >>$TEMPCMD
-echo "setenv OMP_NUM_THREADS 1" >>$TEMPCMD
+echo "setenv OMP_NUM_THREADS 4" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD

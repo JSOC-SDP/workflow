@@ -77,7 +77,7 @@ echo 6 > $HERE/retstatus
 echo "BEFORE qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
-echo "setenv OMP_NUM_THREADS 1" >>$TEMPCMD
+echo "setenv OMP_NUM_THREADS 4" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "$HMIprogram lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
