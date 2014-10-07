@@ -16,6 +16,7 @@ set HERE = $cwd
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 set MASKSERIES = hmi.Marmask_720s
 set HARPSERIES = hmi.Mharp_720s
 set OUTDIR = /surge40/jsocprod/HARPS/definitive/tmp
@@ -23,38 +24,42 @@ if ( ! -e $OUTDIR ) then
   mkdir -p $OUTDIR
 endif
 
-
-# Must fetch low and high from the ticket used to start the data update
-foreach ATTR (WANTLOW WANTHIGH)
-    set ATTRTXT = `grep $ATTR ticket`
-    set $ATTRTXT
+foreach ATTR (GATE WANTLOW WANTHIGH)
+  set ATTRTXT = `grep $ATTR ticket`
+  set $ATTRTXT
 end
 
-set wantlow = $WANTLOW
-set wanthigh = $WANTHIGH
-#set wantlow=2011.03.26
-#set wanthigh=2011.03.26_03
+#set WANTLOW = $argv[1]
+#set WANTHIGH = $argv[2]
 
-set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
+@ low_s = `$TIME_CONVERT time=$WANTLOW`
+@ high_s = `$TIME_CONVERT time=$WANTHIGH`
+set first_hour = `echo $WANTLOW | awk -F\: '{print $1}'`
+@ first_hour_s = `$TIME_CONVERT time=$first_hour`
+@ next_hour_s = $first_hour_s + 3600
 
-set qsubscr = HI$timestr
+if ( ($low_s > $first_hour_s) && ($high_s < $next_hour_s) ) then
+  # nothing to do
+  exit 0
+endif
 
-# Initialize the retstatus state file to what I guess is a bad value
-echo 6 > $HERE/retstatus
+if ( $low_s == $first_hour_s ) then
+  set low = `echo $WANTLOW | awk -F\: '{print $1}'`
+else
+  set low = `$TIME_CONVERT s=$next_hour_s zone=TAI o=cal | awk -F\: '{print $1}'`
+endif
 
-# Must round down to the nearest hour. I have no clue how you'd do this in csh, so I'm doing this in perl.
-# Assume that at least the hour field is present.
-set low = `perl -e 'my($wantlow) = "'$wantlow'"; if ($wantlow =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)(.*)/) { my($datestr) = $1 . "\." . $2 . "\." . $3; my($hrstr) = "_00"; my($suff) = $4; my($tz) = ""; if ($suff =~ /^_(\d+)(.*)$/) { $hrstr = "_$1"; $suff = $2; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } } elsif ($suff =~ /^_(.*)/) { $tz = "_$1"; } print "$datestr$hrstr:00:00$tz"; }'`
+set high = `echo $WANTHIGH | awk -F\: '{print $1}'`
 
-set high = `perl -e 'my($wanthigh) = "'$wanthigh'"; if ($wanthigh =~ /^\s*(\d\d\d\d)\.(\d+)\.(\d+)(.*)/) { my($datestr) = $1 . "\." . $2 . "\." . $3; my($hrstr) = "_00"; my($suff) = $4; my($tz) = ""; if ($suff =~ /^_(\d+)(.*)$/) { $hrstr = "_$1"; $suff = $2; if ($suff =~ /^[^_]*_(\S+)/) {$tz = "_$1"; } } elsif ($suff =~ /^_(.*)/) { $tz = "_$1"; } print "$datestr$hrstr:00:00$tz"; }'`
-
-set CMDFILE = $HERE/$qsubscr
+set HERE = $cwd
+set timestr = `echo $WANTLOW  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
+set CMDFILE = $HERE/HI$timestr
 set log = $HERE/runlog
+echo 6 > $HERE/retstatus
 
 # Create the qsub script
 echo "#! /bin/csh -f " >> $CMDFILE
 echo "cd $HERE" >> $CMDFILE
-#echo "HOST is $HOST >>& $log" >> $CMDFILE
 echo "hostname >>&$log" >>$CMDFILE
 
 echo "$SRCTREE/$SCRIPT -fE $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $log" >> $CMDFILE
