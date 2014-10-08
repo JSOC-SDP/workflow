@@ -226,7 +226,7 @@ if ( ($retstatus == 0) && ($num_harps > 0) ) then
     set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
     set min = `echo $WANT | awk -F\: '{print $2}'`
     if ( $min == "00" ) then
-      set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi_harpimages_nrt wantlow=$WANT wanthigh=$WANT action=5`
+      set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANT wanthigh=$WANT action=5`
     endif
     @ i++
   end
