@@ -84,16 +84,16 @@ echo "$CONVERT $TMP -fill white -gravity North -pointsize 36 -font Helvetica -an
 echo "mv $TMP $PNGLATEST" >> $CMDFILE
 
 # Create negative color image for nrt data visualization
-set TMP = $OUTDIR/.latest.png >> $CMDFILE
-set NEG = $OUTDIR/latest_negative.png >> $CMDFILE
-echo "cp $lastPNG $TMP" >> $CMDFILE
+set TMP = $OUTDIR/.latest.png 
+set NEG = $OUTDIR/latest_negative.png 
+echo 'cp $lastPNG '$TMP >> $CMDFILE
 echo "$CONVERT $TMP -negate $TMP" >> $CMDFILE
 echo "mv $TMP $NEG" >> $CMDFILE
 
 # Create thumbnail
-set TMP = $OUTDIR/.thumbnail.png >> $CMDFILE
-set THUMB = $OUTDIR/thumbnail.png >> $CMDFILE
-echo "cp $lastPNG $TMP" >> $CMDFILE
+set TMP = $OUTDIR/.thumbnail.png
+set THUMB = $OUTDIR/thumbnail.png 
+echo 'cp $lastPNG '$TMP >> $CMDFILE
 echo "$CONVERT -define png:size=1024x1024 $TMP -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
 echo "mv $TMP $THUMB" >> $CMDFILE
 echo "/home/jeneen/latestHMI/getHarpTime.csh" >> $CMDFILE
