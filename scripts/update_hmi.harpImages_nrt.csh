@@ -71,6 +71,37 @@ foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
   echo "endif" >> $CMDFILE
 end
 
+# Identify the latest .png file
+echo 'set lastPNG = `ls -1 '$OUTDIR'/harp.*.png | tail -1`' >> $CMDFILE
+echo 'echo $lastPNG >>& '$HERE'/runlog' >> $CMDFILE
+
+# Fancify latest.png file
+set TMP = $OUTDIR/.latest_nrt.png
+set PNGLATEST = $OUTDIR/latest_nrt.png
+echo 'cp $lastPNG '$TMP >> $CMDFILE
+echo "$CONVERT $TMP -fill white -gravity North -pointsize 36 -font Helvetica -annotate 0 'near real-time (nrt) data' $TMP" >> $CMDFILE
+echo "mv $TMP $PNGLATEST" >> $CMDFILE
+
+# Create negative color image for nrt data visualization
+set TMP = $OUTDIR/.latest.png >> $CMDFILE
+set NEG = $OUTDIR/latest_negative.png >> $CMDFILE
+echo 'cp $lastPNG '$TMP >> $CMDFILE
+echo "$CONVERT $TMP -negate $TMP" >> $CMDFILE
+echo "mv $TMP $NEG" >> $CMDFILE
+
+# Create thumbnail
+set TMP = $OUTDIR/.thumbnail.png >> $CMDFILE
+set THUMB = $OUTDIR/thumbnail.png >> $CMDFILE
+echo 'cp $lastPNG '$TMP >> $CMDFILE
+echo "$CONVERT -define png:size=1024x1024 $TMP -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
+echo "mv $TMP $THUMB" >> $CMDFILE
+echo "/home/jeneen/latestHMI/getHarpTime.csh" >> $CMDFILE
+
+# Delete all .png files older than 60 days
+foreach oldFile ( `find $OUTDIR/harp.*.png* -type f -atime +30` )
+  rm $oldFile
+end
+
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
 echo 'echo $retstatus > ' "$HERE/retstatus" >> $CMDFILE
