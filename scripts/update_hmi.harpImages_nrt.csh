@@ -79,7 +79,7 @@ echo 'echo $lastPNG >>& '$HERE'/runlog' >> $CMDFILE
 # Fancify latest.png file
 set TMP = $OUTDIR/.latest_nrt.png
 set PNGLATEST = $OUTDIR/latest_nrt.png
-echo "cp $lastPNG $TMP" >> $CMDFILE
+echo 'cp $lastPNG '$TMP >> $CMDFILE
 echo "$CONVERT $TMP -fill white -gravity North -pointsize 36 -font Helvetica -annotate 0 'near real-time (nrt) data' $TMP" >> $CMDFILE
 echo "mv $TMP $PNGLATEST" >> $CMDFILE
 
