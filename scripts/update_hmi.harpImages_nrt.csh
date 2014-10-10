@@ -73,7 +73,7 @@ foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
 end
 
 # Identify the latest .png file
-echo "set lastPNG = `ls -1 $OUTDIR/harp.*.png | tail -1`" >> $CMDFILE
+echo "set lastPNG = `ls -1 '$OUTDIR'/harp.*.png | tail -1`" >> $CMDFILE
 echo 'echo $lastPNG >>& '$HERE'/runlog' >> $CMDFILE
 
 # Fancify latest.png file
