@@ -74,7 +74,7 @@ end
 
 # Identify the latest .png file
 echo 'set lastPNG = `ls -1 '$OUTDIR'/harp.*.png | tail -1`' >> $CMDFILE
-echo 'echo '$lastPNG' >>& '$HERE'/runlog' >> $CMDFILE
+echo 'echo $lastPNG >>& '$HERE'/runlog' >> $CMDFILE
 
 # Fancify latest.png file
 set TMP = $OUTDIR/.latest_nrt.png
