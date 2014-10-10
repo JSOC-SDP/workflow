@@ -19,7 +19,7 @@ set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 set MASKSERIES = hmi.Marmask_720s_nrt
 set HARPSERIES = hmi.Mharp_720s_nrt
-set OUTDIR = /surge40/jsocprod/HARPS/nrt/tmp
+set OUTDIR = /surge40/jsocprod/HARPS/nrt/images
 set CONVERT = /usr/bin/convert
 if ( ! -e $OUTDIR ) then
   mkdir -p $OUTDIR
