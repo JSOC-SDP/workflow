@@ -37,8 +37,10 @@ set showCovAIANRT = "/web/jsoc/htdocs/data/.showCovAIANRT"
 $SHOW_COVERAGE aia.lev1_nrt2 low=$fFSN[1] high=$lFSN[1] key=FSN | grep UNK > $showCovAIANRT'.tmp'
 mv $showCovAIANRT'.tmp' $showCovAIANRT
 
-#IRIS
-
-set showCovIRIS = "/web/jsoc/htdocs/data/.showCovIRIS"
-$SHOW_COVERAGE iris.lev1 low=$TenDaysAgo high=$ThreeDaysAgo key=FSN | grep UNK > $showCovIRIS'.tmp'
-mv $showCovIRIS'.tmp' $showCovIRIS
+##IRIS
+#
+#set showCovIRIS = "/web/jsoc/htdocs/data/.showCovIRIS"
+#set FSN1 = `$SHOW_INFO iris.lev1'['$TenDaysAgo'/5h]' -q key=fsn | head -1`
+#set FSN2 = `$SHOW_INFO iris.lev1'['$ThreeDaysAgo'/5h]' -q key=fsn | tail -1`
+#$SHOW_COVERAGE iris.lev1 low=$FSN1 high=$FSN2 key=FSN | grep UNK > $showCovIRIS'.tmp'
+#mv $showCovIRIS'.tmp' $showCovIRIS
