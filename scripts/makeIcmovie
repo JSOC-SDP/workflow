@@ -76,7 +76,7 @@ foreach Quant (Ic_flat M M_color)
   
   if ( $JSOC_MACHINE == 'linux_avx' ) then
     set mpg_opts = "-b:v 15000k"
-    set mp4_opts = "-qscale 5 -r 20 -b:v 9600"
+    set mp4_opts = "-qscale 5 -b 9600"
   else
     set mpg_opts = "-qscale 5 -r 20 -b 9600" 
     set mp4_opts = "-qscale 5 -r 20 -b 9600"
@@ -84,8 +84,7 @@ foreach Quant (Ic_flat M M_color)
 
   set MOVIE = $WORK/$Quant'_2d'.mpg
 #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE 
-#  ffmpeg $mpg_opts -i %04d.$Type $MOVIE
-  ffmpeg -b 15000k -i %04d.jpg $MOVIE
+  ffmpeg -i %04d.$Type $mpg_opts $MOVIE
   if ($status == 0) then
       cp $MOVIE $Imgpath
       mv $MOVIE /home/jsoc/hmi/movies/latest
@@ -93,7 +92,7 @@ foreach Quant (Ic_flat M M_color)
   
   set MOVIE = $WORK/$Quant'_2d'.mp4
 #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE
-  ffmpeg $mp4_opts -i %04d.$Type $MOVIE 
+  ffmpeg -i %04d.$Type $mp4_opts $MOVIE 
   if ($status == 0) then
       cp $MOVIE $Imgpath
       mv $MOVIE /home/jsoc/hmi/movies/latest
