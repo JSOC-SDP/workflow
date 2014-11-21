@@ -76,7 +76,7 @@ foreach Quant (Ic_flat M M_color)
   
   if ( $JSOC_MACHINE == 'linux_avx' ) then
     set mpg_opts = "-qscale 5 -r 20 -b:v 9600"
-    set mp4_opts = "-qscale 5 -r 20 -b:v 9600 -c mpeg4"
+    set mp4_opts = "-b:v 15000k"
   else
     set mpg_opts = "-qscale 5 -r 20 -b 9600" 
     set mp4_opts = "-qscale 5 -r 20 -b 9600"
