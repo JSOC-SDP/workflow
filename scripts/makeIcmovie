@@ -75,7 +75,7 @@ foreach Quant (Ic_flat M M_color)
   echo Movie making place is $cwd
   
   if ( $JSOC_MACHINE == 'linux_avx' ) then
-    set mpg_opts = "-b:v 15000k"
+    set mpg_opts = "-b:v 35000k"
     set mp4_opts = "-qscale 5 -b 9600"
   else
     set mpg_opts = "-qscale 5 -r 20 -b 9600" 
