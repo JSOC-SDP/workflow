@@ -22,7 +22,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   @ THREADS = 1
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = p4.q
+  set QUE = p4.q,a8.q
   @ THREADS = 4
   set QSUB = qsub2
 endif
