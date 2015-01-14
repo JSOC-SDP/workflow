@@ -59,7 +59,7 @@ echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> 
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
 
-echo '<P><TABLE WIDTH=800>' >>$TMP
+echo '<P><TABLE WIDTH=850>' >>$TMP
 echo '<TR><TD>Product</TD><TD>Lag</TD><TD>Note</TD></TR>' >>$TMP
 
 set nprod = $#product
@@ -170,7 +170,7 @@ while ($iprod <= $nprod)
   if ($prod == hmi_images) then
     set note = "HMI nrt web images"
   else
-    set note = `$SHOW_SERIES -p '^'$prod'$' | grep "Note:" | sed -e 's/"/'"'/"`
+    set note = `$SHOW_SERIES -p '^'$prod'$' | grep "Note:" | head -1 | sed -e 's/"/'"'/"`
     shift note
   endif
   if (!($prod =~ "$project"*)) then
