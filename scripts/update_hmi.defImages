@@ -38,8 +38,8 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 # execute qsub script
 touch qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-#$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
-qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q $TEMPCMD
+$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
+#qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q $TEMPCMD
 
 if ( -e $HERE/qsub_running ) then
   rm -f $HERE/qsub_running
