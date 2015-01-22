@@ -68,9 +68,9 @@ set project = hmi
 while ($iprod <= $nprod)
   set prod = $product[$iprod]
   if ($prod == hmi.lev0a)  then
-    set times = `$SHOW_INFO key=T_OBS -q hmi.lev0a'[? FSN < 200000000 ?]' n=-1`
+    set times = `$SHOW_INFO key=T_OBS -q hmi.lev0a'[? FSN < 200000000 ?][? T_OBS > 0 ?]' n=-1`
   else if ($prod == aia.lev0)  then
-    set times = `$SHOW_INFO key=T_OBS -q aia.lev0'[? FSN < 200000000 ?]' n=-1`
+    set times = `$SHOW_INFO key=T_OBS -q aia.lev0'[? FSN < 200000000 ?][? T_OBS > 0 ?]' n=-1`
   else if ($prod == hmi_images) then
     set times = ` head -1 /web/jsoc/htdocs/data/hmi/images/image_times`
     set times = `echo $times[2] | awk --  'BEGIN {FIELDWIDTHS = "4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%s_TAI",$1,$2,$3,$5,$6,$7)}'`
