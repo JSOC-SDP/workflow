@@ -75,9 +75,9 @@ while ($iprod <= $nprod)
     set times = ` head -1 /web/jsoc/htdocs/data/hmi/images/image_times`
     set times = `echo $times[2] | awk --  'BEGIN {FIELDWIDTHS = "4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%s_TAI",$1,$2,$3,$5,$6,$7)}'`
   else if ($prod == hmi.MHarp_720s_nrt ) then
-    set times = `$SHOW_INFO -q key=T_OBS $prod'[][$]' n=-1`
+    set times = `$SHOW_INFO -q key=T_OBS $prod'[][$][? T_OBS > 0 ?]' n=-1`
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then        
-      set times = `$SHOW_INFO -q key=T_REC $prod'[][$]' n=-1`
+      set times = `$SHOW_INFO -q key=T_REC $prod'[][$][? T_OBS > 0 ?]' n=-1`
     endif
   else if ( $prod == iris.lev0 ) then
     set times = `$SHOW_INFO -q key=t_obs iris.lev0'[? FSN != 8421504 ?][? t_obs > 0 ?]' n=-1 | sed s/-/./g | sed s/T/_/ | cut -c1-19`
