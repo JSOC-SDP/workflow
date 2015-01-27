@@ -52,7 +52,8 @@ set WFDIR = $WORKFLOW_DATA
 set WFCODE = $WORKFLOW_ROOT
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
-set MHarp = /home/jsoc/cvs/Development/JSOC/proj/mag/harp/scripts/track_and_ingest_mharp.sh
+#set MHarp = /home/jsoc/cvs/Development/JSOC/proj/mag/harp/scripts/track_and_ingest_mharp.sh
+set MHarp = /home/jsoc/cvs/Development/JSOC_20150122/proj/mag/harp/scripts/track_and_ingest_mharp.sh
 
 # Make sure there isn't a runaway process happening.  There should NEVER be more than one
 # harps nrt job running at one time!  If there is, put a hold on the gate, clean up and
