@@ -68,7 +68,7 @@ echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
-echo "setenv SGE_ROOT /SGE" >>$TEMPCMD
+#echo "setenv SGE_ROOT /SGE" >>$TEMPCMD
 echo "setenv MPI_MAPPED_STACK_SIZE 100M" >> $TEMPCMD
 echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >> $TEMPCMD
 echo "setenv KMP_STACKSIZE 16M" >> $TEMPCMD
