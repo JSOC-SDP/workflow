@@ -53,7 +53,7 @@ set retstatus=0
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-#echo "$Limbprogram tmpdir=/tmp22/jsocprod/lfwrp/ logdir=/tmp22/jsocprod/lfwrp/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit  >>&$TEMPLOG" >>$TEMPCMD
+#echo "$Limbprogram tmpdir=/tmp29/jsocprod/lfwrp/ logdir=/tmp29/jsocprod/lfwrp/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit  >>&$TEMPLOG" >>$TEMPCMD
 echo "$Limbprogram tmpdir=$TMPDIR/ logdir=$TMPDIR/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit_tas >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
