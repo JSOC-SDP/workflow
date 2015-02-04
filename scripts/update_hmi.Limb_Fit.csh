@@ -18,13 +18,13 @@ endif
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
-#  set QSUB = /SGE/bin/lx24-amd64/qsub
+  set QSUB = /SGE/bin/lx24-amd64/qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QUE = a.q
-#  set QSUB = /SGE/bin/lx24-amd64/qsub2
+  set QSUB = /SGE/bin/lx24-amd64/qsub2
 endif
 
-set QSUB = $SGE_ROOT/bin/$SGE_ARCH
+#set QSUB = $SGE_ROOT/bin/$SGE_ARCH
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
