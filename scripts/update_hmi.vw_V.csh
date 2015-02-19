@@ -52,7 +52,7 @@ echo 'set REBINstatus = $?' >> $CMD
 echo 'echo $REBINstatus >retstatus' >>&$CMD
 
 set LOG = `echo $LOG | sed "s/^\/auto//"`
-$QSUB -e $LOG -o $LOG -q $QUE $CMD >> runlog
+$QSUB -sync yes -e $LOG -o $LOG -q $QUE $CMD 
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
