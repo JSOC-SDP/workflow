@@ -46,16 +46,15 @@ echo "#! /bin/csh -f " >$CMD
 echo "cd $HERE" >> $CMD
 echo "hostname >>&$LOG" >> $CMD
 echo "" >> $CMD
+echo "set echo" >> $CMD
 echo "$JREBINSMOOTH in=hmi.V_45s'['$wantlow'-'$wanthigh']' $params" >> $CMD
 echo 'set REBINstatus = $?' >> $CMD
-echo 'if ($REBINstatus) goto DONE' >>&$CMD
-echo 'DONE:' >>$CMD
 echo 'echo $REBINstatus >retstatus' >>&$CMD
 
 set LOG = `echo $LOG | sed "s/^\/auto//"`
 $QSUB -e $LOG -o $LOG -q $QUE $CMD >> runlog
 
-if (-e retstatus) set retstatus = `cat $HERE/retstatus`
+set retstatus = `cat $HERE/retstatus`
 exit $retstatus
 
 
