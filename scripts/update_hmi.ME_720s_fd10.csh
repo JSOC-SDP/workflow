@@ -36,7 +36,7 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set VFISV = /home/jsoc/cvs/Development/JSOC/bin/linux_x86_64/vfisv
+set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv
 set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/$JSOC_MACHINE/show_info
 
 set wantlow = `cat wantlow`
