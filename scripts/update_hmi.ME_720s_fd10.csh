@@ -79,12 +79,7 @@ echo 'echo $VFnrtstatus >retstatus' >>&$TEMPCMD
 echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
 # execute qsub script
 
-echo "$QSUB -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD"
+$QSUB -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
-if ( $retstatus ) then
-  exit $retstatus
-#else 
-#  set SHP_TICKET = `$WFCODE/maketicket.csh gate=hmi.sharp_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
-endif
 exit $retstatus
