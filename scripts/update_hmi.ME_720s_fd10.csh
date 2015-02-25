@@ -42,8 +42,9 @@ set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/$JSOC_MACHINE/show_info
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
 
+set timest = `echo $WANTLOW | cut -c9-10,12-13`
 set TEMPLOG = $HERE/runlog
-set TEMPCMD = $HERE/$qsubname
+set TEMPCMD = $HERE/VFISV_$timest
 echo 6 > $HERE/retstatus
 
 # make qsub script
