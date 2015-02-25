@@ -45,9 +45,9 @@ set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
 set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
 
-set timest = `echo $WANTLOW | cut -c9-10,12-13`
+set timest = `echo $WANTLOW | cut -c9-13,15-16`
 set TEMPLOG = $HERE/runlog
-set TEMPCMD = $HERE/VFISV_$timest
+set TEMPCMD = $HERE/VFV$timest
 echo 6 > $HERE/retstatus
 
 # make qsub script
