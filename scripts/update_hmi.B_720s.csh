@@ -32,9 +32,11 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-
-set wantlow = `cat wantlow`
-set wanthigh = `cat wanthigh`
+set indexlow = `index_convert ds=$product $key=$WANTLOW`
+set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+@ indexhigh = $indexhigh - 1
+set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
+set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = HMIB
