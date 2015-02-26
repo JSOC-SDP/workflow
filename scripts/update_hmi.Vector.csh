@@ -148,6 +148,6 @@ end
 @ indexhigh++
 set vfisvhigh = `index_convert ds=$product $key"_index"=$indexhigh`
 
-set VFISV_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5
+set VFISV_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus
