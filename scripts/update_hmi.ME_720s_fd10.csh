@@ -82,4 +82,8 @@ echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
 $QSUB -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
+if ( $retstatus == 0 ) then
+  set B_TICKET = `$WFCODE/maketicket.csh gate=hmi.B_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
+endif
 exit $retstatus
+
