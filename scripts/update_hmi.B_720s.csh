@@ -55,7 +55,7 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set HMIBstatus=6' >>&$TEMPCMD
 
-echo "$DIS in=hmi.ME_720s_fd10\["$T"] out=hmi.B_720s $ARGS " >> $TEMPCMD
+echo "$DIS in=hmi.ME_720s_fd10\[$wantlow'_'$wanthigh] out=hmi.B_720s $ARGS " >> $TEMPCMD
 echo 'set HMIBstatus = $?' >>$TEMPCMD
 echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
