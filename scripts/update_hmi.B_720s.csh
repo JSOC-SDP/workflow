@@ -44,6 +44,7 @@ set TEMPLOG = $HERE/runlog
 set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set DIS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig_v3
 set ARGS = "AMBNEQ=100 AMBTFCTR=0.98 OFFSET=50 AMBNPAD=200 AMBNTX=30 AMBNTY=30 AMBNAP=10 AMBSEED=4 errlog=$TEMPLOG" 
 
@@ -55,7 +56,9 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set HMIBstatus=6' >>&$TEMPCMD
 
-echo "$DIS in=hmi.ME_720s_fd10'['$wantlow'_'$wanthigh']' out=hmi.B_720s $ARGS " >> $TEMPCMD
+foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'[$wantlow'_'$wanthigh']' -q key=T_REC` )
+  echo "$DIS in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
+end
 echo 'set HMIBstatus = $?' >>$TEMPCMD
 echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
