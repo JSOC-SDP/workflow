@@ -46,14 +46,14 @@ while ($keep_running > 0) # KEEPRUNNING LOOP
       set debugmode = 1
     endif
 
-   $WFCODE/scripts/checkDRMSnSUMS.csh
-   if ($?) then 
-      echo "GATEKEEPER,  DRMS and/or SUMS is down, try again in a minute."
-      set CADENCE = $SLOWCADENCE
-      goto ALL_GATES_DONE
-   else
+#   $WFCODE/scripts/checkDRMSnSUMS.csh
+#   if ($?) then 
+#      echo "GATEKEEPER,  DRMS and/or SUMS is down, try again in a minute."
+#      set CADENCE = $SLOWCADENCE
+#      goto ALL_GATES_DONE
+#   else
       set CADENCE = $FASTCADENCE
-   endif
+#   endif
 
    touch GATEKEEPERBUSY
 
