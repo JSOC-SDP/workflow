@@ -22,20 +22,20 @@ endif
 
 cd $WFDIR
 
-$WFCODE/scripts/checkDRMSnSUMS.csh
-set DRMSstat = $?
-set DRMSwaits = 0
-while ($DRMSstat)
-  echo -n "DRMS and/or SUMS is down at " ; date
-  if ($DRMSwaits > 360) then
-    echo DRMS down for 6 hours, quit.
-    exit 1
-  endif
-  sleep 60
-  $WFCODE/scripts/checkDRMSnSUMS.csh
-  set DRMSstat = $?
-  @ DRMSwaits = $DRMSwaits + 1
-end
+#$WFCODE/scripts/checkDRMSnSUMS.csh
+#set DRMSstat = $?
+#set DRMSwaits = 0
+#while ($DRMSstat)
+#  echo -n "DRMS and/or SUMS is down at " ; date
+#  if ($DRMSwaits > 360) then
+#    echo DRMS down for 6 hours, quit.
+#    exit 1
+#  endif
+#  sleep 60
+#  $WFCODE/scripts/checkDRMSnSUMS.csh
+#  set DRMSstat = $?
+#  @ DRMSwaits = $DRMSwaits + 1
+#end
 
 set task=NOT_SPECIFIED
 set gate=NOT_SPECIFIED
