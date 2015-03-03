@@ -1,5 +1,5 @@
 #! /bin/csh -f
-# Script to make hmi.ME_720s_fd10
+# Script to make hmi.B_720s
 #
 
 # XXXXXXXXXX test
@@ -20,7 +20,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
+  set QUE = k.q
   set QSUB = qsub2
 endif
 
