@@ -106,6 +106,7 @@ while ($iprod <= $nprod)
     else
       set iris_stat = RED
       @ r = 1
+      echo "$now IRIS lev0 is $iris_diff behind" >> /web/jsoc/htdocs/data/red.log
     endif
   else if ( $prod == iris.lev1_nrt ) then 
     set times = `$SHOW_INFO -q key=t_obs iris.lev1_nrt'[$]' | sed s/-/./g | sed s/T/_/ | cut -c1-19` 
@@ -134,6 +135,7 @@ while ($iprod <= $nprod)
     else 
       set iris1_stat = RED 
       @ r = 1 
+      echo "$now IRIS lev1 is $iris1_diff behind" >> /web/jsoc/htdocs/data/red.log
     endif 
   else
     set times = `$SHOW_INFO -q key=T_OBS $prod'[$]'`
@@ -157,6 +159,7 @@ while ($iprod <= $nprod)
   else 
     set stat = RED
     @ r = 1
+    echo "$now $prod is behind by $lags" >> /web/jsoc/htdocs/data/red.log
   endif
   if ($lags < 60) then
     set lag = "$lags minutes"
