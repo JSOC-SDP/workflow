@@ -58,7 +58,7 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set HMIBstatus=6' >>&$TEMPCMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
+foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.M_720s'['$wantlow'-'$wanthigh']' -q key=T_REC` )
   echo "$DIS in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
 end
 echo 'set HMIBstatus = $?' >>$TEMPCMD
