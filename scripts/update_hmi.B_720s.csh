@@ -40,7 +40,7 @@ set key = `cat $WFDIR/gates/$GATE/key`
 
 set wantlow = $WANTLOW
 @ WANTHIGH_s = `time_convert time=$WANTHIGH`
-@ wanthigh_s = $WANTHIGH_S + 360
+@ wanthigh_s = $WANTHIGH_s + 360
 set wanthigh = `time_convert s=$wanthigh_s o=cal zone=tai` 
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
