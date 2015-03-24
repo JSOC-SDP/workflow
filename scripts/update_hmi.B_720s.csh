@@ -44,7 +44,7 @@ set wantlow = $WANTLOW
 set wanthigh = `time_convert s=$wanthigh_s o=cal zone=tai` 
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
-set timename = HMIB
+set timename = B
 set qsubname = $timename$timestr
 
 set TEMPLOG = $HERE/runlog
