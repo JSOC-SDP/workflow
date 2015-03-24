@@ -549,7 +549,7 @@ if ($b == 1) then
   set favicon = blue_sq.gif 
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh blue
   if ( ! -e /home/jeneen/CAMERA_ANOMALY.lock ) then
-    /usr/bin/Mail -s 'Important:  Camera Anomaly' jsoc_ops < /tmp/camera_anomaly
+    /usr/bin/Mail -s 'Important:  Camera Anomaly' jsoc_ops@lmsal.com < /tmp/camera_anomaly
     touch /home/jeneen/CAMERA_ANOMALY.lock
   endif
 else if ($r == 1) then
