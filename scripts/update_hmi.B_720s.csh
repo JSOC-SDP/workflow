@@ -33,15 +33,15 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 #set indexlow = `index_convert ds=$product $key=$WANTLOW`
-#set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
-#@ indexhigh = $indexhigh - 1
+set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+@ indexlast = $indexhigh - 1
 #set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-#set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wanthigh = `index_convert ds=$product $key"_index"=$indexlast`
 
 set wantlow = $WANTLOW
-@ WANTHIGH_s = `time_convert time=$WANTHIGH`
-@ wanthigh_s = $WANTHIGH_s - 360
-set wanthigh = `time_convert s=$wanthigh_s o=cal zone=tai` 
+#@ WANTHIGH_s = `time_convert time=$WANTHIGH`
+#@ wanthigh_s = $WANTHIGH_s - 360
+#set wanthigh = `time_convert s=$wanthigh_s o=cal zone=tai` 
 #set wanthigh = $WANTHIGH
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
