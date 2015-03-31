@@ -42,7 +42,7 @@ set wantlow = $WANTLOW
 #@ WANTHIGH_s = `time_convert time=$WANTHIGH`
 #@ wanthigh_s = $WANTHIGH_s + 360
 #set wanthigh = `time_convert s=$wanthigh_s o=cal zone=tai` 
-iset wanthigh = $WANTHIGH
+set wanthigh = $WANTHIGH
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = B
