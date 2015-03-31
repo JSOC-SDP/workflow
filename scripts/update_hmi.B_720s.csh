@@ -38,9 +38,9 @@ set key = `cat $WFDIR/gates/$GATE/key`
 #set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 #set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
 
-#set wantlow = $WANTLOW
+set wantlow = $WANTLOW
 @ WANTHIGH_s = `time_convert time=$WANTHIGH`
-@ wanthigh_s = $WANTHIGH_s + 360
+@ wanthigh_s = $WANTHIGH_s - 360
 set wanthigh = `time_convert s=$wanthigh_s o=cal zone=tai` 
 #set wanthigh = $WANTHIGH
 
