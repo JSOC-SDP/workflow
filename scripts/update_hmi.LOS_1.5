@@ -103,8 +103,9 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 # end
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
-
-set WEBIMAGE_TICKET = `$WFCODE/maketicket.csh gate=hmi.defImages wantlow=$wantlow wanthigh=$wanthigh action=5`
-set VW_TICKET = `$WFCODE/maketicket.csh gate=hmi.vw_V wantlow=$wantlow wanthigh=$wanthigh action=5`
+if ($retstatus == 0 ) then
+  set WEBIMAGE_TICKET = `$WFCODE/maketicket.csh gate=hmi.defImages wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set VW_TICKET = `$WFCODE/maketicket.csh gate=hmi.vw_V wantlow=$wantlow wanthigh=$wanthigh action=5`
+endif
 
 exit $retstatus
