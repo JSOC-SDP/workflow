@@ -35,13 +35,13 @@ set key = `cat $WFDIR/gates/$GATE/key`
 set low_s = `time_convert time=$WANTLOW`
 set high_s = `time_convert time=$WANTHIGH`
 set tdiff = `$high_s - $low_s`
-if ( $tdiff <= 3600 ) then
-  set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
-  @ indexlast = $indexhigh - 1
-  set wanthigh = `index_convert ds=$product $key"_index"=$indexlast`
-else
+#if ( $tdiff <= 3600 ) then
+#  set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+#  @ indexlast = $indexhigh - 1
+#  set wanthigh = `index_convert ds=$product $key"_index"=$indexlast`
+#else
   set wanthigh = $WANTHIGH
-endif
+#endif
 set wantlow = $WANTLOW
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
