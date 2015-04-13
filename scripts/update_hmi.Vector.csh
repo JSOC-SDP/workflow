@@ -130,24 +130,22 @@ touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
-@ t1 = `time_convert time=$WANTLOW`
-@ t2 = `time_convert time=$WANTHIGH - 720`
-@ t = $t1
-while ( $t <= $t2 )
-  @ end = $t + 3600
-  set WLO = `time_convert s=$t zone=tai`
-  set WHI = `time_convert s=$end zone=tai`
-  set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits wantlow=$WLO wanthigh=$WHI action=5`
-  @ t = $end + 1
-end
-
-#if ( $retstatus == 0 ) then
+if ( -e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
+if ( $retstatus == 0 ) then
+  @ t1 = `time_convert time=$WANTLOW`
+  @ t2 = `time_convert time=$WANTHIGH - 720`
+  @ t = $t1
+  while ( $t <= $t2 )
+    @ end = $t + 3600
+    set WLO = `time_convert s=$t zone=tai`
+    set WHI = `time_convert s=$end zone=tai`
+    set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits wantlow=$WLO wanthigh=$WHI action=5`
+    @ t = $end + 1
+  end
   set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask wantlow=$wantlow wanthigh=$wanthigh action=5`
-#endif
-
-@ indexhigh++
-set vfisvhigh = `index_convert ds=$product $key"_index"=$indexhigh`
-
-set VFISV_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
-if (-e retstatus) set retstatus = `cat $HERE/retstatus`
+  @ indexhigh++
+  set vfisvhigh = `index_convert ds=$product $key"_index"=$indexhigh`
+  set VFISV_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
+  set LATLON_TICKET = `$WFCODE/maketicket.csh gate=hmi.MrMap_latlon_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
+endif
 exit $retstatus
