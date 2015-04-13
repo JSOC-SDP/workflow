@@ -38,8 +38,8 @@ set JSOC_REBIN = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jsoc_rebin
 set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree -R clat=0.0"
 set BINARGS = "u=1 h=1 scale=0.1 method=boxcar"
 
-set wantlow = `cat wantlow`
-set wanthigh = `cat wanthigh`
+set wantlow = $WANTLOW
+set wanthigh = $WANTHIGH
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = LL
@@ -57,7 +57,7 @@ echo "hostname >>&$LOG" >>$CMD
 echo "set echo >>&$LOG" >>$CMD
 echo 'set retstatus=6' >>&$CMD
 
-foreach trec ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
+foreach T ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
   echo "$MAPROJ -v in=hmi.M_720s'['$T']' out=hmi.Mrmap_latlon_720s $MAPARGS" >> $CMD
   echo "$JSOC_REBIN in=hmi.Mrmap_latlon_720s'['$T']' out=hmi.Mrmap_latlon_900x900_720s $BINARGS" >> $CMD
 end
