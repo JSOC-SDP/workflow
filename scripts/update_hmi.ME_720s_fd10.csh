@@ -39,14 +39,11 @@ set key = `cat $WFDIR/gates/$GATE/key`
 set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv
 set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/$JSOC_MACHINE/show_info
 
-#set indexlow = `index_convert ds=$product $key=$WANTLOW`
-#set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
-#@ indexhigh = $indexhigh - 1
-#set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-#set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
-
-set wantlow = $WANTLOW
-set wanthigh = $WANTHIGH
+set indexlow = `index_convert ds=$product $key=$WANTLOW`
+set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+@ indexhigh = $indexhigh - 1
+set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
+set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
 
 set timest = `echo $WANTLOW | cut -c9-13,15-16`
 set TEMPLOG = $HERE/runlog
