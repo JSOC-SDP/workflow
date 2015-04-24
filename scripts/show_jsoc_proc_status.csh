@@ -2,6 +2,7 @@
 
 set echo
 source /home/jsoc/.setJSOCenv
+setenv SGE_ROOT /SGE
 set TARG = /web/jsoc/htdocs/data
 set TMP = $TARG/.jsoc_proc_status.tmp
 
