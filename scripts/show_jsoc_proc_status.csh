@@ -258,7 +258,7 @@ echo "$db_diff"'s </TD><TD>Lag between hmidb and hmidb2</TD></TR>' >>$TMP
 set count1 = `wget -O - -q 'http://jsoc2.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
 #echo -n $count1
 set count2 = `wget -O - -q 'http://jsoc.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
-set count3 = `qstat | grep JSOC_ | grep jsoc | grep qw | wc -l`
+set count3 = `/SGE/bin/lx24-amd64/qstat | grep JSOC_ | grep jsoc | grep qw | wc -l`
  
 echo -n '<TR><TD>Exports Pending </TD><TD' >> $TMP
 
