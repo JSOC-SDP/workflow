@@ -258,7 +258,8 @@ echo "$db_diff"'s </TD><TD>Lag between hmidb and hmidb2</TD></TR>' >>$TMP
 set count1 = `wget -O - -q 'http://jsoc2.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
 #echo -n $count1
 set count2 = `wget -O - -q 'http://jsoc.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
-
+set count3 = `qstat | grep JSOC_ | grep jsoc | grep qw | wc -l`
+ 
 echo -n '<TR><TD>Exports Pending </TD><TD' >> $TMP
 
   if ($count1 < 2) then
@@ -281,6 +282,20 @@ else
   echo -n ' BGCOLOR="#FF6666">' >>$TMP
 endif
 echo "$count2"' </TD><TD>' $USERDB2'</TD></TR>' >>$TMP
+
+echo -n '<TR><TD>Exports in Queue </TD><TD' >> $TMP
+
+if ($count3 < 7) then
+  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+else if ( ($count3 >= 7) && ($count3 < 10) ) then
+  echo -n ' BGCOLOR="yellow">'  >>$TMP
+else
+  echo -n ' BGCOLOR="#FF6666">' >>$TMP
+  set stat = red
+  @ r = 1
+endif
+echo "$count3"' </TD><TD>' $USERDB + $USERDB2'</TD></TR>' >>$TMP
+
 
 ### End of export monitoring ###
 
