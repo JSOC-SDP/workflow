@@ -572,7 +572,8 @@ if ($b == 1) then
 else if ($r == 1) then
   set favicon = red_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh red
-else if ( $g2 = 1 ) then
+else if ( $g2 == 1 ) then
+  set favicon = green2_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh green2
 else if ($y == 1) then
   set favicon = yellow_sq.gif
