@@ -289,15 +289,42 @@ echo -n '<TR><TD>Exports in Queue </TD><TD' >> $TMP
 
 if ($count3 < 7) then
   echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo "$count3"' </TD><TD>' $USERDB + $USERDB2'</TD></TR>' >>$TMP
 else if ( ($count3 >= 7) && ($count3 < 10) ) then
   echo -n ' BGCOLOR="yellow">'  >>$TMP
+  echo "$count3"' </TD><TD>' $USERDB + $USERDB2'</TD></TR>' >>$TMP
 else
   echo -n ' BGCOLOR="#FF6666">' >>$TMP
   set stat = green2
   @ g2 = 1
+  set ex1 = `qstat | grep JSOC | head -1`
+  set ext1 = `echo $ex1[6] | awk -F\/ '{print $3"."$1"."$2"_"}'`$ex1[7]
+  @ extLag1 = $now_t - `$TIME_CONVERT time=$ext1`
+  if ( $extLag1 < 3600 ) then
+    @ exp1Lag = $extLag1 / 60
+    set exp1T = mins
+  else if ( $extLag1 < 86400 ) then
+    @ exp1Lag = $extLag1 / 3600
+    set exp1T = hours
+  else
+    @ exp1Lag = $extLag1 / 86400
+    set exp1T = days
+  endif
+  set ex2 = `qstat | grep JSOC | head -6 | tail -1`
+  set ext2 = `echo $ex2[6] | awk -F\/ '{print $3"."$1"."$2"_"}'`$ex2[7]
+  @ extLag2 = $now_t - `$TIME_CONVERT time=$ext2`
+  if ( $extLag2 < 3600 ) then
+    @ exp2Lag = $extLag2 / 60
+    set exp2T = mins
+  else if ( $extLag2 < 86400 ) then
+    @ exp2Lag = $extLag2 / 3600
+    set exp2T = hours
+  else
+    @ exp1Lag = $extLag1 / 86400
+    set exp1T = days
+  endif
+  echo "$count3"' </TD><TD>' Tmax=$exp1Lag $exp1T, Tmin=$exp2Lag $exp2T'</TD></TR>' >>$TMP
 endif
-echo "$count3"' </TD><TD>' $USERDB + $USERDB2'</TD></TR>' >>$TMP
-
 
 ### End of export monitoring ###
 
