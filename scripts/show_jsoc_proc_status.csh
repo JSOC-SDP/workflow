@@ -49,6 +49,7 @@ set red = ($hred $ared $ired )
 @ r = 0
 @ y = 0
 @ g = 0
+@ g2 = 0
 
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set now_t = `$TIME_CONVERT time=$now`
@@ -292,8 +293,8 @@ else if ( ($count3 >= 7) && ($count3 < 10) ) then
   echo -n ' BGCOLOR="yellow">'  >>$TMP
 else
   echo -n ' BGCOLOR="#FF6666">' >>$TMP
-  set stat = red
-  @ r = 1
+  set stat = green2
+  @ g2 = 1
 endif
 echo "$count3"' </TD><TD>' $USERDB + $USERDB2'</TD></TR>' >>$TMP
 
@@ -571,6 +572,8 @@ if ($b == 1) then
 else if ($r == 1) then
   set favicon = red_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh red
+else if ( $g2 = 1 ) then
+  /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh green2
 else if ($y == 1) then
   set favicon = yellow_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh yellow
