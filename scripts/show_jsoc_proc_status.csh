@@ -2,7 +2,7 @@
 
 set echo
 source /home/jsoc/.setJSOCenv
-setenv SGE_ROOT /SGE
+setenv SGE_ROOT /SGE2
 set TARG = /web/jsoc/htdocs/data
 set TMP = $TARG/.jsoc_proc_status.tmp
 
@@ -60,6 +60,7 @@ echo '<HTML><HEAD><TITLE>JSOC Processing Status</TITLE><META HTTP-EQUIV="Refresh
 echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> $TMP
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
+echo '<!--#include virtual="http://jsoc.stanford.edu/ajax/URGENT_MOTD.html" -->' >>$TMP
 
 echo '<P><TABLE WIDTH=800>' >>$TMP
 echo '<TR><TD>Product</TD><TD>Lag</TD><TD>Note</TD></TR>' >>$TMP
