@@ -21,7 +21,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QUE = a.q
-  set QSUB = qsub2
+  set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
