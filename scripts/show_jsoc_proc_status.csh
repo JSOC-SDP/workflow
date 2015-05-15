@@ -3,7 +3,8 @@
 set echo
 source /home/jsoc/.setJSOCenv
 setenv SGE_ROOT /SGE2
-set TARG = /web/jsoc/htdocs/data
+# set TARG = /web/jsoc/htdocs/data
+set TARG = ./
 set TMP = $TARG/.jsoc_proc_status.tmp
 
 set noglob
@@ -55,15 +56,14 @@ set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set now_t = `$TIME_CONVERT time=$now`
 
 #echo "Content-type: text/html" >$TMP
-echo '<\!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">' >$TMP
-echo '<HTML><HEAD><TITLE>JSOC Processing Status</TITLE><META HTTP-EQUIV="Refresh" CONTENT="60"></HEAD><BODY LINK=black>' >>$TMP
+echo '<\!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">' >$TMP
+echo '<html><head><title>JSOC Processing Status</title><meta http-equiv="Refresh" content="60"></head><body link=black>' >>$TMP
 echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> $TMP
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
-#set warning = `grep -v \> /web/jsoc/htdocs/ajax/URGENT_MOTD.html`
-#echo "<BR><FONT COLOR=RED><B>$warning</FONT></B><BR>" >>$TMP
-echo '<P><TABLE WIDTH=800>' >>$TMP
-echo '<TR><TD>Product</TD><TD>Lag</TD><TD>Note</TD></TR>' >>$TMP
+cat /web/jsoc/htdocs/ajax/URGENT_MOTD.html >>$TMP
+echo '<p><table width=800>' >>$TMP
+echo '<tr><td>Product</td><td>Lag</td><td>Note</td></tr>' >>$TMP
 
 set nprod = $#product
 set iprod = 1
@@ -180,40 +180,40 @@ while ($iprod <= $nprod)
     shift note
   endif
   if (!($prod =~ "$project"*)) then
-    echo '<TR><TD>&nbsp;<TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR>' >>$TMP
+    echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
     set project = $prod:r
   endif
-  echo -n '<TR><TD>'$prod'</TD><TD' >>$TMP
+  echo -n '<tr><td>'$prod'</td><td' >>$TMP
   if ($stat == GREEN) then
-    echo -n ' BGCOLOR="#66FF66">' >>$TMP
+    echo -n ' bgcolor="#66FF66">' >>$TMP
   else if ($stat == YELLOW) then
-    echo -n ' BGCOLOR="yellow">' >>$TMP
+    echo -n ' bgcolor="yellow">' >>$TMP
   else
-    echo -n ' BGCOLOR="#FF6666">' >>$TMP
+    echo -n ' bgcolor="#FF6666">' >>$TMP
   endif
-  echo "$lag"'</TD><TD>'"$note"'</TD></TR>' >>$TMP
+  echo "$lag"'</td><td>'"$note"'</td></tr>' >>$TMP
   if ( $prod == 'iris.lev0' ) then
-    echo -n '<TR><TD>iris processing time</TD><TD' >>$TMP
+    echo -n '<tr><td>iris processing time</td><td' >>$TMP
     if ($iris_stat == GREEN) then
-      echo -n ' BGCOLOR="#66FF66">' >>$TMP
+      echo -n ' bgcolor="#66FF66">' >>$TMP
     else if ($iris_stat == YELLOW) then
-      echo -n ' BGCOLOR="yellow">' >>$TMP
+      echo -n ' bgcolor="yellow">' >>$TMP
     else
-      echo -n ' BGCOLOR="#FF6666">' >>$TMP
+      echo -n ' bgcolor="#FF6666">' >>$TMP
     endif
-    echo "$iris_lag"'</TD><TD>'"$iris_proc_time_utc"'</TD></TR>' >>$TMP
+    echo "$iris_lag"'</td><td>'"$iris_proc_time_utc"'</td></tr>' >>$TMP
   endif
 
   if ( $prod == 'iris.lev1_nrt' ) then
-    echo -n '<TR><TD>iris lev1_nrt proc lag</TD><TD' >>$TMP
+    echo -n '<tr><td>iris lev1_nrt proc lag</td><td' >>$TMP
     if ($iris1_stat == GREEN) then
-      echo -n ' BGCOLOR="#66FF66">' >>$TMP
+      echo -n ' bgcolor="#66FF66">' >>$TMP
     else if ($iris1_stat == YELLOW) then
-      echo -n ' BGCOLOR="yellow">' >>$TMP
+      echo -n ' bgcolor="yellow">' >>$TMP
     else
-      echo -n ' BGCOLOR="#FF6666">' >>$TMP
+      echo -n ' bgcolor="#FF6666">' >>$TMP
     endif
-    echo "$iris1_lag"'</TD><TD>'"$iris1_proc_time_utc"'</TD></TR>' >>$TMP
+    echo "$iris1_lag"'</td><td>'"$iris1_proc_time_utc"'</td></tr>' >>$TMP
   endif
 
   @ iprod = $iprod + 1
@@ -221,22 +221,22 @@ end
 
 # get lookdata and exportdata responsiveness
 set webinfo = `tail -30 /home/jsoc/exports/logs/fetch_log | awk 'BEGIN { min=100000; max=0} {for (i=1; i<NF; i++) if ($i ~ /lag=.*/) {sub(/lag=/,"",$i); lag=$i}} {sum += lag; n++; } lag<min{min=lag} lag>max{max=lag} END { avg = sum/n; print  sprintf("%0.3f",avg) " min=" min " max=" max }'`
-echo '<TR><TD>&nbsp;<TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR>' >>$TMP
-echo -n '<TR><TD>web response</TD><TD' >>$TMP
+echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
+echo -n '<tr><td>web response</td><td' >>$TMP
 set lag=$webinfo[1]
 
 set mslag = `echo $lag | sed -e "s/\.//" -e "s/^0*//"`
 set lastReqId = `grep JSOC /home/jsoc/exports/RequestID`
 echo $lastReqId
 if ($mslag < 5000) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
 else if ($mslag < 20000) then
-  echo -n ' BGCOLOR="yellow">' >>$TMP
+  echo -n ' bgcolor="yellow">' >>$TMP
 else
-  echo -n ' BGCOLOR="#FF6666">' >>$TMP
+  echo -n ' bgcolor="#FF6666">' >>$TMP
 endif
-#echo "$lag"'s</TD><TD>'$webinfo[2]'s, '$webinfo[3]'s, lookdata, exportdata response</TD></TR>' >>$TMP
-echo "$lag"'s</TD><TD>'$webinfo[2]'s, '$webinfo[3]'s, last ReqID: '$lastReqId' </TD></TR>' >>$TMP
+#echo "$lag"'s</td><td>'$webinfo[2]'s, '$webinfo[3]'s, lookdata, exportdata response</td></tr>' >>$TMP
+echo "$lag"'s</td><td>'$webinfo[2]'s, '$webinfo[3]'s, last ReqID: '$lastReqId' </td></tr>' >>$TMP
 
 ### Added 9/7/12 for monitoring lag between hmidb and hmidb2
 
@@ -245,16 +245,16 @@ set last_hmidb2_s = `$TIME_CONVERT time=$last_hmidb2`
 set last_hmidb = `$SHOW_INFO aia.lev1'[$]' -q key=T_REC JSOC_DBHOST=hmidb JSOC_DBUSER=production`
 set last_hmidb_s = `$TIME_CONVERT time=$last_hmidb`
 @ db_diff = $last_hmidb_s - $last_hmidb2_s
-echo -n '<TR><TD>DB Lag </TD><TD ' >> $TMP
+echo -n '<tr><td>DB Lag </td><td ' >> $TMP
 if ($db_diff < 300 ) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
 else if ( ($db_diff >= 300) && ($db_diff < 900) ) then
-  echo -n ' BGCOLOR="yellow">'  >>$TMP
+  echo -n ' bgcolor="yellow">'  >>$TMP
 else
-  echo -n ' BGCOLOR="#FF6666">' >>$TMP
+  echo -n ' bgcolor="#FF6666">' >>$TMP
   set stat = RED
 endif
-echo "$db_diff"'s </TD><TD>Lag between hmidb and hmidb2</TD></TR>' >>$TMP
+echo "$db_diff"'s </td><td>Lag between hmidb and hmidb2</td></tr>' >>$TMP
 
 ### Added 12/5/11 for monitoring exports ###
 
@@ -263,39 +263,39 @@ set count1 = `wget -O - -q 'http://jsoc2.stanford.edu/cgi-bin/ajax/show_info?c=1
 set count2 = `wget -O - -q 'http://jsoc.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
 set count3 = `/SGE/bin/lx24-amd64/qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
  
-echo -n '<TR><TD>Exports Pending </TD><TD' >> $TMP
+echo -n '<tr><td>Exports Pending </td><td' >> $TMP
 
   if ($count1 < 2) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
 else if ( ($count1 >= 2) && ($count1 < 6) ) then
-  echo -n ' BGCOLOR="yellow">'  >>$TMP
+  echo -n ' bgcolor="yellow">'  >>$TMP
 else
-  echo -n ' BGCOLOR="#FF6666">' >>$TMP
+  echo -n ' bgcolor="#FF6666">' >>$TMP
 endif
-echo "$count1"' </TD><TD>' $USERDB'</TD></TR>' >>$TMP
+echo "$count1"' </td><td>' $USERDB'</td></tr>' >>$TMP
 
 
-echo -n '<TR><TD>Exports Pending </TD><TD' >> $TMP
+echo -n '<tr><td>Exports Pending </td><td' >> $TMP
 
 if ($count2 < 2) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
 else if ( ($count2 >= 2) && ($count2 < 6) ) then
-  echo -n ' BGCOLOR="yellow">'  >>$TMP
+  echo -n ' bgcolor="yellow">'  >>$TMP
 else
-  echo -n ' BGCOLOR="#FF6666">' >>$TMP
+  echo -n ' bgcolor="#FF6666">' >>$TMP
 endif
-echo "$count2"' </TD><TD>' $USERDB2'</TD></TR>' >>$TMP
+echo "$count2"' </td><td>' $USERDB2'</td></tr>' >>$TMP
 
-echo -n '<TR><TD>Exports in Queue </TD><TD' >> $TMP
+echo -n '<tr><td>Exports in Queue </td><td' >> $TMP
 
 if ($count3 < 7) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
-  echo "$count3"' </TD><TD>' $USERDB + $USERDB2'</TD></TR>' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
+  echo "$count3"' </td><td>' $USERDB + $USERDB2'</td></tr>' >>$TMP
 else if ( ($count3 >= 7) && ($count3 < 10) ) then
-  echo -n ' BGCOLOR="yellow">'  >>$TMP
-  echo "$count3"' </TD><TD>' $USERDB + $USERDB2'</TD></TR>' >>$TMP
+  echo -n ' bgcolor="yellow">'  >>$TMP
+  echo "$count3"' </td><td>' $USERDB + $USERDB2'</td></tr>' >>$TMP
 else
-  echo -n ' BGCOLOR="#FF6666">' >>$TMP
+  echo -n ' bgcolor="#FF6666">' >>$TMP
   set stat = green2
   @ g2 = 1
   set ex1 = `qstat | grep JSOC | head -1`
@@ -324,7 +324,7 @@ else
     @ exp1Lag = $extLag1 / 86400
     set exp1T = days
   endif
-  echo "$count3"' </TD><TD>' Tmax=$exp1Lag $exp1T, Tmin=$exp2Lag $exp2T'</TD></TR>' >>$TMP
+  echo "$count3"' </td><td>' Tmax=$exp1Lag $exp1T, Tmin=$exp2Lag $exp2T'</td></tr>' >>$TMP
 endif
 
 ### End of export monitoring ###
@@ -353,19 +353,19 @@ if ( $n > 1 ) then
   end
 endif
 
-echo '<TR><TD>&nbsp;<TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR>' >>$TMP
-echo -n '<TR><TD>Missing HMI Obs </TD><TD' >> $TMP
+echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
+echo -n '<tr><td>Missing HMI Obs </td><td' >> $TMP
 
 if ($missingDefinitive == 0 ) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
 else
-#  echo -n ' BGCOLOR="#FF6666">' >>$TMP
-   echo -n ' BGCOLOR="yellow">' >>$TMP
+#  echo -n ' bgcolor="#FF6666">' >>$TMP
+   echo -n ' bgcolor="yellow">' >>$TMP
 endif
 if ( $missingDefinitive == 0 ) then
-  echo "$missingDefinitive"' </TD><TD> Missing HMI Observables Records (10 days)</TD></TR>' >>$TMP
+  echo "$missingDefinitive"' </td><td> Missing HMI Observables Records (10 days)</td></tr>' >>$TMP
 else
-  echo "<A HREF=http://jsoc.stanford.edu/data/.showCov> $missingDefinitive </A>"' </TD><TD> Missing HMI Observables Records (10 days)</TD></TR>' >>$TMP
+  echo "<a href=http://jsoc.stanford.edu/data/.showCov> $missingDefinitive </a>"' </td><td> Missing HMI Observables Records (10 days)</td></tr>' >>$TMP
 endif
 
 
@@ -384,18 +384,18 @@ if ( $n > 1 ) then
   end
 endif
 
-echo -n '<TR><TD>Missing HMI NRT </TD><TD' >> $TMP
+echo -n '<tr><td>Missing HMI NRT </td><td' >> $TMP
 
 if ($missingNRT == 0 ) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
 else
-#  echo -n ' BGCOLOR="#FF6666">' >>$TMP
-   echo -n ' BGCOLOR="yellow">' >>$TMP
+#  echo -n ' bgcolor="#FF6666">' >>$TMP
+   echo -n ' bgcolor="yellow">' >>$TMP
 endif
 if ( $missingNRT == 0 ) then
-  echo "$missingNRT"' </TD><TD> Missing HMI NRT Records (3 days)</TD></TR>' >>$TMP
+  echo "$missingNRT"' </td><td> Missing HMI NRT Records (3 days)</td></tr>' >>$TMP
 else
-  echo "<A HREF=http://jsoc.stanford.edu/data/.showCovNRT> $missingNRT </A>"' </TD><TD> Missing HMI NRT Records (3 days)</TD></TR>' >>$TMP
+  echo "<a href=http://jsoc.stanford.edu/data/.showCovNRT> $missingNRT </a>"' </td><td> Missing HMI NRT Records (3 days)</td></tr>' >>$TMP
 endif
 
 
@@ -422,19 +422,19 @@ endif
 #endif
 
 
-echo '<TR><TD>&nbsp;<TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR>' >>$TMP
-echo -n '<TR><TD>Missing AIA Lev1 </TD><TD' >> $TMP
+echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
+echo -n '<tr><td>Missing AIA Lev1 </td><td' >> $TMP
 
 if ($missingDefAIA <= 0 ) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
 else
-#  echo -n ' BGCOLOR="#FF6666">' >>$TMP
-  echo -n ' BGCOLOR="yellow">' >>$TMP
+#  echo -n ' bgcolor="#FF6666">' >>$TMP
+  echo -n ' bgcolor="yellow">' >>$TMP
 endif
 if ( $missingDefAIA <= 0 ) then
-  echo "0"' </TD><TD> Missing AIA Lev1 Records (10 days)</TD></TR>' >>$TMP
+  echo "0"' </td><td> Missing AIA Lev1 Records (10 days)</td></tr>' >>$TMP
 else if ( $missingDefAIA > 0 ) then
-  echo "<A HREF=http://jsoc.stanford.edu/data/.showCovAIA> $missingDefAIA </A>"' </TD><TD> Missing AIA Lev1 Records (10 days)</TD></TR>' >>$TMP
+  echo "<a href=http://jsoc.stanford.edu/data/.showCovAIA> $missingDefAIA </a>"' </td><td> Missing AIA Lev1 Records (10 days)</td></tr>' >>$TMP
 endif
 
 if ( -z $showCovAIANRT ) then
@@ -453,21 +453,21 @@ if ( $n > 0 ) then
   end
 endif
 
-echo -n '<TR><TD>Missing AIA NRT </TD><TD' >> $TMP
+echo -n '<tr><td>Missing AIA NRT </td><td' >> $TMP
 
 if ( $missingAIANRT < 1200  ) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
 else
-#  echo -n ' BGCOLOR="#FF6666">' >>$TMP
-  echo -n ' BGCOLOR="yellow">' >>$TMP
+#  echo -n ' bgcolor="#FF6666">' >>$TMP
+  echo -n ' bgcolor="yellow">' >>$TMP
 endif
 if ( $missingAIANRT == 0 ) then
-  echo "$missingAIANRT"' </TD><TD> Missing AIA NRT Records (3 days)</TD></TR>' >>$TMP
+  echo "$missingAIANRT"' </td><td> Missing AIA NRT Records (3 days)</td></tr>' >>$TMP
 else
-  echo "<A HREF=http://jsoc.stanford.edu/data/.showCovAIANRT> $missingAIANRT </A>"' </TD><TD> Missing AIA NRT Records (3 days)</TD></TR>' >>$TMP
+  echo "<a href=http://jsoc.stanford.edu/data/.showCovAIANRT> $missingAIANRT </a>"' </td><td> Missing AIA NRT Records (3 days)</td></tr>' >>$TMP
 endif
 
-echo '<TR><TD>&nbsp;<TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR>' >>$TMP
+echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
 
 if ( -e /tmp/camera_anomaly ) then
   rm /tmp/camera_anomaly
@@ -489,15 +489,15 @@ endif
 
 @ totalBF = $BF1 + $BF2 + $BF3 + $BF4
 
-echo -n '<TR><TD>Datamin = 0</TD><TD' >> $TMP
+echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBF < 100 ) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
-  echo "$totalBF"' </TD><TD> ' >>$TMP 
-  echo "No AIA Camera Anomalies (last 600s)"'</TD></TR>' >> $TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
+  echo "$totalBF"' </td><td> ' >>$TMP 
+  echo "No AIA Camera Anomalies (last 600s)"'</td></tr>' >> $TMP
 else
   @ b = 1
-  echo -n ' BGCOLOR="#FF6666">' >>$TMP
-  echo "$totalBF"' </TD><TD> ' >>$TMP 
+  echo -n ' bgcolor="#FF6666">' >>$TMP
+  echo "$totalBF"' </td><td> ' >>$TMP 
   if ( $BF1 > 0 ) then
     echo "AIA Camera 1: $BF1    ">>$TMP
     echo "Bit Flip Camera Anomaly for AIA Camera 1" >> /tmp/camera_anomaly
@@ -514,7 +514,7 @@ else
     echo "AIA Camera 4: $BF4    " >>$TMP
     echo "Bit Flip Camera Anomaly for AIA Camera 4" >> /tmp/camera_anomaly
   endif
-  echo "</TD></TR>" >>$TMP
+  echo "</td></tr>" >>$TMP
 endif
 
 ### Look for Bit Flip Anomaly in HMI
@@ -527,15 +527,15 @@ endif
 
 @ totalBF = $BF1 + $BF2 
 
-echo -n '<TR><TD>Datamin = 0</TD><TD' >> $TMP
+echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBF < 100 ) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
-  echo "$totalBF"' </TD><TD> ' >>$TMP
-  echo "No HMI Camera Anomalies (last 600s)"'</TD></TR>' >> $TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
+  echo "$totalBF"' </td><td> ' >>$TMP
+  echo "No HMI Camera Anomalies (last 600s)"'</td></tr>' >> $TMP
 else
   @ b = 1
-  echo -n ' BGCOLOR="blue">' >>$TMP
-  echo "$totalBF"' </TD><TD> ' >>$TMP
+  echo -n ' bgcolor="blue">' >>$TMP
+  echo "$totalBF"' </td><td> ' >>$TMP
   if ( $BF1 > 0 ) then
     echo "HMI Camera 1: $BF1    ">>$TMP
     echo "Bit Flip Camera Anomaly for HMI Camera 1" >> /tmp/camera_anomaly
@@ -544,7 +544,7 @@ else
     echo "HMI Camera 2: $BF2    " >>$TMP
     echo "Bit Flip Camera Anomaly for HMI Camera 2" >> /tmp/camera_anomaly
   endif
-  echo "</TD></TR>" >>$TMP
+  echo "</td></tr>" >>$TMP
 endif
 
 ### Look for Bit Flip Anomaly in IRIS
@@ -560,15 +560,15 @@ set t2 = `$TIME_CONVERT s=$s_last | awk -F\_ '{print $1"_"$2}'`
 
 @ totalBF = $BF1 + $BF2
 
-echo -n '<TR><TD>Datamin = 0</TD><TD' >> $TMP
+echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBF < 100 ) then
-  echo -n ' BGCOLOR="#66FF66">' >>$TMP
-  echo "$totalBF"' </TD><TD> ' >>$TMP
-  echo "No IRIS Camera Anomalies (last 600 FSNs)"'</TD></TR>' >> $TMP
+  echo -n ' bgcolor="#66FF66">' >>$TMP
+  echo "$totalBF"' </td><td> ' >>$TMP
+  echo "No IRIS Camera Anomalies (last 600 FSNs)"'</td></tr>' >> $TMP
 else
   @ b = 1
-  echo -n ' BGCOLOR="blue">' >>$TMP
-  echo "$totalBF"' </TD><TD> ' >>$TMP
+  echo -n ' bgcolor="blue">' >>$TMP
+  echo "$totalBF"' </td><td> ' >>$TMP
   if ( $BF1 > 0 ) then
     echo "IRIS Camera 1: $BF1    ">>$TMP
     echo "Bit Flip Camera Anomaly for IRIS Camera 1" >> /tmp/camera_anomaly
@@ -577,18 +577,18 @@ else
     echo "IRIS Camera 2: $BF2    " >>$TMP
     echo "Bit Flip Camera Anomaly for IRIS Camera 2" >> /tmp/camera_anomaly
   endif
-  echo "</TD></TR>" >>$TMP
+  echo "</td></tr>" >>$TMP
 endif
 
 
-echo '</TABLE>' >>$TMP
-echo '<P>' >>$TMP
+echo '</table>' >>$TMP
+echo '<p>' >>$TMP
 
 
-echo 'Data times given are lag between observation time and the current time.<BR>' >>$TMP
-echo 'Web times given are sample of most recent 30 requests, avg, min, max.<BR>' >>$TMP
+echo 'Data times given are lag between observation time and the current time.<br>' >>$TMP
+echo 'Web times given are sample of most recent 30 requests, avg, min, max.<br>' >>$TMP
 echo 'Colors indicate: green -> as expected; yellow -> late; red -> very late; blue -> camera anomaly' >>$TMP
-echo '<P>' >>$TMP
+echo '<p>' >>$TMP
 
 if ($b == 1) then
   set favicon = blue_sq.gif 
@@ -610,8 +610,8 @@ else
   set favicon = green_sq.gif 
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh green
 endif
-echo '</BODY>' >>$TMP
-echo '<HEAD><link rel="stat icon" href="http://jsoc.stanford.edu/data/tmp/'$favicon'"></HEAD>' >>$TMP
-echo '</HTML>' >>$TMP
+echo '</body>' >>$TMP
+echo '<head><link rel="stat icon" href="http://jsoc.stanford.edu/data/tmp/'$favicon'"></head>' >>$TMP
+echo '</html>' >>$TMP
 
 mv $TMP $TARG/jsoc_proc_status.html
