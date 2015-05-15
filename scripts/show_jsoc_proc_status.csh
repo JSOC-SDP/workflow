@@ -60,8 +60,8 @@ echo '<HTML><HEAD><TITLE>JSOC Processing Status</TITLE><META HTTP-EQUIV="Refresh
 echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> $TMP
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
-set warning = `grep -v \> /web/jsoc/htdocs/ajax/URGENT_MOTD.html`
-echo "<BR><FONT COLOR=RED><B>$warning</FONT></B><BR>" >>$TMP
+#set warning = `grep -v \> /web/jsoc/htdocs/ajax/URGENT_MOTD.html`
+#echo "<BR><FONT COLOR=RED><B>$warning</FONT></B><BR>" >>$TMP
 echo '<P><TABLE WIDTH=800>' >>$TMP
 echo '<TR><TD>Product</TD><TD>Lag</TD><TD>Note</TD></TR>' >>$TMP
 
