@@ -54,7 +54,16 @@ set red = ($hred $ared $ired )
 
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set now_t = `$TIME_CONVERT time=$now`
-
+set last_update = `ls -l --time-style="+%Y.%m.%d_%H:%M" /web/jsoc/htdocs/data/jsoc_proc_status.html | awk '{print $6}'`
+@ last_update_s = `$TIME_CONVERT time=$last_update`
+@ update_lag = $now_t - $last_update_s
+if ( $update_lag > 600 ) then
+  set mail_list = jeneen,phil,kehcheng,rock,thailand
+  echo "$update_lag seconds" > /tmp/update_lag
+  echo "Run /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/show_jsoc_proc_status.csh to find error" >> /tmp/update_lag
+  @ min = $update_lag / 60
+  /usr/bin/Mail -s "Status Page Not Updated for $min minutes" $mail_list < /tmp/update_lag
+endif
 #echo "Content-type: text/html" >$TMP
 echo '<\!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">' >$TMP
 echo '<html><head><title>JSOC Processing Status</title><meta http-equiv="Refresh" content="60"></head><body link=black>' >>$TMP
