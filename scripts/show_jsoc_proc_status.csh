@@ -61,7 +61,7 @@ if ( $update_lag > 600 ) then
   set mail_list = jeneen,phil,kehcheng,rock,thailand
   echo "$update_lag seconds" > /tmp/update_lag
   echo "Run /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/show_jsoc_proc_status.csh to find error" >> /tmp/update_lag
-  @ min = $update_lag / 60
+  @ min = $update_lag_s / 60
   /usr/bin/Mail -s "Status Page Not Updated for $min minutes" $mail_list < /tmp/update_lag
 endif
 #echo "Content-type: text/html" >$TMP
