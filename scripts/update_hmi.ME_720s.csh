@@ -30,7 +30,7 @@ echo 0 > retstatus
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$WFDIR/scripts/make_vfisv $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
+echo "$WFDIR/scripts/make_vfisv -f $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
