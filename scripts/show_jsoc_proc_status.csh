@@ -501,7 +501,7 @@ endif
 @ totalBF = $BF1 + $BF2 + $BF3 + $BF4
 
 echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
-if ( $totalBF < 100 ) then
+if ( $totalBF < 50 ) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
   echo "$totalBF"' </td><td> ' >>$TMP 
   echo "No AIA Camera Anomalies (last 600s)"'</td></tr>' >> $TMP
