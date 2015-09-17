@@ -37,7 +37,6 @@ set key = `cat $WFDIR/gates/$GATE/key`
 set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
 set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_IQUV_averaging
 set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables
-set PolarF = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/meanpf
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_segment_module
 set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_patch_module
 set JV2TS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jv2ts
@@ -91,10 +90,9 @@ echo "$HMIprogram begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$T
 echo 'set OBSstatus = $?' >>$TEMPCMD
 echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
 
-# Remove limb darkening & calculate mean polar field
+# Remove limb darkening/create marmask
 
 echo "/home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_limbdark in=hmi.Ic_720s\["$wantlow"-"$wanthigh"]  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
-echo "$PolarF in=hmi.M_720s\["$wantlow"-"$wanthigh"] >>&$TEMPLOG" >>$TEMPCMD
 
 # Remap/Resize mags for synoptic charts
 

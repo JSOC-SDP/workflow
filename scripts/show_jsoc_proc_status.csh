@@ -492,7 +492,7 @@ endif
 #@ BF3 = `$SHOW_INFO -cq 'aia.lev0['$fsn0'/4000][?datamin=0?][?camera=3?]'`
 #@ BF4 = `$SHOW_INFO -cq 'aia.lev0['$fsn0'/4000][?datamin=0?][?camera=4?]'`
 
-@ then_t = $now_t - 1200
+@ then_t = $now_t - 600
 @ BF1 = `$SHOW_INFO -cq "aia.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=1?]"`
 @ BF2 = `$SHOW_INFO -cq "aia.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=2?]"`
 @ BF3 = `$SHOW_INFO -cq "aia.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=3?]"`
@@ -501,10 +501,10 @@ endif
 @ totalBF = $BF1 + $BF2 + $BF3 + $BF4
 
 echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
-if ( $totalBF < 50 ) then
+if ( $totalBF < 100 ) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
   echo "$totalBF"' </td><td> ' >>$TMP 
-  echo "No AIA Camera Anomalies (last 20m)"'</td></tr>' >> $TMP
+  echo "No AIA Camera Anomalies (last 600s)"'</td></tr>' >> $TMP
 else
   @ b = 1
   echo -n ' bgcolor="#FF6666">' >>$TMP
@@ -542,7 +542,7 @@ echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBF < 100 ) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
   echo "$totalBF"' </td><td> ' >>$TMP
-  echo "No HMI Camera Anomalies (last 4000 images)"'</td></tr>' >> $TMP
+  echo "No HMI Camera Anomalies (last 600s)"'</td></tr>' >> $TMP
 else
   @ b = 1
   echo -n ' bgcolor="blue">' >>$TMP
