@@ -148,6 +148,6 @@ if ( $retstatus == 0 ) then
   @ indexhigh++
   set vfisvhigh = `index_convert ds=$product $key"_index"=$indexhigh`
   set VFISV_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
-  set LATLON_TICKET = `$WFCODE/maketicket.csh gate=hmi.MrMap_latlon_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
+#  set LATLON_TICKET = `$WFCODE/maketicket.csh gate=hmi.MrMap_latlon_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 exit $retstatus
