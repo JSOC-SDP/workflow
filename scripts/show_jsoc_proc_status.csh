@@ -60,7 +60,7 @@ set last_update = `ls -l --time-style="+%Y.%m.%d_%H:%M" /web/jsoc/htdocs/data/js
 @ last_update_s = `$TIME_CONVERT time=$last_update`
 @ update_lag = $now_pacific_s - $last_update_s
 if ( $update_lag > 600 ) then
-  set mail_list = jeneen,phil,kehcheng,rock,thailand
+  set mail_list = jeneen,phil,kehcheng,thailand
   echo "/web/jsoc/htdocs/data/jsoc_proc_status.html is $update_lag seconds old" > /tmp/update_lag
   echo "Run /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/show_jsoc_proc_status.csh to find error" >> /tmp/update_lag
   @ min = $update_lag / 60
