@@ -101,13 +101,19 @@ set last_mask = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[\$] key=t_rec`
 set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
 @ maskMag_s = `$TIME_CONVERT time=$maskMag`
 @ i = 1
+set next_mag_s = $last_mask_s + 720
+set next_mag = `$TIME_CONVERT s=$next_mag_s`
+
 while ( $i < 36 )  # 9 hours, allowing for long maneuvers 
-  while ( $maskMag_s < 0 )
-    sleep 900
+  @ good_mags = `$SHOW_INFO hmi.M_720s_nrt'['$next_mag'/1h][? quality > 0 ?]' -cq`
+  if ( good_mags == 0 ) then
     touch $HERE/NO_GOOD_MAG
-    set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_rec`
+    sleep 900
+    set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
     @ maskMag_s = `$TIME_CONVERT time=$maskMag`
-  end
+    @ next_mag_s = $last_mask_s + 720
+    set next_mag = `$TIME_CONVERT s=$next_mag_s`
+  endif
   @ i++
 end
 
