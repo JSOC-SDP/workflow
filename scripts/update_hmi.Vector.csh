@@ -57,7 +57,7 @@ set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
 set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
-set timename = VEC
+set timename = CVEC
 set qsubname = $timename$timestr
 
 if ($indexhigh < $indexlow) then
