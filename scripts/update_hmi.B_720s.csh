@@ -55,11 +55,11 @@ echo 6 > $HERE/retstatus
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set DIS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig_v3
 set ARGS = "AMBNEQ=100 AMBTFCTR=0.98 OFFSET=50 AMBNPAD=200 AMBNTX=30 AMBNTY=30 AMBNAP=10 AMBSEED=4 errlog=$TEMPLOG" 
-set MProj = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/maproj3comperrorlonat02deg
-set RESIZE = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/resizeb3compwitherror
+set MAPROJ = /home/jsoc/cvs/Development/waystation/JSOC/bin/$JSOC_MACHINE/maproj3comperrorlonat02deg
+set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree clat=0.0"
 
 # make qsub scripts
-#
+
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
@@ -68,9 +68,8 @@ echo 'set HMIBstatus=6' >>&$TEMPCMD
 
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
   echo "$DIS in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
-#  echo "$MProj in=hmi.B_720s'['$T']' out=hmi.Bmap_latlon_720s cols=9000 rows=9000 scale=0.02 map=carree clat=0.0" >> $TEMPCMD
-#  echo "$RESIZE in=hmi.Bmap_latlon_720s'['$T']' out=hmi.Bmap_lowres_latlon_720s u=1 h=1 scale=0.1 method=boxcar" >> $TEMPCMD
 end
+echo "$MAPROJ in=hmi.B_720s'['$wantlow'-'$wanthigh']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS" >> $TMPCMD
 echo 'set HMIBstatus = $?' >>$TEMPCMD
 echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
