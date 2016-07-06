@@ -130,9 +130,11 @@ touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD 
 
-set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
-set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+if ( -e retstatus ) set retstatus = `cat $HERE/retstatus`
+if ( $retstatus == 0 ) then
+  set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+endif
 #set REMAP_TICKET = `$WFCODE/maketicket.csh gate=hmi.MrMap_latlon_720s_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 
-if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus
