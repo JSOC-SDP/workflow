@@ -512,18 +512,22 @@ else
   if ( $BF1 > 0 ) then
     echo "AIA Camera 1: $BF1    ">>$TMP
     echo "Bit Flip Camera Anomaly for AIA Camera 1" >> /tmp/camera_anomaly
+    echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF2 > 0 ) then
     echo "AIA Camera 2: $BF2    " >>$TMP
     echo "Bit Flip Camera Anomaly for AIA Camera 2" >> /tmp/camera_anomaly
+    echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF3 > 0 ) then
     echo "AIA Camera 3: $BF3    " >>$TMP
     echo "Bit Flip Camera Anomaly for AIA Camera 3" >> /tmp/camera_anomaly
+    echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF4 > 0 ) then
     echo "AIA Camera 4: $BF4    " >>$TMP
     echo "Bit Flip Camera Anomaly for AIA Camera 4" >> /tmp/camera_anomaly
+    echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   echo "</td></tr>" >>$TMP
 endif
@@ -535,8 +539,12 @@ endif
 #@ BF2 = `$SHOW_INFO -cq 'hmi.lev0a['$fsn0'/4000][?datamin=0?][?camera=2?]'`
 @ BF1 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin=0?][?camera=1?]"`
 @ BF2 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin=0?][?camera=2?]"`
+@ BAD1 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin<0?][?camera=1?]"`
+@ BAD2 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin<0?][?camera=2?]"`
 
 @ totalBF = $BF1 + $BF2 
+@ totalBAD = $BAD1 + $BAD2
+echo "$totalBAD"
 
 echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBF < 100 ) then
@@ -550,13 +558,31 @@ else
   if ( $BF1 > 0 ) then
     echo "HMI Camera 1: $BF1    ">>$TMP
     echo "Bit Flip Camera Anomaly for HMI Camera 1" >> /tmp/camera_anomaly
+    echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF2 > 0 ) then
     echo "HMI Camera 2: $BF2    " >>$TMP
     echo "Bit Flip Camera Anomaly for HMI Camera 2" >> /tmp/camera_anomaly
+    echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   echo "</td></tr>" >>$TMP
 endif
+
+if ( $totalBAD > 0 ) then
+  @ b = 1
+  echo -n ' bgcolor="blue">' >>$TMP
+  echo "$totalBAD"' </td><td> ' >>$TMP
+  if ( $BAD1 > 0 ) then
+    echo "HMI Camera 1: $BAD1    ">>$TMP
+    echo "HMI Camera 1 Error" >> /tmp/camera_bad
+  endif
+  if ( $BAD2 > 0 ) then
+    echo "HMI Camera 2: $BAD2    " >>$TMP
+    echo "HMI Camera 2 Error" >> /tmp/camera_bad
+  endif
+  echo "</td></tr>" >>$TMP
+endif
+
 
 ### Look for Bit Flip Anomaly in IRIS
 
@@ -584,10 +610,12 @@ else
   if ( $BF1 > 0 ) then
     echo "IRIS Camera 1: $BF1    ">>$TMP
     echo "Bit Flip Camera Anomaly for IRIS Camera 1" >> /tmp/camera_anomaly
+    echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF2 > 0 ) then
     echo "IRIS Camera 2: $BF2    " >>$TMP
     echo "Bit Flip Camera Anomaly for IRIS Camera 2" >> /tmp/camera_anomaly
+    echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder`
   endif
   echo "</td></tr>" >>$TMP
 endif
@@ -607,6 +635,7 @@ if ($b == 1) then
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh blue
   if ( ! -e /home/jeneen/CAMERA_ANOMALY.lock ) then
     /usr/bin/Mail -s 'Important:  Camera Anomaly' jsoc_ops@lmsal.com < /tmp/camera_anomaly
+    /usr/bin/Mail -s 'Remove cameral anomaly temp files' jeneen < /tmp/camera_anomaly_reminder
     touch /home/jeneen/CAMERA_ANOMALY.lock
   endif
 else if ($r == 1) then
