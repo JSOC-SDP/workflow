@@ -635,7 +635,7 @@ if ($b == 1) then
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh blue
   if ( ! -e /home/jeneen/CAMERA_ANOMALY.lock ) then
     /usr/bin/Mail -s 'Important:  Camera Anomaly' jsoc_ops@lmsal.com < /tmp/camera_anomaly
-    /usr/bin/Mail -s 'Remove cameral anomaly temp files' jeneen < /tmp/camera_anomaly_reminder
+    /usr/bin/Mail -s 'Remove cameral anomaly temp files' jsoc_ops@lmsal.com < /tmp/camera_anomaly_reminder
     touch /home/jeneen/CAMERA_ANOMALY.lock
   endif
 else if ($r == 1) then
