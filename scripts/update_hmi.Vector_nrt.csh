@@ -42,6 +42,7 @@ set HMI_limbdark = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_limbdar
 set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_segment_module
 set JV2TS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jv2ts
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 
 #set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1_nrt quicklook=1"
 #set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=0 cadence=720.0 lev1=hmi.lev1_nrt"
