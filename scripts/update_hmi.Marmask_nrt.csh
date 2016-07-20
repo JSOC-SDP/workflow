@@ -55,7 +55,7 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus=0' >>&$TEMPCMD
 
-@ count = $SHOW_INFO -qc hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality > 0 ?]'`
+@ count = `$SHOW_INFO -qc hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality > 0 ?]'`
 if ( $count == 0 ) then
   exit
 endif
