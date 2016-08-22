@@ -54,7 +54,7 @@ echo "hostname >>&$LOG" >>$CMD
 echo "set echo >>&$LOG" >>$CMD
 echo 'set retstatus=6' >>&$CMD
 
-foreach T ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
+foreach T ( `$SHOW_INFO -q hmi.M_720s_nrt'['$wantlow'-'$wanthigh']' key=t_rec` )
   echo "$MAPROJ -v in=hmi.M_720s_nrt'['$T']' out=hmi.Mrmap_latlon_720s_nrt $MAPARGS" >> $CMD
 end
 echo 'set retstatus = $?' >>$CMD
