@@ -21,7 +21,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QUE = k.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -33,20 +33,17 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
-set MAPROJ = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/maproj
-set JSOC_REBIN = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jsoc_rebin
+set MAPROJ = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/maprojlonat02deg
 set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree -R clat=0.0"
-set BINARGS = "u=1 h=1 scale=0.1 method=boxcar"
 
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
-set timename = LL
+set timename = MrMap
 set qsubname = $timename$timestr
 
 set LOG = $HERE/runlog
-set babble = $HERE/babble
 set CMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
@@ -57,9 +54,8 @@ echo "hostname >>&$LOG" >>$CMD
 echo "set echo >>&$LOG" >>$CMD
 echo 'set retstatus=6' >>&$CMD
 
-foreach T ( `$SHOW_INFO -q hmi.M_720s_nrt'['$wantlow'-'$wanthigh']' key=t_rec` )
-  echo "$MAPROJ -v in=hmi.M_720s_nrt'['$T']' out=hmi.Mrmap_latlon_720s_nrt $MAPARGS" >> $CMD
-  echo "$JSOC_REBIN in=hmi.Mrmap_latlon_720s_nrt'['$T']' out=hmi.Mrmap_latlon_900x900_720s_nrt $BINARGS" >> $CMD
+foreach T ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
+  echo "$MAPROJ -v in=hmi.M_720s'['$T']' out=hmi.Mrmap_latlon_720s_nrt $MAPARGS" >> $CMD
 end
 echo 'set retstatus = $?' >>$CMD
 echo 'if ($retstatus) goto DONE' >>&$CMD
