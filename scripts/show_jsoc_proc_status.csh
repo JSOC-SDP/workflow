@@ -569,8 +569,8 @@ else
 endif
 
 if ( $totalBAD > 0 ) then
-  @ b = 1
-  echo -n ' bgcolor="blue">' >>$TMP
+  @ o = 1
+  echo -n ' bgcolor="#FF6600">' >>$TMP
   echo "$totalBAD"' </td><td> ' >>$TMP
   if ( $BAD1 > 0 ) then
     echo "HMI Camera 1: $BAD1    ">>$TMP
@@ -638,6 +638,10 @@ if ($b == 1) then
     /usr/bin/Mail -s 'Remove cameral anomaly temp files' jsoc_ops@lmsal.com < /tmp/camera_anomaly_reminder
     touch /home/jeneen/CAMERA_ANOMALY.lock
   endif
+else if ($o ==1 ) then
+  set favicon = orange_sq.gif
+  /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh orange
+  /usr/bin/Mail -s 'Bad Images Found' jeneen < /tmp/camera_bad
 else if ($r == 1) then
   set favicon = red_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh red
