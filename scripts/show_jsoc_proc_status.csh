@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-#set echo
+set echo
 source /home/jsoc/.setJSOCenv
 setenv SGE_ROOT /SGE2
 set TARG = /web/jsoc/htdocs/data
@@ -47,6 +47,7 @@ set yellow = ($hyellow $ayellow $iyellow )
 set red = ($hred $ared $ired )
 
 @ b = 0
+@ o = 0
 @ r = 0
 @ y = 0
 @ g = 0
@@ -638,7 +639,7 @@ if ($b == 1) then
     /usr/bin/Mail -s 'Remove cameral anomaly temp files' jsoc_ops@lmsal.com < /tmp/camera_anomaly_reminder
     touch /home/jeneen/CAMERA_ANOMALY.lock
   endif
-else if ($o ==1 ) then
+else if ($o == 1 ) then
   set favicon = orange_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh orange
   /usr/bin/Mail -s 'Bad Images Found' jeneen < /tmp/camera_bad
