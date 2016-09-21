@@ -12,6 +12,8 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
+set BASEDIR = /tmp28 
+
 set HERE = $cwd
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
 set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
@@ -19,7 +21,7 @@ set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 set MASKSERIES = hmi.Marmask_720s
 set HARPSERIES = hmi.Mharp_720s
-set OUTDIR = /surge40/jsocprod/HARPS/definitive/tmp
+set OUTDIR = $BASEDIR/jsocprod/HARPS/definitive/tmp
 if ( ! -e $OUTDIR ) then
   mkdir -p $OUTDIR
 endif
@@ -69,9 +71,9 @@ foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
   @ year = `echo $trec | awk -F\. '{print $1}'`
   set mo = `echo $trec | awk -F\. '{print $2}'`
   set dy = `echo $trec | awk -F\. '{print $3}' | awk -F\_ '{print $1}'`
-  mkdir -p /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy
+  mkdir -p $BASEDIR/jsocprod/HARPS/definitive/images/$year/$mo/$dy
   echo "if ( -e $file ) then" >>$CMDFILE
-  echo "  mv $file /surge40/jsocprod/HARPS/definitive/images/$year/$mo/$dy" >> $CMDFILE
+  echo "  mv $file $BASEDIR/jsocprod/HARPS/definitive/images/$year/$mo/$dy" >> $CMDFILE
   echo "endif" >> $CMDFILE
 end
 
