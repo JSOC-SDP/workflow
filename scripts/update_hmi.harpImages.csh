@@ -12,7 +12,7 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
-set BASEDIR = /tmp28 
+set BASEDIR = /surge40
 
 set HERE = $cwd
 set SRCTREE = /home/jsoc/cvs/Development/JSOC
