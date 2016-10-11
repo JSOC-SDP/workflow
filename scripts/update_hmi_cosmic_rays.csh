@@ -91,7 +91,7 @@ set N_NOCR = 100000000
 if ($ACTION == 4 && $FIXMISSING == 0) then
   set loopcount = 0
   while ($N_NOCR > 0)
-    show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 AND HFTSACID < 2000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
+    show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
     comm -23 FSN_lev1 FSN_cosmic > NOCR
     set N_NOCR = `wc -l <NOCR`
     echo "Lev1 records without cosmic ray records count = " $N_NOCR >>$LOG
@@ -110,7 +110,7 @@ if ($ACTION == 4 && $FIXMISSING == 0) then
 endif
 
 if ($ACTION == 4) then
-  show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 AND HFTSACID < 2000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
+  show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
   comm -23 FSN_lev1 FSN_cosmic > NOCR
   set N_NOCR = `wc -l <NOCR`
   echo "Lev1 records without cosmic ray records count = " $N_NOCR >>$LOG
@@ -261,7 +261,7 @@ endif # DO_POST
 
 # verify make of cosmic ray records
 
-show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 AND HFTSACID < 2000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
+show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
 comm -23 FSN_lev1 FSN_cosmic > NOCR
 set N_NOCR = `wc -l <NOCR`
 echo "Lev1 records now without cosmic ray records count = " $N_NOCR >>$LOG
