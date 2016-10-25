@@ -107,8 +107,8 @@ set next_mag = `$TIME_CONVERT s=$next_mag_s`
 
 while ( $i < 36 )  # 9 hours, allowing for long maneuvers 
   @ good_mags = `$SHOW_INFO hmi.M_720s_nrt'['$next_mag'/1h][? quality > 0 ?]' -cq`
-  if ( $good_mags < 2 ) then 
-#  if ( $good_mags == 0 ) then
+#  if ( $good_mags < 2 ) then 
+  if ( $good_mags == 0 ) then
     touch $HERE/NO_GOOD_MAG
     sleep 120
     set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
