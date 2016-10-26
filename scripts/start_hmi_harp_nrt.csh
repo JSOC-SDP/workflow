@@ -50,7 +50,6 @@ endif
 
 set WFDIR = $WORKFLOW_DATA
 set WFCODE = $WORKFLOW_ROOT
-echo $WORKFLOW_ROOT > $HERE/WORKFLOW_ROOT
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set MHarp = /home/jsoc/cvs/Development/JSOC/proj/mag/harp/scripts/track_and_ingest_mharp.sh
