@@ -110,7 +110,12 @@ while ( $i <= 270 )  # 9 hours, allowing for long maneuvers
   @ last_mask_recnum = `$SHOW_INFO hmi.marmask_720s_nrt'[$]' -rq`
   @ prev_mask_recnum = $last_mask_recnum - 1
   @ good_mags = `$SHOW_INFO hmi.marmask_720s_nrt'[:#'$prev_mask_recnum'/2][? quality > 0 ?]' -qc`
-  if ( $good_mags < 2 ) then   
+  set last_T = `$SHOW_INFO hmi.marmask_720s_nrt'[:#'$last_mask_recnum'/2][? quality > 0 ?]' -q key=t_obs`
+  set prev_T = `$SHOW_INFO hmi.marmask_720s_nrt'[:#'$prev_mask_recnum'/2][? quality > 0 ?]' -q key=t_obs`
+  @ last_T_s = `$TIME_CONVERT time=$last_T`
+  @ prev_T_s = `$TIME_CONVERT time=$prev_T`
+  @ Tdiff = $last_T_s - $prev_T_s
+  if ( ($good_mags < 2) && ($Tdiff == 720) ) then   
     echo "$i"/"270 good_mags:  $good_mags  last mask:  $last_mask  last harp:  $last_harp" > $HERE/NO_GOOD_DATA
     sleep 120
     @ i++
