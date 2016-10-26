@@ -90,7 +90,7 @@ set key = `cat $WFDIR/gates/$GATE/key`
 
 # NOTE:  there may be 720s mags without masks due to quality bits in the VEC data.
 
-set echo
+#set echo
 
 # Look for harps that need to be processed
 
@@ -105,14 +105,13 @@ set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
 @ next_mag_s = $last_mask_s + 720
 set next_mag = `$TIME_CONVERT s=$next_mag_s`
 set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1`
-set last_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[]' key=t_rec n=-1`
 
 
 while ( $i <= 270 )  # 9 hours, allowing for long maneuvers 
-  @ good_mags = `$SHOW_INFO hmi.M_720s_nrt'['$last_harp'-'$next_mag'][? quality >= 0 ?]' -cq`
+  @ good_mags = `$SHOW_INFO hmi.M_720s_nrt'['$last_harp'-'$last_mask'][? quality >= 0 ?]' -cq`
   if ( $good_mags <= 2 ) then   # this allows for the last harp and the first one coming out of a maneuver
     touch $HERE/NO_GOOD_MAG
-    echo "$i'/'270' last mask:  $last_mask  last harp:  $last_harp" > $HERE/NO_GOOD_MAG 
+    echo "$i"/"270 last mask:  $last_mask  last harp:  $last_harp" > $HERE/NO_GOOD_MAG 
     sleep 120
     set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
     @ maskMag_s = `$TIME_CONVERT time=$maskMag`
