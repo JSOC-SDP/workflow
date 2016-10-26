@@ -107,23 +107,23 @@ set next_mag = `$TIME_CONVERT s=$next_mag_s`
 set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1`
 
 
-#while ( $i < 270 )  # 9 hours, allowing for long maneuvers 
-#  @ good_mags = `$SHOW_INFO hmi.M_720s_nrt'['$last_harp'-'$next_mag'][? quality > 0 ?]' -cq`
-#  if ( $good_mags == 0 ) then
-#    touch $HERE/NO_GOOD_MAG
-#    echo "$i last mag:  $next_mag  last harp:  $last_harp" > $HERE/NO_GOOD_MAG 
-#    sleep 120
-#    set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
-#    @ maskMag_s = `$TIME_CONVERT time=$maskMag`
-#    @ next_mag_s = $last_mask_s + 720
-#    set next_mag = `$TIME_CONVERT s=$next_mag_s`
-#    @ i++
-#  else
-#    @ i = 271
-#  endif
-#end
+while ( $i <= 270 )  # 9 hours, allowing for long maneuvers 
+  @ good_mags = `$SHOW_INFO hmi.M_720s_nrt'['$last_harp'-'$next_mag'][? quality > 0 ?]' -cq`
+  if ( $good_mags == 0 ) then
+    touch $HERE/NO_GOOD_MAG
+    echo "$i'/'270' last mask:  $last_mask  last harp:  $last_harp" > $HERE/NO_GOOD_MAG 
+    sleep 120
+    set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
+    @ maskMag_s = `$TIME_CONVERT time=$maskMag`
+    @ next_mag_s = $last_mask_s + 720
+    set next_mag = `$TIME_CONVERT s=$next_mag_s`
+    @ i++
+  else
+    @ i = 271
+  endif
+end
 
-#rm $HERE/NO_GOOD_MAG
+rm $HERE/NO_GOOD_MAG
 
 set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1` 
 @ last_harp_s = `$TIME_CONVERT time=$last_harp`
