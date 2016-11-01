@@ -134,8 +134,10 @@ set last_good_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' key=t_rec
 @ last_mag_s = `$TIME_CONVERT time=$last_mag`
 @ last_good_mag_s = `$TIME_CONVERT time=$last_good_mag`
 @ mag_lag = $last_mag_s - $last_good_mag_s 
+set last_two_good_mag_r = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' -r n=-2`
+@ rdiff = $last_two_good_mag_r[2] - $last_two_good_mag_r[1]
 
-while ( ($harp_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) || ($mag_lag > 0) )
+while ( ($harp_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) || ($mag_lag > 0) || ($rdiff != 1) )
   if ( $harp_lag < 1440) then
     echo $harp_lag > $HERE/WAITING_HARP_LAG
   else if ( -e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) then
@@ -154,6 +156,8 @@ while ( ($harp_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_
   @ last_mag_s = `$TIME_CONVERT time=$last_mag`
   @ last_good_mag_s = `$TIME_CONVERT time=$last_good_mag`
   @ mag_lag = $last_mag_s - $last_good_mag_s
+    set last_two_good_mag_r = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' -r n=-2`
+  @ rdiff = $last_two_good_mag_r[2] - $last_two_good_mag_r[1]
 end
 
 rm $HERE/WAITING*
