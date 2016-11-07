@@ -629,6 +629,7 @@ echo '<p>' >>$TMP
 echo 'Data times given are lag between observation time and the current time.<br>' >>$TMP
 echo 'Web times given are sample of most recent 30 requests, avg, min, max.<br>' >>$TMP
 echo 'Colors indicate: green -> as expected; yellow -> late; red -> very late; blue -> camera anomaly' >>$TMP
+echo 'orange -> datamin < 0 (Ground station issues, likely)' >>$TMP
 echo '<p>' >>$TMP
 
 if ($b == 1) then
@@ -642,7 +643,7 @@ if ($b == 1) then
 else if ($o == 1 ) then
   set favicon = orange_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh orange
-  /usr/bin/Mail -s 'Bad Images Found' jeneen < /tmp/camera_bad
+  /usr/bin/Mail -s 'Bad Images Found' jeneen,baldner,zoe@lmsal.com < /tmp/camera_bad
 else if ($r == 1) then
   set favicon = red_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh red
