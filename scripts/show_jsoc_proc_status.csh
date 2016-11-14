@@ -570,25 +570,12 @@ else
 endif
 
 if ( $totalBAD > 0 ) then
-  if ( -e /tmp/camera_bad ) then
-    @ nowS =  `date +%s`
-    @ fileS = `stat -c %Z /tmp/camera_bad`
-    @ diffS = $nowS - $fileS
-    set badFileDays = `$ARITH $diffS / 86400`
-    if ( $badFileDays > 1 ) then
-      rm /tmp/camera_bad
-    endif
-  endif
+  rm /tmp/camera_bad
   @ o = 1
   echo -n ' bgcolor="#FF6600">' >>$TMP
   echo "$totalBAD"' </td><td> ' >>$TMP
-  if ( $BAD1 > 0 ) then
-    echo "HMI Camera 1: $BAD1    ">>$TMP
-    echo "HMI Camera 1 datamin < 0 (likely problems at SDOGS)" >> /tmp/camera_bad
-  endif
-  if ( $BAD2 > 0 ) then
-    echo "HMI Camera 2: $BAD2    " >>$TMP
-    echo "HMI Camera 2 datamin < 0 (likely problems at SDOGS)" >> /tmp/camera_bad
+  if ( $BAD1 > 0 || $BAD2 > 0 ) then
+    $SHOW_INFO -i "hmi.lev0a[? t_obs > $then_t ?][?datamin<0?]" key=datamin  > /tmp/camera_bad
   endif
   echo "</td></tr>" >>$TMP
 endif
