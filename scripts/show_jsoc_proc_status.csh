@@ -570,16 +570,25 @@ else
 endif
 
 if ( $totalBAD > 0 ) then
+  if ( -e /tmp/camera_bad ) then
+    @ nowS =  `date +%s`
+    @ fileS = `stat -c %Z /tmp/camera_bad`
+    @ diffS = $nowS - $fileS
+    set badFileDays = `$ARITH $diffS / 86400`
+    if ( $badFileDays > 1 ) then
+      rm /tmp/camera_bad
+    endif
+  endif
   @ o = 1
   echo -n ' bgcolor="#FF6600">' >>$TMP
   echo "$totalBAD"' </td><td> ' >>$TMP
   if ( $BAD1 > 0 ) then
     echo "HMI Camera 1: $BAD1    ">>$TMP
-    echo "HMI Camera 1 Error" >> /tmp/camera_bad
+    echo "HMI Camera 1 datamin < 0 (likely problems at SDOGS)" >> /tmp/camera_bad
   endif
   if ( $BAD2 > 0 ) then
     echo "HMI Camera 2: $BAD2    " >>$TMP
-    echo "HMI Camera 2 Error" >> /tmp/camera_bad
+    echo "HMI Camera 2 datamin < 0 (likely problems at SDOGS)" >> /tmp/camera_bad
   endif
   echo "</td></tr>" >>$TMP
 endif
@@ -643,7 +652,7 @@ if ($b == 1) then
 else if ($o == 1 ) then
   set favicon = orange_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh orange
-  /usr/bin/Mail -s 'Bad Images Found' jeneen,baldner,zoe@lmsal.com < /tmp/camera_bad
+  /usr/bin/Mail -s 'HMI images with datamin < 0 found' jeneen,baldner,zoe@lmsal.com < /tmp/camera_bad
 else if ($r == 1) then
   set favicon = red_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh red
