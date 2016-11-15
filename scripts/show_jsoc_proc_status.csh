@@ -540,8 +540,9 @@ endif
 #@ BF2 = `$SHOW_INFO -cq 'hmi.lev0a['$fsn0'/4000][?datamin=0?][?camera=2?]'`
 @ BF1 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin=0?][?camera=1?]"`
 @ BF2 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin=0?][?camera=2?]"`
-@ BAD1 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin<0?][?camera=1?]"`
-@ BAD2 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin<0?][?camera=2?]"`
+@ bad_t = $now_t - 300
+@ BAD1 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $bad_t ?][?datamin<0?][?camera=1?]"`
+@ BAD2 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $bad_t ?][?datamin<0?][?camera=2?]"`
 
 @ totalBF = $BF1 + $BF2 
 @ totalBAD = $BAD1 + $BAD2
