@@ -21,7 +21,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QSUB = /SGE/bin/lx24-amd64/qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QUE = a.q
-  set QSUB = /SGE/bin/lx24-amd64/qsub2
+  set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
 #set QSUB = $SGE_ROOT/bin/$SGE_ARCH
@@ -36,7 +36,7 @@ set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/lfwrp_tas
 #set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/lfwrp
 
-set TMPDIR = /surge40/jsocprod/lfwrp
+set TMPDIR = /tmp28/jsocprod/lfwrp
 
 set product = `/bin/cat $WFDIR/gates/$GATE/product`
 set key = `/bin/cat $WFDIR/gates/$GATE/key`
