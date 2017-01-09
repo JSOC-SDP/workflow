@@ -5,10 +5,10 @@
 ### NOT OK to process them out of order.  If a problem arises, they
 ### must be restarted from the last good record.  To do that:
 ###
-### 1.  mv /tmp28/jsocprod/HARPS/nrt/ /tmp28/jsocprod/HARPS/nrt.<DATE>
-### 2.  mkdir -p /tmp28/jsocprod/HARPS/nrt/Tracks/jsoc
+### 1.  mv /surge40/jsocprod/HARPS/nrt/ /surge40/jsocprod/HARPS/nrt.<DATE>
+### 2.  mkdir -p /surge40/jsocprod/HARPS/nrt/Tracks/jsoc
 ### 3.  set dir = `show_info -p hmi.Mharp_log_720s_nrt\[<LAST GOOD T_REC>]`
-### 4.  cp $dir/track-post.mat /tmp28/jsocprod/HARPS/nrt/Tracks/jsoc/track-prior.mat
+### 4.  cp $dir/track-post.mat /surge40/jsocprod/HARPS/nrt/Tracks/jsoc/track-prior.mat
 ### 5.  rerun harps by hand to catch up:  /home/jeneen/campaigns/scripts/hmi/do_Mharps_by_hand.csh <START> <END>
 ###     example:  /home/jeneen/campaigns/scripts/hmi/do_Mharps_by_hand.csh 2012.03.01_10:12:00_TAI 2012.03.01_14:24:00_TAI 
 ### 6.  restart NRT HARPs pipeline:  /home/jsoc/cvs/Development/JSOC/proj/workflow/maketicket.csh gate=repeat_harps_nrt wantlow=<NEXT TREC> wanthigh=<NEXT TREC> action=5
@@ -192,7 +192,7 @@ echo "cd $HERE" >>$CMD
 echo "hostname >>&$TEMPLOG" >>$CMD
 echo "set echo" >>$CMD
 
-echo "setenv TMPDIR /tmp28/jsocprod/HARPS/nrt/" >>$CMD
+echo "setenv TMPDIR /surge40/jsocprod/HARPS/nrt/" >>$CMD
 echo "set MHarpstatus = 0" >>&$CMD
 set Htimes
 
@@ -207,7 +207,7 @@ while ( $nextH_s < $last_mask_s )
   else
     set Htimes = ($Htimes $nextH)
     echo "touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
-    echo "$MHarp -n /tmp28/jsocprod/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] hmi.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
+    echo "$MHarp -n /surge40/jsocprod/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] hmi.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
     echo 'set MHarpstatus = $?' >> $CMD
     echo 'if ($MHarpstatus) goto DONE' >>&$CMD
     echo "/home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/harp_nrt_movies.csh" >> $CMD
