@@ -103,9 +103,10 @@ echo "$PolarF in=hmi.M_720s\["$wantlow"-"$wanthigh"] >>&$TEMPLOG" >>$TEMPCMD
 @ wantlow_s = `$TIME_CONVERT time=$wantlow`
 @ wanthigh_s = `$TIME_CONVERT time=$wanthigh`
 @ diff = $wanthigh_s - $wantlow_s
-set t = $diff's'
+@ diff2 = $diff + 360   #  add 6 minutes, otherwise last record isn't included
+set t = $diff2's'
 if ( $diff < 720 ) then
-  set t = 720s
+  set t = 1080s
 endif
 
 echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=hmi.M_720s\["$wantlow"/"$t"] v2hout=hmi.Ml_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
