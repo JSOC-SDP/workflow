@@ -37,7 +37,8 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv
-set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/$JSOC_MACHINE/show_info
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
+set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 
 #set indexlow = `index_convert ds=$product $key=$WANTLOW`
 #set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
@@ -86,7 +87,10 @@ $QSUB -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
-  set B_TICKET = `$WFCODE/maketicket.csh gate=hmi.B_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
+  @ s = `$TIME_CONVERT time=$wanthigh`
+  @ sB = $s + 360
+  set BHigh = `$TIME_CONVERT s=$sB zone=TAI`
+  set B_TICKET = `$WFCODE/maketicket.csh gate=hmi.B_720s wantlow=$wantlow wanthigh=$BHigh action=5`
 endif
 exit $retstatus
 
