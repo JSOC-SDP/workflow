@@ -14,4 +14,4 @@ cd $WORKFLOW_DATA
 # only completed tasks will have old logs removed.
 
 set NOW = `date +%Y%m%d_%H%M`
-$WORKFLOW_ROOT/cleanup.csh >& $WORKFLOW_DATA/cleanup_log.$NOW
+$WORKFLOW_ROOT/cleanup.csh >& $WORKFLOW_DATA/cleanup_logs/cleanup_log.$NOW
