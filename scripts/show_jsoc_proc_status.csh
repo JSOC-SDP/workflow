@@ -90,7 +90,13 @@ while ($iprod <= $nprod)
     set times = ` head -1 /web/jsoc/htdocs/data/hmi/images/image_times`
     set times = `echo $times[2] | awk --  'BEGIN {FIELDWIDTHS = "4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%s_TAI",$1,$2,$3,$5,$6,$7)}'`
   else if ($prod == hmi.MHarp_720s_nrt ) then
-    set times = `$SHOW_INFO -q key=T_OBS $prod'[][$][? T_OBS > 0 ?]' n=-1`
+    set Z = `$SHOW_INFO -q key=T_OBS $prod'[][$][? T_OBS > 0 ?]' -c`
+    if ( $Z == 1 ) then
+      set times = `$SHOW_INFO -q key=T_OBS $prod'[][$][? T_OBS > 0 ?]'`
+    else
+      set times = `$SHOW_INFO -q key=T_OBS $prod'[][$][? T_OBS > 0 ?]' n=-1`
+    endif
+    echo $times
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then        
       set times = `$SHOW_INFO -q key=T_REC $prod'[][$][? T_OBS > 0 ?]' n=-1`
     endif
