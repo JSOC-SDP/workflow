@@ -236,21 +236,25 @@ if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 @ num_harps = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
 echo "number of harps:  $num_harps" >> $TEMPLOG
 
-if ( $retstatus == 0 ) then
+if ( ($retstatus == 0) && ($num_harps > 0) ) then
   @ i = 1
   while ( $i <= $#Htimes )
     set WANT = $Htimes[$i]
     if ( $num_harps > 0) ) then
       set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
     endif
-    set min = `echo $WANT | awk -F\: '{print $2}'`
-    echo "Minute is $min" >> $TEMPLOG
-    if ( $min == "00" ) then
-      set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANT wanthigh=$WANT action=5`
-    endif
     @ i++
   end
 endif
+
+if ( $num_harps == 0 ) then
+  set min = `echo $WANTLOW | awk -F\: '{print $2}'`
+  echo "Minute is $min" >> $TEMPLOG
+  if ( $min == "00" ) then
+    set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
+  endif
+endif
+
 
 if ($retstatus == 0) then
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
