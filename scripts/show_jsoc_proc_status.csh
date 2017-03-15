@@ -77,6 +77,12 @@ cat /web/jsoc/htdocs/ajax/URGENT_MOTD.html >>$TMP
 echo '<p><table width=800>' >>$TMP
 echo '<tr><td>Product</td><td>Lag</td><td>Note</td></tr>' >>$TMP
 
+set lastAccess = `stat -c "%z" /home/jsoc/pipeline/tasks/update_hmi.harp_nrt/numHarps`
+@ numHarps = `cat /home/jsoc/pipeline/tasks/update_hmi.harp_nrt/numHarps`
+set Htime = $lastAccess[1]"_"$lastAccess[2]
+@ Htime_s = `$TIME_CONVERT time=$Htime`
+@ Htime_diff = $now_pacific_s - $Htime_s
+
 set nprod = $#product
 set iprod = 1
 set project = hmi
@@ -96,7 +102,6 @@ while ($iprod <= $nprod)
     else
       set times = `$SHOW_INFO -q key=T_OBS $prod'[][$][? T_OBS > 0 ?]' n=-1`
     endif
-    echo $times
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then        
       set times = `$SHOW_INFO -q key=T_REC $prod'[][$][? T_OBS > 0 ?]' n=-1`
     endif
@@ -182,7 +187,11 @@ while ($iprod <= $nprod)
     @ r = 1
     echo "$now $prod is behind by $lags" >> /web/jsoc/htdocs/data/red.log
   endif
-  if ($lags < 60) then
+  if ( ($prod == "hmi.MHarp_720s_nrt") && ($numHarps == 0) && ($Htime_diff < 3600) ) then
+    set lag = "0 HARPs"
+    set stat = GREEN
+    @ g = 1
+  else if ($lags < 60) then
     set lag = "$lags minutes"
   else if ($lags < 1440) then
     set hours = `$ARITH $lags / 60`
