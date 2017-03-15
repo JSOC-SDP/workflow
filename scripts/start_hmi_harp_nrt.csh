@@ -235,6 +235,7 @@ sleep 15
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 @ num_harps = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
 echo "number of harps:  $num_harps" >> $TEMPLOG
+echo $num_harps > $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps
 
 if ( ($retstatus == 0) && ($num_harps > 0) ) then
   @ i = 1
