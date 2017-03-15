@@ -176,21 +176,36 @@ while ($iprod <= $nprod)
   endif
   set times_t = `$TIME_CONVERT time=$times[1]`
   @  lags = ( $now_t - $times_t ) / 60
-  if ( $lags <= $green[$iprod]) then
-    set stat = GREEN
-    @ g = 1
-  else if ($lags <= $yellow[$iprod]) then
-    set stat = YELLOW
-    @ y = 1
-  else 
-    set stat = RED
-    @ r = 1
-    echo "$now $prod is behind by $lags" >> /web/jsoc/htdocs/data/red.log
+  if ( $product[$iprod] == hmi.MHarp_720s_nrt ) then
+    if ( ($numHarps == 0) && ($Htime_diff < 3600) ) then
+      set stat = GREEN
+      @ g = 1
+    else if ( $lags <= $green[$iprod]) then
+      set stat = GREEN
+      @ g = 1
+    else if ($lags <= $yellow[$iprod]) then
+      set stat = YELLOW
+      @ y = 1
+    else
+      set stat = RED
+      @ r = 1
+      echo "$now $prod is behind by $lags" >> /web/jsoc/htdocs/data/red.log
+    endif
+  else
+    if ( $lags <= $green[$iprod]) then
+      set stat = GREEN
+      @ g = 1
+    else if ($lags <= $yellow[$iprod]) then
+      set stat = YELLOW
+      @ y = 1
+    else 
+      set stat = RED
+      @ r = 1
+      echo "$now $prod is behind by $lags" >> /web/jsoc/htdocs/data/red.log
+    endif
   endif
   if ( ($prod == "hmi.MHarp_720s_nrt") && ($numHarps == 0) && ($Htime_diff < 3600) ) then
     set lag = "0 HARPs"
-    set stat = GREEN
-    @ g = 1
   else if ($lags < 60) then
     set lag = "$lags minutes"
   else if ($lags < 1440) then
@@ -561,7 +576,6 @@ endif
 
 @ totalBF = $BF1 + $BF2 
 @ totalBAD = $BAD1 + $BAD2
-echo "$totalBAD"
 
 echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBF < 100 ) then
