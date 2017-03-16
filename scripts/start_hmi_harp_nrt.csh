@@ -248,12 +248,10 @@ if ( ($retstatus == 0) && ($num_harps > 0) ) then
   end
 endif
 
-if ( $num_harps == 0 ) then
-  set min = `echo $WANTLOW | awk -F\: '{print $2}'`
-  echo "Minute is $min" >> $TEMPLOG
-  if ( $min == "00" ) then
-    set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
-  endif
+set min = `echo $WANTLOW | awk -F\: '{print $2}'`
+echo "Minute is $min" >> $TEMPLOG
+if ( $min == "00" ) then
+  set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
 endif
 
 
