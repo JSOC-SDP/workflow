@@ -120,6 +120,8 @@ set fitspath = http://jsoc.stanford.edu/data/hmi/fits/$last_fits_y/$last_fits_m/
 
 set tstamp = $last_fits_y$last_fits_m$last_fits_d'_'$last_fits_h'0000_TAI'
 set last_file = "/home/jsoc/hmi/fits/$last_fits_y/$last_fits_m/$last_fits_d/hmi.M_720s_nrt.$tstamp.fits"
+cp $last_file /home/jsoc/hmi/images/latest/HMI_latest_Mag.fits
+
 if ( -e $last_file ) then
   echo "M_1k_fits $fitspath//hmi.M_720s_nrt.$tstamp.fits" > $LATESTLIST
 else
