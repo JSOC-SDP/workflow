@@ -96,18 +96,17 @@ foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s_nrt['$wantlow'-'$want
   if ( ($n <= 0) && ($i == 20) ) then
     echo 'set VFnrtstatus = 0' >>$TEMPCMD
     echo 'echo No HARPs' >>$TMPCMD
-    echo 'goto DONE' >>&$TEMPCMD
+#    echo 'goto DONE' >>&$TEMPCMD
+#   exit
   else  
     echo "date" >>$TEMPCMD
     echo "$MPIEXEC -n 8 $VFISV out=hmi.ME_720s_fd10_nrt in=hmi.S_720s_nrt\["$T"] in3=hmi.MHarp_720s_nrt'[]['"$T"']' in5=hmi.M_720s_nrt\["$T"] -v" >>$TEMPCMD
     echo "date" >>$TEMPCMD
-    echo 'set VFnrtstatus = $?' >>$TEMPCMD
-    echo 'if ($VFnrtstatus) goto DONE' >>&$TEMPCMD
   endif
 end
 
-#echo 'set VFnrtstatus = $?' >>$TEMPCMD
-#echo 'if ($VFnrtstatus) goto DONE' >>&$TEMPCMD
+echo 'set VFnrtstatus = $?' >>$TEMPCMD
+echo 'if ($VFnrtstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $VFnrtstatus >retstatus' >>&$TEMPCMD
 echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
