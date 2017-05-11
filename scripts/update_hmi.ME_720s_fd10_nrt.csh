@@ -37,7 +37,7 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv_harp
-set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/$JSOC_MACHINE/show_info
+set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
@@ -94,8 +94,9 @@ foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s_nrt['$wantlow'-'$want
     @ i ++
   end
   if ( ($n <= 0) && ($i == 20) ) then
-    echo 'set VFnrtstatus = 10' >>$TEMPCMD
-    echo 'if ($VFnrtstatus) goto DONE' >>&$TEMPCMD
+    echo 'set VFnrtstatus = 0' >>$TEMPCMD
+    echo 'echo No HARPs' >>$TMPCMD
+    echo 'goto DONE' >>&$TEMPCMD
   else  
     echo "date" >>$TEMPCMD
     echo "$MPIEXEC -n 8 $VFISV out=hmi.ME_720s_fd10_nrt in=hmi.S_720s_nrt\["$T"] in3=hmi.MHarp_720s_nrt'[]['"$T"']' in5=hmi.M_720s_nrt\["$T"] -v" >>$TEMPCMD
