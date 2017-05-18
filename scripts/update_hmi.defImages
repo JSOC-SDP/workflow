@@ -31,6 +31,7 @@ echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "$WFCODE/scripts/makeimageslowhigh $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
+echo "$WFCODE/scripts/makehicadIc.csh $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
