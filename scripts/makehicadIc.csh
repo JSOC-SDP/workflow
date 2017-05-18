@@ -22,8 +22,10 @@ set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_conver
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 
 set obslist = (Ic) 
-set minlist = (20000)
-set maxlist = (75000)
+#set minlist = (20000)
+#set maxlist = (75000)
+set minlist = (10000)
+set maxlist = (62000)
 set scalinglist = (minmaxgiven)
 #set colorlist = (/home/phil/apps/heat.sao)
 set colorlist = ($WF/apps/heat.sao)
