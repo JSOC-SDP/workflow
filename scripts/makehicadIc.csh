@@ -135,7 +135,7 @@ if ($finalimagetime != NONE) then
     set prevd = `echo $prevdt | sed -e 's/_.*//'`
     set prevt = `echo $prevdt | sed -e 's/.*_//' | sed -e 's/^0//'`
   endif
-  set hhmmss_test = `echo $hhmmss | sed -e 's/^0//'`
+  set hhmmss_test = `echo $hhmmss | sed -e 's/^[0]*//'`
   if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e /home/jsoc/hmi/hicadImages/$YEAR/$MON/$DAY) ) then
       set imagepath = http://jsoc.stanford.edu/data/hmi/hicadImages/$YEAR/$MON/$DAY
       set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
