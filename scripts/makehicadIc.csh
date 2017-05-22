@@ -133,7 +133,7 @@ if ($finalimagetime != NONE) then
     set prev = `grep Time $LATESTLIST`
     set prevdt = $prev[2]
     set prevd = `echo $prevdt | sed -e 's/_.*//'`
-    set prevt = `echo $prevdt | sed -e 's/.*_//' | sed -e 's/^0//'`
+    set prevt = `echo $prevdt | sed -e 's/.*_//' | sed -e 's/^0*//'`
   endif
   set hhmmss_test = `echo $hhmmss | sed -e 's/^[0]*//'`
   if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e /home/jsoc/hmi/hicadImages/$YEAR/$MON/$DAY) ) then
