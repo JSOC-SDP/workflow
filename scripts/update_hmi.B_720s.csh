@@ -84,7 +84,7 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 
 if ( $retstatus == 0 ) then
-  /home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh
+  /home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh >> runlog
 endif
 
 exit $retstatus
