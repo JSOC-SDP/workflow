@@ -70,6 +70,7 @@ foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'['$wantlow'-'$wa
 #foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.S_720s'['$wantlow'-'$wanthigh']' -q key=T_REC` )
   echo "$DIS in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
   echo "$MAPROJ in=hmi.B_720s'['$wantlow'-'$wanthigh']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
+  echo "/home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh" >> $TEMPCMD
 end
 echo 'set HMIBstatus = $?' >>$TEMPCMD
 
@@ -82,9 +83,5 @@ set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
-
-if ( $retstatus == 0 ) then
-  /home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh >> runlog
-endif
 
 exit $retstatus
