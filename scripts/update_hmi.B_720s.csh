@@ -67,16 +67,15 @@ echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set HMIBstatus=6' >>&$TEMPCMD
 
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
-#foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.S_720s'['$wantlow'-'$wanthigh']' -q key=T_REC` )
   echo "$DIS in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
   echo "$MAPROJ in=hmi.B_720s'['$wantlow'-'$wanthigh']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
 end
-echo "/home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh" >> $TEMPCMD
 echo 'set HMIBstatus = $?' >>$TEMPCMD
-
 echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $HMIBstatus >retstatus' >>&$TEMPCMD
+
+echo "/home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh" >> $TEMPCMD
 
 # execute qsub script
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
