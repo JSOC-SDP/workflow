@@ -99,7 +99,7 @@ echo "mv $TMP $THUMB" >> $CMDFILE
 echo "/home/jeneen/latestHMI/getHarpTime.csh" >> $CMDFILE
 
 # Delete all .png files older than 60 days
-echo "find $OUTDIR/harp.*.png* -type f -atime +30 | xargs rm -f" >> $CMDFILE
+echo "find $OUTDIR/harp.*.png* -type f -atime +90 | xargs rm -f" >> $CMDFILE
 
 # Set the real return status
 echo 'set retstatus = $?' >> $CMDFILE
