@@ -103,7 +103,8 @@ set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
 @ i = 1
 @ next_mag_s = $last_mask_s + 720
 set next_mag = `$TIME_CONVERT s=$next_mag_s`
-set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1`
+#set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1`
+set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][$]' key=t_rec n=-1`
 
 
 while ( $i <= 270 )  # 9 hours, allowing for long maneuvers 
