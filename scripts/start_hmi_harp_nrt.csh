@@ -131,6 +131,8 @@ rm $HERE/NO_GOOD_MAG
 set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][$]' key=t_rec n=-1`
 @ last_harp_s = `$TIME_CONVERT time=$last_harp`
 @ harp_lag = $last_mask_s - $last_harp_s
+@ last_processed = `cat $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/last_processed`
+@ process_lag = $last_mask_s - $last_processed
 set last_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[]' key=t_rec n=-1`
 set last_good_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' key=t_rec n=-1`
 @ last_mag_s = `$TIME_CONVERT time=$last_mag`
@@ -138,10 +140,15 @@ set last_good_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' key=t_rec
 @ mag_lag = $last_mag_s - $last_good_mag_s 
 set last_two_good_mag_r = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' -r n=-2`
 @ rdiff = $last_two_good_mag_r[2] - $last_two_good_mag_r[1]
+set last_mask = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[\$] key=t_rec`
+@ last_mask_s = `$TIME_CONVERT time=$last_mask`
 
-while ( ($harp_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) || ($mag_lag > 0) || ($rdiff != 1) )
+#while ( ($harp_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) || ($mag_lag > 0) || ($rdiff != 1) )
+while ( ($harp_lag < 1440) || ($process_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) || ($mag_lag > 0) || ($rdiff != 1) )
   if ( $harp_lag < 1440) then
     echo $harp_lag > $HERE/WAITING_HARP_LAG
+  else if ( $process_lag < 1440 && `cat $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps` == 0 ) then
+    echo $process_lag > $HERE/NO_HARPS
   else if ( -e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING) then
     touch $HERE/WAITING_QSUB_RUNNING
   else if ( $mag_lag > 0 ) then
@@ -154,12 +161,14 @@ while ( ($harp_lag < 1440) || (-e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_
   set last_mask = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[\$] key=t_rec`
   @ last_mask_s = `$TIME_CONVERT time=$last_mask`
   @ harp_lag = $last_mask_s - $last_harp_s
+  @ last_processed = `cat $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/last_processed`
+  @ process_lag = $last_mask_s - $last_processed
   set last_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[]' key=t_rec n=-1`
   set last_good_mag = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' key=t_rec n=-1`
   @ last_mag_s = `$TIME_CONVERT time=$last_mag`
   @ last_good_mag_s = `$TIME_CONVERT time=$last_good_mag`
   @ mag_lag = $last_mag_s - $last_good_mag_s
-    set last_two_good_mag_r = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' -r n=-2`
+  set last_two_good_mag_r = `$SHOW_INFO -q 'hmi.M_720s_nrt[][? quality > 0 ?]' -r n=-2`
   @ rdiff = $last_two_good_mag_r[2] - $last_two_good_mag_r[1]
 end
 
@@ -200,8 +209,12 @@ echo "set MHarpstatus = 0" >>&$CMD
 set Htimes
 
 while ( $nextH_s < $last_mask_s )
+  if ( `cat $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps` == 0 ) then
+    @ nextH_s = $last_mask_s - 720
+  endif
+  echo $nextH_s > $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/last_processed
   set nextH = `$TIME_CONVERT s=$nextH_s zone=TAI`
- 
+  
   # make sure mask exists
   set a = `$SHOW_INFO -q hmi.Marmask_720s_nrt\["$nextH"] -c`
   if ( $a == 0 ) then
