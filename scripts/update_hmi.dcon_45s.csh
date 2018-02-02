@@ -95,8 +95,7 @@ set lev1retstatus=0
 
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
-#echo "$LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
-echo "echo Running $LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
+echo "$LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
 echo 'set lev1retstatus = $?' >>$CMD
 echo 'echo $lev1retstatus >' "$HERE/lev1retstatus" >>$CMD
 
@@ -123,8 +122,7 @@ set QUE = p4.q
 
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
-#echo "$OBS begin=$T end=$T $PARAMS" >> $CMD
-echo "echo Running $OBS begin=$T end=$T $PARAMS" >> $CMD
+echo "$OBS begin=$T end=$T $PARAMS" >> $CMD
 echo 'set obsretstatus = $?' >>$CMD
 echo 'echo $obsretstatus >' "$HERE/obs.retstatus" >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
