@@ -93,14 +93,13 @@ echo 6 > $HERE/lev1retstatus
 
 set lev1retstatus=0
 
-echo "echo foo" > $CMD
-#echo "hostname >>&$LOG" >$CMD
-#echo "set echo >>&$LOG" >>$CMD
+echo "hostname >>&$LOG" >$CMD
+echo "set echo >>&$LOG" >>$CMD
 #echo "$LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
-#echo "echo Running lev1 for $T using $T1 - $T2 filtergrams"  >> $CMD
-#echo "echo $LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
-#echo 'set lev1retstatus = $?' >>$CMD
-#echo 'echo $lev1retstatus >' "$HERE/lev1.retstatus" >>$CMD
+echo "echo Running lev1 for $T using $T1 - $T2 filtergrams"  >> $CMD
+echo "echo $LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
+echo 'set lev1retstatus = $?' >>$CMD
+echo 'echo $lev1retstatus >' "$HERE/lev1.retstatus" >>$CMD
 
 $QSUB -sync yes -e $LOG -o $LOG -q $QUE $CMD >> $LOG
 
