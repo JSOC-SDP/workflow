@@ -95,8 +95,8 @@ set lev1.retstatus=0
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
 #echo "$LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
-echo "Running lev1 for $T, using $T1 - $T2 filtergrams"
-echo "$LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25"
+echo "echo Running lev1 for $T, using $T1 - $T2 filtergrams"  >> $CMD
+echo "echo $LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
 echo 'set lev1.retstatus = $?' >>$CMD
 echo 'echo $lev1.retstatus >' "$HERE/lev1.retstatus" >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
@@ -122,7 +122,7 @@ set QUE = p4.q
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
 #echo "$OBS begin=$T end=$T $PARAMS" >> $CMD
-echo "Running observables for $T -  $OBS begin=$T end=$T $PARAMS"
+echo "echo Running observables for $T -  $OBS begin=$T end=$T $PARAMS" >> $CMD
 echo 'set obs.retstatus = $?' >>$CMD
 echo 'echo $obs.retstatus >' "$HERE/obs.retstatus" >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
