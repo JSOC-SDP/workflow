@@ -52,6 +52,7 @@ if ( ($test1_s < $WANTLOW_s) && ($test2_s > $WANTHIGH_s) ) then
   set retstatus = 10
   echo "19:00_TAI must be included between wantlow and wanthigh"
   exit $retstatus
+endif
 
 if ( $test1_s >= $WANTLOW_s ) then
   set T = $test1
@@ -121,7 +122,7 @@ set QUE = p4.q
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
 #echo "$OBS begin=$T end=$T $PARAMS" >> $CMD
-echo "Running observables for $T:  $OBS begin=$T end=$T $PARAMS"
+echo "Running observables for $T -  $OBS begin=$T end=$T $PARAMS"
 echo 'set obs.retstatus = $?' >>$CMD
 echo 'echo $obs.retstatus >' "$HERE/obs.retstatus" >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
