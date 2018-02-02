@@ -96,10 +96,9 @@ set lev1retstatus=0
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
 #echo "$LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
-echo "echo Running lev1 for $T using $T1 - $T2 filtergrams"  >> $CMD
-echo "echo $LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
+echo "echo Running $LEV1 in=hmi.lev1'['$T1'-'$T2']' out=hmi.lev1_dcon psf=hmi.psf iter=25" >> $CMD
 echo 'set lev1retstatus = $?' >>$CMD
-echo 'echo $lev1retstatus >' "$HERE/lev1.retstatus" >>$CMD
+echo 'echo $lev1retstatus >' "$HERE/lev1retstatus" >>$CMD
 
 $QSUB -sync yes -e $LOG -o $LOG -q $QUE $CMD >> $LOG
 
@@ -107,28 +106,28 @@ $QSUB -sync yes -e $LOG -o $LOG -q $QUE $CMD >> $LOG
 
 # make observables
 
-#set OBS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables_dcon2
-#set PARAMS = "levin=lev1 levout=lev1.5 wavelength=3 quicklook=0 camid=1 cadence=45.0 lev1=hmi.lev1_dcon smooth=1 rotational=0 linearity=1 -L"
+set OBS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables_dcon2
+set PARAMS = "levin=lev1 levout=lev1.5 wavelength=3 quicklook=0 camid=1 cadence=45.0 lev1=hmi.lev1_dcon smooth=1 rotational=0 linearity=1 -L"
 
-#set NAME = DC45
-#set qsubname = $NAME'_'$TSTMP
-#echo 6 > $HERE/obsretstatus
+set NAME = DC45
+set qsubname = $NAME'_'$TSTMP
+echo 6 > $HERE/obsretstatus
 
-#set LOG = $HERE/obsrunlog
-#set CMD = $HERE/$qsubname
+set LOG = $HERE/obsrunlog
+set CMD = $HERE/$qsubname
 
-#set obsretstatus=0
+set obsretstatus=0
 
-#set QUE = p4.q
-#@ THREADS = 4
+set QUE = p4.q
+@ THREADS = 4
 
-#echo "hostname >>&$LOG" >$CMD
-#echo "set echo >>&$LOG" >>$CMD
+echo "hostname >>&$LOG" >$CMD
+echo "set echo >>&$LOG" >>$CMD
 #echo "$OBS begin=$T end=$T $PARAMS" >> $CMD
-#echo "echo Running observables for $T -  $OBS begin=$T end=$T $PARAMS" >> $CMD
-#echo 'set obsretstatus = $?' >>$CMD
-#echo 'echo $obsretstatus >' "$HERE/obs.retstatus" >>$CMD
-#echo "rm -f $HERE/qsub_running" >>$CMD
+echo "echo Running $OBS begin=$T end=$T $PARAMS" >> $CMD
+echo 'set obsretstatus = $?' >>$CMD
+echo 'echo $obsretstatus >' "$HERE/obs.retstatus" >>$CMD
+echo "rm -f $HERE/qsub_running" >>$CMD
 
-#$QSUB -e $LOG -o $LOG -q $QUE $CMD >> $LOG
+$QSUB -e $LOG -o $LOG -q $QUE $CMD >> $LOG
 
