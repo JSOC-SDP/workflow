@@ -48,7 +48,7 @@ set test2 = $day2'_'$wantT
 @ test1_s = `$TIME_CONVERT time=$test1`
 @ test2_s = `$TIME_CONVERT time=$test2`
 
-if ( ($test1_s < $WANTLOW_s) || ($test2_s > $WANTHIGH_s) ) then
+if ( ($test1_s < $WANTLOW_s) && ($test2_s > $WANTHIGH_s) ) then
   set retstatus = 10
   echo "19:00_TAI must be included between wantlow and wanthigh"
   exit $retstatus
