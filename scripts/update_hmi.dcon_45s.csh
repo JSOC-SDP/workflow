@@ -18,7 +18,7 @@ else
   exit 1
 endif
 
-set QUE = p4.q,k.q
+set QUE = p4.q
 @ THREADS = 4
 set QSUB = /SGE2/bin/lx-amd64/qsub
 
