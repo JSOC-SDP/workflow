@@ -50,7 +50,7 @@ if ( $need > $have ) then
   set CMD = $HERE/CDCON$tstmp
   set LOG = $HERE/runlog
   echo "cd $HERE" >$CMD
-  echo "hostname >& $LOG" >>$CMD
+  echo "hostname >&$LOG" >>$CMD
   echo "set echo >>&$LOG" >>$CMD
   echo 6 > $HERE/retstatus
 
