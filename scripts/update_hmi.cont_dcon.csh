@@ -55,7 +55,7 @@ if ( $need > $have ) then
   echo 6 > $HERE/retstatus
 
   foreach T ( $todo )
-    echo "$LEV1 in=hmi.lev1'['$T'/1d][? fid = 10001 ?]' out=hmi.cont_dcon psf=hmi.psf iter=25" >>&$LOG >>$CMD
+    echo "$LEV1 in=hmi.lev1'['$T'/1d][? fid = 10001 ?]' out=hmi.cont_dcon psf=hmi.psf iter=25 >>&$LOG" >>$CMD
   end
 else
   echo "No new data"
