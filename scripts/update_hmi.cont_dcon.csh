@@ -46,9 +46,9 @@ if ( $need > $have ) then
     endif
   end
 
-  set tstmp = `echo $day | sed -e 's/[.]//g' | cut -c3-8`       
-  set CMD = $HERE/CDCON.$tstmp.cmd
-  set LOG = $HERE/CDCON.$tstmp.log
+  set tstmp = `echo $day | sed -e 's/[.]//g' | cut -c5-8`       
+  set CMD = $HERE/CDCON$tstmp
+  set LOG = $HERE/runlog
   echo "hostname >& $LOG" >$CMD
   echo "set echo >>&$LOG" >>$CMD
   echo "set TCstatus=6" >>&$CMD
