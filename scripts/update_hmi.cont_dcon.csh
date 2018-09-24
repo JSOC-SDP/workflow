@@ -64,7 +64,7 @@ endif
 echo 'set TCstatus = $?' >> $CMD
 echo 'echo $TCstatus >retstatus' >>$CMD
 
-#$QSUB -e $LOG -o $LOG -q $QUE $CMD
+$QSUB -e $LOG -o $LOG -q $QUE $CMD
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
