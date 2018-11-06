@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-set echo
+#set echo
 source /home/jsoc/.setJSOCenv
 setenv SGE_ROOT /SGE2
 set TARG = /web/jsoc/htdocs/data
@@ -105,6 +105,7 @@ while ($iprod <= $nprod)
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then        
       set times = `$SHOW_INFO -q key=T_REC $prod'[][$][? T_OBS > 0 ?]' n=-1`
     endif
+ set echo
   else if ( $prod == iris.lev0 ) then
     set times = `$SHOW_INFO -q key=t_obs iris.lev0'[? FSN != 8421504 ?][? t_obs > 0 ?]' n=-1 | sed s/-/./g | sed s/T/_/ | cut -c1-19`
     set iris_proc_time = `$SHOW_INFO -q iris.lev0'[:#$]' key=date`
@@ -131,7 +132,8 @@ while ($iprod <= $nprod)
       @ y = 1
     else
       set iris_stat = RED
-      @ r = 1
+      #@ r = 1                 ### added 11/6/2018.  Remove when IRIS is out of safe mode.
+      @ r = 0                  ###
       echo "$now IRIS lev0 is $iris_diff behind" >> /web/jsoc/htdocs/data/red.log
     endif
   else if ( $prod == iris.lev1_nrt ) then 
@@ -160,9 +162,11 @@ while ($iprod <= $nprod)
       @ y = 1 
     else 
       set iris1_stat = RED 
-      @ r = 1 
+      #@ r = 1                ### added 11/6/2018.  Remove when IRIS is out of safe mode.
+      @ r = 0                 ###
       echo "$now IRIS lev1 is $iris1_diff behind" >> /web/jsoc/htdocs/data/red.log
     endif 
+  unset echo
   else
     set times = `$SHOW_INFO -q key=T_OBS $prod'[$]'`
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then       
@@ -200,7 +204,9 @@ while ($iprod <= $nprod)
       @ y = 1
     else 
       set stat = RED
-      @ r = 1
+      if ( $product[$iprod] != iris.lev0 && $product[$iprod] != iris.lev1_nrt) then   ### added 11/6/2018.  Remove when IRIS is out of safe mode.
+        @ r = 1                                                                       ###
+      endif                                                                           ###
       echo "$now $prod is behind by $lags" >> /web/jsoc/htdocs/data/red.log
     endif
   endif
@@ -658,6 +664,7 @@ echo 'Colors indicate: green -> as expected; yellow -> late; red -> very late; b
 echo 'orange -> datamin < 0 (Ground station issues, likely)' >>$TMP
 echo '<p>' >>$TMP
 
+set echo
 if ($b == 1) then
   set favicon = blue_sq.gif 
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh blue
