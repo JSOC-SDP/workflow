@@ -1,12 +1,6 @@
 #! /bin/csh -f
 
 # Script to make HMI lev1.5 45s observables from HMI lev1 that has been scatter light corrected.
-# #
-#
-# # XXXXXXXXXX test
-# # set echo
-# # XXXXXXXXXX test
-
 
 set HERE = $cwd 
 
@@ -17,9 +11,6 @@ else
   echo Need WORKFLOW_ROOT variable to be set.
   exit 1
 endif
-
-set QUE = k.q
-set QSUB = /SGE2/bin/lx-amd64/qsub
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
@@ -42,9 +33,12 @@ set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
 set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
-set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
-set name = DCL145
+set timestr = `echo $wantlow  | sed -e 's/[.:_]//g' -e 's/^......//' -e 's/..TAI//'`
+
+set name = DCL45
 set qsubname = $name'_'$timestr
+set LOG = $HERE/runlog
+set CMD = $HERE/$qsubname
 
 # make lev1
 
@@ -58,12 +52,8 @@ set T2 = `$TIME_CONVERT s=$T2_s zone=TAI`
 set QUE = k.q
 @ THREADS = 4
 
-set LOG = $HERE/lev1runlog
-set CMD = $HERE/$qsubname
 touch $HERE/qsub_running
 echo 6 > $HERE/lev1retstatus
-
-set lev1retstatus=0
 
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
@@ -75,7 +65,6 @@ echo 'if ($lev1retstatus) goto DONE' >> $CMD
 
 # make observables
 
-
 echo 6 > $HERE/obsretstatus
 
 echo "$OBS begin=$wantlow end=$wanthigh $OBS_ARGS" >> $CMD
@@ -86,4 +75,3 @@ echo 'DONE:' >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
 
 $QSUB -pe smp 4 -e $LOG -o $LOG -q $QUE $CMD >> $LOG
-
