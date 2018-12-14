@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# Script to make HMI lev1.5 observables from HMI lev1 data
+# Script to make HMI lev1.5 45s observables from HMI lev1 that has been scatter light corrected.
 # #
 #
 # # XXXXXXXXXX test
@@ -32,8 +32,10 @@ set key = `cat $WFDIR/gates/$GATE/key`
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 set LEV1 = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/lev1_dcon
+set OBS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables_dcon2
 
 set LEV1_ARGS = "out=hmi.lev1_dcon psf=hmi.psf iter=25"
+set OBS_ARGS = "levin=lev1 levout=lev1.5 wavelength=3 quicklook=0 camid=1 cadence=45.0 lev1=hmi.lev1_dcon smooth=1 rotational=0 linearity=1 -L"
 
 set indexlow = `index_convert ds=$product $key=$WANTLOW`
 set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
@@ -53,6 +55,8 @@ set qsubname = $name'_'$timestr
 set T1 = `$TIME_CONVERT s=$T1_s zone=TAI`
 set T2 = `$TIME_CONVERT s=$T2_s zone=TAI`
 
+set QUE = k.q
+@ THREADS = 4
 
 set LOG = $HERE/lev1runlog
 set CMD = $HERE/$qsubname
@@ -63,40 +67,22 @@ set lev1retstatus=0
 
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
+echo "setenv OMP_NUM_THREADS $THREADS" >> $CMD
 echo "$LEV1 in=hmi.lev1'['$T1'-'$T2']' $LEV1_ARGS" >> $CMD
 echo 'set lev1retstatus = $?' >>$CMD
 echo 'echo $lev1retstatus >' "$HERE/lev1retstatus" >>$CMD
 echo 'if ($lev1retstatus) goto DONE' >> $CMD
 
-echo 'DONE:' >>$CMD
-echo "rm -f $HERE/qsub_running" >>$CMD
-
-$QSUB -sync yes -e $LOG -o $LOG -q $QUE $CMD >> $LOG
-
-
-
 # make observables
 
-set OBS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables_dcon2
-set PARAMS = "levin=lev1 levout=lev1.5 wavelength=3 quicklook=0 camid=1 cadence=45.0 lev1=hmi.lev1_dcon smooth=1 rotational=0 linearity=1 -L"
 
-set name = DCO45
-set qsubname = $name'_'$timestr
 echo 6 > $HERE/obsretstatus
 
-set LOG = $HERE/obsrunlog
-set CMD = $HERE/$qsubname
-
-set obsretstatus=0
-
-set QUE = k.q
-@ THREADS = 4
-
-echo "hostname >>&$LOG" >$CMD
-echo "set echo >>&$LOG" >>$CMD
-echo "$OBS begin=$wantlow end=$wanthigh $PARAMS" >> $CMD
+echo "$OBS begin=$wantlow end=$wanthigh $OBS_ARGS" >> $CMD
 echo 'set obsretstatus = $?' >>$CMD
 echo 'echo $obsretstatus >' "$HERE/obs.retstatus" >>$CMD
+
+echo 'DONE:' >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
 
 $QSUB -pe smp 4 -e $LOG -o $LOG -q $QUE $CMD >> $LOG
