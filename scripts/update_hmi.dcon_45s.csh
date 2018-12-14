@@ -53,7 +53,8 @@ set QUE = k.q
 @ THREADS = 4
 
 touch $HERE/qsub_running
-echo 6 > $HERE/lev1retstatus
+@ lev1retstatus = 6
+echo $lev1retstatus > $HERE/lev1retstatus
 
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
@@ -65,8 +66,10 @@ echo 'if ($lev1retstatus) goto DONE' >> $CMD
 
 # make observables
 
-echo 6 > $HERE/obsretstatus
+@ obsretstatus = 6
+echo $obsretstatus > $HERE/obsretstatus
 
+echo >> $CMD
 echo "$OBS begin=$wantlow end=$wanthigh $OBS_ARGS" >> $CMD
 echo 'set obsretstatus = $?' >>$CMD
 echo 'echo $obsretstatus >' "$HERE/obs.retstatus" >>$CMD
@@ -74,4 +77,4 @@ echo 'echo $obsretstatus >' "$HERE/obs.retstatus" >>$CMD
 echo 'DONE:' >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
 
-$QSUB -pe smp 4 -e $LOG -o $LOG -q $QUE $CMD >> $LOG
+$QSUB -pe smp 4 -e $LOG -o $LOG -q $QUE $CMD
