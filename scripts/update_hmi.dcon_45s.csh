@@ -12,6 +12,9 @@ else
   exit 1
 endif
 
+set QUE = k.q
+set QSUB = /SGE2/bin/lx-amd64/qsub
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
@@ -35,8 +38,10 @@ set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[.:_]//g' -e 's/^......//' -e 's/..TAI//'`
 
-set name = DCL45
+set name = DC45
 set qsubname = $name'_'$timestr
+@ THREADS = 4
+
 set LOG = $HERE/runlog
 set CMD = $HERE/$qsubname
 
@@ -49,15 +54,13 @@ set CMD = $HERE/$qsubname
 set T1 = `$TIME_CONVERT s=$T1_s zone=TAI`
 set T2 = `$TIME_CONVERT s=$T2_s zone=TAI`
 
-set QUE = k.q
-@ THREADS = 4
-
 touch $HERE/qsub_running
 @ lev1retstatus = 6
 echo $lev1retstatus > $HERE/lev1retstatus
 
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
+echo >> $CMD
 echo "setenv OMP_NUM_THREADS $THREADS" >> $CMD
 echo "$LEV1 in=hmi.lev1'['$T1'-'$T2']' $LEV1_ARGS" >> $CMD
 echo 'set lev1retstatus = $?' >>$CMD
@@ -72,9 +75,9 @@ echo $obsretstatus > $HERE/obsretstatus
 echo >> $CMD
 echo "$OBS begin=$wantlow end=$wanthigh $OBS_ARGS" >> $CMD
 echo 'set obsretstatus = $?' >>$CMD
-echo 'echo $obsretstatus >' "$HERE/obs.retstatus" >>$CMD
+echo 'echo $obsretstatus >' "$HERE/obsretstatus" >>$CMD
 
 echo 'DONE:' >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
 
-$QSUB -pe smp 4 -e $LOG -o $LOG -q $QUE $CMD
+$QSUB -pe smp $THREADS -e $LOG -o $LOG -q $QUE $CMD
