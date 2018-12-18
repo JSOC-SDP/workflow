@@ -80,4 +80,4 @@ echo 'echo $obsretstatus >' "$HERE/obsretstatus" >>$CMD
 echo 'DONE:' >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
 
-$QSUB -pe smp $THREADS -e $LOG -o $LOG -q $QUE $CMD
+$QSUB -sync yes -pe smp $THREADS -e $LOG -o $LOG -q $QUE $CMD
