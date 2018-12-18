@@ -12,6 +12,6 @@ echo "echo sleeping" > $CMD
 echo "sleep 60" >> $CMD
 echo "echo done" >> $CMD
 
-$QSUB -e $LOG -o $LOG -q $QUE $CMD
+$QSUB -sync yes -e $LOG -o $LOG -q $QUE $CMD
 
 
