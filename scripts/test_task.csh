@@ -1,5 +1,7 @@
 #! /bin/csh -f
 
+setenv WORKFLOW_ROOT /home/jsoc/cvs/Development/JSOC/proj/workflow
+
 set QUE = k.q
 set QSUB = /SGE2/bin/lx-amd64/qsub
 
