@@ -308,7 +308,7 @@ ACTION_4_OR_5:
 #        until ready ticket for this chunk.
 
 # XXXXXXXXXXXXXXXX
-# set echo
+ set echo
 # XXXXXXXXXXXXXXXX
 
 set num_pending = 0
@@ -329,7 +329,7 @@ end
 echo 3 >state
 
 # XXXXXXXXXXXXXXXX
- #unset echo
+# unset echo
 # XXXXXXXXXXXXXXXX
 
 set pendcount = `/bin/ls  pending_tickets | wc -l`
