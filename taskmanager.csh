@@ -293,7 +293,7 @@ echo XXXX now MISCARGS = $MISCARGS
     goto SUBTICKETSDONE
 endif
 
-unset echo
+#unset echo
 
 ACTION_4_OR_5:
 
@@ -329,7 +329,7 @@ end
 echo 3 >state
 
 # XXXXXXXXXXXXXXXX
-# unset echo
+ #unset echo
 # XXXXXXXXXXXXXXXX
 
 set pendcount = `/bin/ls  pending_tickets | wc -l`
