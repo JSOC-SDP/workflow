@@ -80,11 +80,14 @@ echo 6 > $HERE/Sretstatus
 
 if ( ($wantlow_s >= $C1[1] && $wanthigh_s <= $C1[2]) || ($wantlow_s >= $C2[1] && $wanthigh_s <= $C2[2]) || ($wantlow_s >= $C3[1] && $wanthigh_s <= $C3[2]) || ($wantlow_s >= $C4[1] && $wanthigh_s <= $C4[2]) ) then
    # modC observables args
+   set mod = C
    set ARGS = "-L -V levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1 smooth=1 linearity=1"
 else if ( ($wantlow_s >= $L1[1] && $wanthigh_s <= $L1[2]) || ($wantlow_s >= $L2[1] && $wanthigh_s <= $L2[2]) || ($wantlow_s >= $L3[1] && $wanthigh_s <= $L3[2]) || ($wantlow_s >= $L4[1] && $wanthigh_s <= $L4[2]) ) then
    # modL observables args
+   set mod = L
    set ARGS = "-L -V levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=3 cadence=720.0 lev1=hmi.lev1 smooth=1 linearity=1"
 else
+  set mod = NOOP
   echo "Check times.  Your request may require separate runs for modC and modL." >> $LOG
   echo "FSN                         MODE    DATE" >> $LOG
   echo "  4612150 -  88861016       modC    2010.05.01_00:00:00_TAI - 2015.05.05_21:08:57_TAI" >> $LOG
@@ -107,6 +110,11 @@ echo 'set Sretstatus = $?' >>$CMD
 echo 'echo $Sretstatus >' "$HERE/Sretstatus" >>$CMD
 echo 'if ($Sretstatus) goto DONE' >> $CMD
 
+if ( $mod = C ) then
+  echo "echo Making ModC observables" >> $CMD
+else if ( $mod = L ) then
+  echo "echo Making ModL observables" >> $CMD
+endif
 echo "$OBS begin=$wantlow end=$wanthigh $ARGS" >> $CMD
 echo 'set obsretstatus = $?' >>$CMD
 echo 'echo $obsretstatus >' "$HERE/obsretstatus" >>$CMD
