@@ -110,9 +110,9 @@ echo 'set Sretstatus = $?' >>$CMD
 echo 'echo $Sretstatus >' "$HERE/Sretstatus" >>$CMD
 echo 'if ($Sretstatus) goto DONE' >> $CMD
 
-if ( $mod = C ) then
+if ( $mod == C ) then
   echo "echo Making ModC observables" >> $CMD
-else if ( $mod = L ) then
+else if ( $mod == L ) then
   echo "echo Making ModL observables" >> $CMD
 endif
 echo "$OBS begin=$wantlow end=$wanthigh $ARGS" >> $CMD
