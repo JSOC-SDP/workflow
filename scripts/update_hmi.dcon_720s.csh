@@ -99,7 +99,7 @@ else
   echo "102999326 - 104683792       modC    2016.03.08_04:33:03_TAI - 2016.04.13_19:13:28_TAI" >> $LOG
   echo "104683793 - present         modL    2016.04.13_19:13:31_TAI - present" >> $LOG
   echo 10 > $HERE/Sretstatus
-  exit
+  exit 10
 endif
 
 echo "hostname >>&$LOG" >$CMD
