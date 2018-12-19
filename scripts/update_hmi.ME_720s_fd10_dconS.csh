@@ -19,6 +19,7 @@ else
 endif
 
 set QUE = k.q
+set QSUB = /SGE2/bin/lx-amd64/qsub
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
