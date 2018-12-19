@@ -32,7 +32,7 @@ set key = `cat $WFDIR/gates/$GATE/key`
 set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
-set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
+set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
 
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH
