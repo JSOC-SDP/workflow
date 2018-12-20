@@ -105,7 +105,7 @@ endif
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
 echo "setenv OMP_NUM_THREADS 4" >>$CMD
-echo "$S in=hmi.S_720s'['$wantlow'-'$wanthigh']' out=hmi.S_720s_dconS psf=hmi.psf " >> $CMD
+echo "$S in=hmi.S_720s'['$wantlow'-'$wanthigh'][? quality = 0 ?]' out=hmi.S_720s_dconS psf=hmi.psf " >> $CMD
 echo 'set Sretstatus = $?' >>$CMD
 echo 'echo $Sretstatus >' "$HERE/Sretstatus" >>$CMD
 echo 'if ($Sretstatus) goto DONE' >> $CMD
