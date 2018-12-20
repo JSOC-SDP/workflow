@@ -132,7 +132,7 @@ while ($iprod <= $nprod)
       @ y = 1
     else
       set iris_stat = RED
-      #@ r = 1                 ### added 11/6/2018.  Remove when IRIS is out of safe mode.
+      @ r = 1                 
       echo "$now IRIS lev0 is $iris_diff behind" >> /web/jsoc/htdocs/data/red.log
     endif
   else if ( $prod == iris.lev1_nrt ) then 
@@ -161,7 +161,7 @@ while ($iprod <= $nprod)
       @ y = 1 
     else 
       set iris1_stat = RED 
-      #@ r = 1                ### added 11/6/2018.  Remove when IRIS is out of safe mode.
+      @ r = 1                
       echo "$now IRIS lev1 is $iris1_diff behind" >> /web/jsoc/htdocs/data/red.log
     endif 
   unset echo
@@ -202,9 +202,6 @@ while ($iprod <= $nprod)
       @ y = 1
     else 
       set stat = RED
-      if ( $product[$iprod] != iris.lev0 && $product[$iprod] != iris.lev1_nrt) then   ### added 11/6/2018.  Remove when IRIS is out of safe mode.
-        @ r = 1                                                                       ###
-      endif                                                                           ###
       echo "$now $prod is behind by $lags" >> /web/jsoc/htdocs/data/red.log
     endif
   endif
