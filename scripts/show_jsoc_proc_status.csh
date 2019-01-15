@@ -202,6 +202,7 @@ while ($iprod <= $nprod)
       @ y = 1
     else 
       set stat = RED
+      @ r = 1
       echo "$now $prod is behind by $lags" >> /web/jsoc/htdocs/data/red.log
     endif
   endif
