@@ -79,6 +79,7 @@ echo 6 > $HERE/retstatus
 @ CR_N = `$SHOW_INFO hmi.cosmic_rays'['$wantlow'-'$wanthigh']' -qc`
 while ( $CR_N < $lev1_N )
   sleep 1800
+  touch $HERE/WAITING_FOR_CR
   @ lev1_N = `$SHOW_INFO hmi.lev1'['$wantlow'-'$wanthigh'][? hftsacid = 1022 ?]' -qc`
   @ CR_N = `$SHOW_INFO hmi.cosmic_rays'['$wantlow'-'$wanthigh']' -qc`
 end
