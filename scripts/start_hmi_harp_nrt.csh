@@ -252,7 +252,8 @@ if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 @ num_harps = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
 echo "number of harps:  $num_harps" >> $TEMPLOG
 echo $num_harps > $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps
-echo "TIME:$WANTLOW   HARPS:$num_harps" > /web/jsoc/htdocs/data/hmi/HARPs_images/latest_HARP_info
+@ num_harps2 = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH'][? npix >= 2000 ?]' -qc`
+echo "TIME:$WANTLOW   HARPS:$num_harps2" > /web/jsoc/htdocs/data/hmi/HARPs_images/latest_HARP_info
 
 if ( ($retstatus == 0) && ($num_harps > 0) ) then
   @ i = 1
