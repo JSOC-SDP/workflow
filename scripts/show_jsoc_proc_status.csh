@@ -309,12 +309,14 @@ set count3 = `/SGE/bin/lx24-amd64/qstat | grep JSOC_ | grep jsoc | grep -v qw | 
  
 echo -n '<tr><td>Exports Pending </td><td' >> $TMP
 
-  if ($count1 < 2) then
+if ($count1 < 2) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
 else if ( ($count1 >= 2) && ($count1 < 6) ) then
   echo -n ' bgcolor="yellow">'  >>$TMP
 else
   echo -n ' bgcolor="#FF6666">' >>$TMP
+  set stat = RED
+  @ r = 1
 endif
 echo "$count1"' </td><td>' $USERDB'</td></tr>' >>$TMP
 
@@ -327,6 +329,8 @@ else if ( ($count2 >= 2) && ($count2 < 6) ) then
   echo -n ' bgcolor="yellow">'  >>$TMP
 else
   echo -n ' bgcolor="#FF6666">' >>$TMP
+  set stat = RED
+  @ r = 1
 endif
 echo "$count2"' </td><td>' $USERDB2'</td></tr>' >>$TMP
 
