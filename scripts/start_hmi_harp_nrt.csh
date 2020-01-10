@@ -59,25 +59,36 @@ set MHarp = /home/jsoc/cvs/Development/JSOC/proj/mag/harp/scripts/track_and_inge
 # start again.
 
 @ i = 0
-set num_running = `ls -1 $WFDIR/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l` 
-while ( $num_running > 1 ) 
-  @ i++
-  if ( $i == 5 ) then
-    echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
-    exit
-  else
-    echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
-    mv $HERE/active/update_hmi.harp_nrt-2* $HERE/done/
-    rm $WFDIR/gates/repeat_harp_nrt/new_tickets/*
-    echo ACTIVE > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
-    sleep 30
-    set num_running = `ls -1 $WFDIR/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l`
-    if ( $num_running == 0 ) then
-      $WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=2013.01.01 wanthigh=2013.01.01 action=5
-      exit
-    endif
+@ num_running = `ls -1 $WFDIR/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l` 
+if ( $num_running > 1 ) then
+  echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
+  if ( -e /tmp/harps.email ) then
+    rm /tmp/harps.email
   endif
-end
+  foreach dir ( `ls -1 $WFDIR/tasks/update_hmi.harp_nrt/active | grep -v root` )
+    echo $dir >> /tmp/harps.email
+    ls -l $WFDIR/tasks/update_hmi.harp_nrt/active/$dir >> /tmp/harps.email
+  end
+  /usr/bin/Mail -s "Multiple HARPS jobs running" jeneen < /tmp/harps.email
+endif    
+  
+#  @ i++
+#  if ( $i == 5 ) then
+#    echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
+#    exit
+#  else
+#    echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
+#    mv $HERE/active/update_hmi.harp_nrt-2* $HERE/done/
+#    rm $WFDIR/gates/repeat_harp_nrt/new_tickets/*
+#    echo ACTIVE > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
+#    sleep 30
+#    set num_running = `ls -1 $WFDIR/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l`
+#    if ( $num_running == 0 ) then
+#      $WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=2013.01.01 wanthigh=2013.01.01 action=5
+#      exit
+#    endif
+#  endif
+endif
   
 foreach ATTR (WANTLOW WANTHIGH GATE)
   set ATTRTXT = `grep $ATTR ticket`
@@ -243,7 +254,7 @@ echo "rm $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
 
 touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
+#$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
 
 # submit next harp and VFISV tickets
 
@@ -260,7 +271,7 @@ if ( ($retstatus == 0) && ($num_harps > 0) ) then
   while ( $i <= $#Htimes )
     set WANT = $Htimes[$i]
     if ( $num_harps > 0 ) then
-      set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
+#      set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
     endif
     @ i++
   end
@@ -269,12 +280,15 @@ endif
 set min = `echo $WANTLOW | awk -F\: '{print $2}'`
 echo "Minute is $min" >> $TEMPLOG
 if ( $min == "00" ) then
-  set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
+#  set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
 endif
 
 
 if ($retstatus == 0) then
+  while ( -e $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING )
+    sleep 5
+  end
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
-  set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
+#  set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
 endif
 
