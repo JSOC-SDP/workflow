@@ -88,7 +88,7 @@ endif
 #      exit
 #    endif
 #  endif
-endif
+#endif
   
 foreach ATTR (WANTLOW WANTHIGH GATE)
   set ATTRTXT = `grep $ATTR ticket`
