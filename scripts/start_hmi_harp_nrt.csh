@@ -258,7 +258,6 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
 
 # submit next harp and VFISV tickets
 
-sleep 15
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 @ num_harps = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
 echo "number of harps:  $num_harps" >> $TEMPLOG
@@ -266,6 +265,7 @@ echo $num_harps > $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps
 @ num_harps2 = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH'][? npix >= 2000 ?]' -qc`
 echo "TIME:$WANTLOW   HARPS:$num_harps2" > /web/jsoc/htdocs/data/hmi/HARPs_images/latest_HARP_info
 
+sleep 15 
 if ( ($retstatus == 0) && ($num_harps > 0) ) then
   @ i = 1
   while ( $i <= $#Htimes )
@@ -289,7 +289,7 @@ if ($retstatus == 0) then
     sleep 5
   end
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
-  sleep 15
+  sleep 60
   set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
 endif
 
