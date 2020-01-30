@@ -289,6 +289,7 @@ if ($retstatus == 0) then
     sleep 5
   end
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
+  sleep 15
   set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
 endif
 
