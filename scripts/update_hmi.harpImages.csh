@@ -47,12 +47,12 @@ if ( ($low_s > $first_hour_s) && ($high_s < $next_hour_s) ) then
 endif
 
 if ( $low_s == $first_hour_s ) then
-  set low = `echo $WANTLOW | awk -F\: '{print $1}'`
+  set low = `echo $WANTLOW | awk -F\: '{print $1}'`_TAI
 else
-  set low = `$TIME_CONVERT s=$next_hour_s zone=TAI o=cal | awk -F\: '{print $1}'`
+  set low = `$TIME_CONVERT s=$next_hour_s zone=TAI o=cal | awk -F\: '{print $1}'`_TAI
 endif
 
-set high = `echo $WANTHIGH | awk -F\: '{print $1}'`
+set high = `echo $WANTHIGH | awk -F\: '{print $1}'`_TAI
 
 set HERE = $cwd
 set timestr = `echo $WANTLOW  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
