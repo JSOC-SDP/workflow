@@ -37,7 +37,7 @@ end
 
 @ low_s = `$TIME_CONVERT time=$WANTLOW`
 @ high_s = `$TIME_CONVERT time=$WANTHIGH`
-set first_hour = `echo $WANTLOW | awk -F\: '{print $1}'`
+set first_hour = `echo $WANTLOW | awk -F\: '{print $1}'`_TAI
 @ first_hour_s = `$TIME_CONVERT time=$first_hour`
 @ next_hour_s = $first_hour_s + 3600
 
@@ -57,7 +57,7 @@ set high = `echo $WANTHIGH | awk -F\: '{print $1}'`
 set HERE = $cwd
 set timestr = `echo $WANTLOW  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set CMDFILE = $HERE/HI$timestr
-set log = $HERE/runlog
+sot log = $HERE/runlog
 echo 6 > $HERE/retstatus
 
 # Create the qsub script
