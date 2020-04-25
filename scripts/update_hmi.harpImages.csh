@@ -2,7 +2,7 @@
 # This script creates the HARP 720s definitive web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
 
-#set echo
+set echo
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -32,8 +32,10 @@ foreach ATTR (GATE WANTLOW WANTHIGH)
   set $ATTRTXT
 end
 
-#set WANTLOW = $argv[1]
-#set WANTHIGH = $argv[2]
+#set WANTLOW = 2010.09.13_00:00_TAI
+#set WANTHIGH = 2010.09.13_23:00_TAI
+#set GATE = hmi.harpImages
+#set ACTION=5
 
 @ low_s = `$TIME_CONVERT time=$WANTLOW`
 @ high_s = `$TIME_CONVERT time=$WANTHIGH`
@@ -57,7 +59,7 @@ set high = `echo $WANTHIGH | awk -F\: '{print $1}'`_TAI
 set HERE = $cwd
 set timestr = `echo $WANTLOW  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set CMDFILE = $HERE/HI$timestr
-sot log = $HERE/runlog
+set log = $HERE/runlog
 echo 6 > $HERE/retstatus
 
 # Create the qsub script
