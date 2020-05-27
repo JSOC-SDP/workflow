@@ -2,7 +2,7 @@
 # This script creates the HARP 720s definitive web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
 
-set echo
+#set echo
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -32,14 +32,12 @@ foreach ATTR (GATE WANTLOW WANTHIGH)
   set $ATTRTXT
 end
 
-#set WANTLOW = 2010.09.13_00:00_TAI
-#set WANTHIGH = 2010.09.13_23:00_TAI
-#set GATE = hmi.harpImages
-#set ACTION=5
+#set WANTLOW = $argv[1]
+#set WANTHIGH = $argv[2]
 
 @ low_s = `$TIME_CONVERT time=$WANTLOW`
 @ high_s = `$TIME_CONVERT time=$WANTHIGH`
-set first_hour = `echo $WANTLOW | awk -F\: '{print $1}'`_TAI
+set first_hour = `echo $WANTLOW | awk -F\: '{print $1}'`
 @ first_hour_s = `$TIME_CONVERT time=$first_hour`
 @ next_hour_s = $first_hour_s + 3600
 
@@ -49,12 +47,12 @@ if ( ($low_s > $first_hour_s) && ($high_s < $next_hour_s) ) then
 endif
 
 if ( $low_s == $first_hour_s ) then
-  set low = `echo $WANTLOW | awk -F\: '{print $1}'`_TAI
+  set low = `echo $WANTLOW | awk -F\: '{print $1}'`
 else
-  set low = `$TIME_CONVERT s=$next_hour_s zone=TAI o=cal | awk -F\: '{print $1}'`_TAI
+  set low = `$TIME_CONVERT s=$next_hour_s zone=TAI o=cal | awk -F\: '{print $1}'`
 endif
 
-set high = `echo $WANTHIGH | awk -F\: '{print $1}'`_TAI
+set high = `echo $WANTHIGH | awk -F\: '{print $1}'`
 
 set HERE = $cwd
 set timestr = `echo $WANTLOW  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`

@@ -54,10 +54,9 @@ echo 6 > $HERE/retstatus
 
 set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set DIS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig_v3
-set ARGS = "-L AMBNEQ=100 AMBTFCTR=0.98 OFFSET=50 AMBNPAD=200 AMBNTX=30 AMBNTY=30 AMBNAP=10 AMBSEED=4 errlog=$TEMPLOG" 
+set ARGS = "AMBNEQ=100 AMBTFCTR=0.98 OFFSET=50 AMBNPAD=200 AMBNTX=30 AMBNTY=30 AMBNAP=10 AMBSEED=4 errlog=$TEMPLOG" 
 set MAPROJ = /home/jsoc/cvs/Development/waystation/JSOC/bin/$JSOC_MACHINE/maproj3comperrorlonat02deg
 set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree clat=0.0"
-set DOPPCAL = /home/jsoc/cvs/Development/waystation/JSOC/bin/$JSOC_MACHINE/cgem_doppcal
 
 # make qsub scripts
 
@@ -70,7 +69,6 @@ echo 'set HMIBstatus=6' >>&$TEMPCMD
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
   echo "$DIS in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
   echo "$MAPROJ in=hmi.B_720s'['$wantlow'-'$wanthigh']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
-  echo "$DOPPCAL -w in=hmi.B_720s'['$wantlow'-'$wanthigh']' out=cgem.doppcal_720s" >> $TEMPCMD
 end
 echo 'set HMIBstatus = $?' >>$TEMPCMD
 echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD

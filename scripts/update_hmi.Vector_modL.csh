@@ -42,7 +42,6 @@ set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_segment_
 set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_patch_module
 set JV2TS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jv2ts
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 
 #set IQUV_args = "-L wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1 quicklook=0"
 #set OBS_args = "-L levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1"
@@ -73,16 +72,6 @@ echo 6 > $HERE/retstatus
 
 # check for eclipse quality bits to be set in lev1_nrt
 #$ECLIPSEscript $wantlow $wanthigh
-
-# wait for cosmic ray completeness
-@ lev1_N = `$SHOW_INFO hmi.lev1'['$wantlow'-'$wanthigh'][? hftsacid = 1022 ?]' -qc`
-@ CR_N = `$SHOW_INFO hmi.cosmic_rays'['$wantlow'-'$wanthigh']' -qc`
-while ( $CR_N < $lev1_N )
-  sleep 1800
-  touch $HERE/WAITING_FOR_CR
-  @ lev1_N = `$SHOW_INFO hmi.lev1'['$wantlow'-'$wanthigh'][? hftsacid = 1022 ?]' -qc`
-  @ CR_N = `$SHOW_INFO hmi.cosmic_rays'['$wantlow'-'$wanthigh']' -qc`
-end
 
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
