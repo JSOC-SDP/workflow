@@ -58,6 +58,7 @@ set ARGS = "-L AMBNEQ=100 AMBTFCTR=0.98 OFFSET=50 AMBNPAD=200 AMBNTX=30 AMBNTY=3
 set MAPROJ = /home/jsoc/cvs/Development/waystation/JSOC/bin/$JSOC_MACHINE/maproj3comperrorlonat02deg
 set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree clat=0.0"
 set DOPPCAL = /home/jsoc/cvs/Development/waystation/JSOC/bin/$JSOC_MACHINE/cgem_doppcal
+set GAPFILL = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/set_gaps_missing
 
 # make qsub scripts
 
@@ -77,7 +78,8 @@ echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $HMIBstatus >retstatus' >>&$TEMPCMD
 
-echo "/home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh" >> $TEMPCMD
+#echo "/home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh" >> $TEMPCMD
+echo "$GAPFILL ds=hmi.B_720s high=$wanthigh low=$wantlow" >> $TEMPCMD
 
 # execute qsub script
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
