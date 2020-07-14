@@ -22,12 +22,13 @@ set USERDB2=hmidb2
 @ fivedays = 5 * 1440
 @ sixdays = 6 * 1440
 @ oneweek = 7 * 1440
+@ eightdays = 8 * 1440
 
 # HMI products
-set hproduct = ( hmi.lev0a hmi.lev1_nrt hmi.V_45s_nrt hmi.V_720s_nrt hmi_images hmi.MHarp_720s_nrt hmi.lev1 hmi.cosmic_rays hmi.V_45s hmi.V_720s)
-set hgreen =  ( 2  7  30  73 51 90 $fivedays $fivedays $sixdays $sixdays)
-set hyellow = ( 4  10  60  85 60 120 $fivedays $fivedays $sixdays $sixdays)
-set hred =    ( 8  20 120 150 150 150 $sixdays  $sixdays  $oneweek $oneweek) 
+set hproduct = ( hmi.lev0a hmi.lev1_nrt hmi.V_45s_nrt hmi.V_720s_nrt hmi_images hmi.MHarp_720s_nrt hmi.lev1 hmi.cosmic_rays hmi.V_45s hmi.V_720s hmi.B_720s)
+set hgreen =  ( 2  7  30  73 51 90 $fivedays $fivedays $sixdays $sixdays $oneweek)
+set hyellow = ( 4  10  60  85 60 120 $fivedays $fivedays $sixdays $sixdays $oneweek)
+set hred =    ( 8  20 120 150 150 150 $sixdays  $sixdays  $oneweek $oneweek $eightdays)
 
 # AIA products
 set aproduct = ( aia.lev0 aia.lev1_nrt2 aia_test.lev1p5 aia.lev1 )
@@ -219,6 +220,8 @@ while ($iprod <= $nprod)
   endif
   if ($prod == hmi_images) then
     set note = "HMI nrt web images"
+  else if ($prod == hmi.B_720s) then
+    set note = "Full-disk Milne-Eddington inversion"
   else
     set note = `$SHOW_SERIES -p '^'$prod'$' | grep "Note:" | head -1 | sed -e 's/"/'"'/"`
     shift note
