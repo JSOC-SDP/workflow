@@ -679,7 +679,7 @@ if ($b == 1) then
 else if ($o == 1 ) then
   set favicon = orange_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh orange
-  /usr/bin/Mail -s 'HMI images with datamin < 0 found' jeneen,baldner,zoe@lmsal.com < /tmp/camera_bad
+  /usr/bin/Mail -s 'HMI images with datamin < 0 found' jeneen,baldner,zoe@lmsal.com,thomas.j.cruz@lmco.com < /tmp/camera_bad
 else if ($r == 1) then
   set favicon = red_sq.gif
   /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh red
