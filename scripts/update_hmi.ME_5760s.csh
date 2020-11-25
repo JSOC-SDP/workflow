@@ -23,7 +23,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QSUB = qsub
   set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a8.q
+  set QUE = k.q
   set QSUB = /SGE2/bin/lx-amd64/qsub
   set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
 endif
@@ -41,7 +41,8 @@ set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
 set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
 
 set timest = `echo $WANTLOW | cut -c9-13,15-16`
-set TEMPLOG = $HERE/runlog
+set OLOG = $HERE/runlog
+set ELOG = $HERE/errlog
 set TEMPCMD = $HERE/ME96$timest
 echo 6 > $HERE/retstatus
 
@@ -56,6 +57,8 @@ echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >> $TEMPCMD
 echo "setenv KMP_STACKSIZE 16M" >> $TEMPCMD
 echo "unlimit" >> $TEMPCMD
 echo "limit core 0" >> $TEMPCMD
+echo "setenv OMP_NUM_THREADS 4" >> $TEMPCMD
+
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD 
 endif
@@ -71,7 +74,7 @@ set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
 
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_5760s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
-  echo "$MPIEXEC -n 8 $VFISV -f out=hmi.ME_5760s in=hmi.S_5760s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
+  echo "$MPIEXEC -n 4 $VFISV -f out=hmi.ME_5760s in=hmi.S_5760s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
 end
 
 echo 'set MEstatus = $?' >>$TEMPCMD
@@ -81,7 +84,7 @@ echo 'echo $MEnrtstatus >retstatus' >>&$TEMPCMD
 echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
 # execute qsub script
 
-$QSUB -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
+$QSUB -pe smp 4 -e $ELOG -o $OLOG -q $QUE $TEMPCMD
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 #if ( $retstatus == 0 ) then
