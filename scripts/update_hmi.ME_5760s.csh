@@ -49,8 +49,8 @@ echo 6 > $HERE/retstatus
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
-echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "set echo >>&$TEMPLOG" >>$TEMPCMD
+echo "hostname >>&$OLOG" >>$TEMPCMD
+echo "set echo >>&$OLOG" >>$TEMPCMD
 #echo "setenv SGE_ROOT /SGE" >>$TEMPCMD
 echo "setenv MPI_MAPPED_STACK_SIZE 100M" >> $TEMPCMD
 echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >> $TEMPCMD
@@ -81,7 +81,7 @@ echo 'set MEstatus = $?' >>$TEMPCMD
 echo 'if ($MEstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $MEnrtstatus >retstatus' >>&$TEMPCMD
-echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
+echo "echo DONE >> $OLOG" >>$TEMPCMD
 # execute qsub script
 
 $QSUB -pe smp 4 -e $ELOG -o $OLOG -q $QUE $TEMPCMD
