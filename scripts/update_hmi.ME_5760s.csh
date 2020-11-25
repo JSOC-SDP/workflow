@@ -83,7 +83,7 @@ echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
 
 $QSUB -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
-#if (-e retstatus) set retstatus = `cat $HERE/retstatus`
+if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 #if ( $retstatus == 0 ) then
 #  @ s = `$TIME_CONVERT time=$wanthigh`
 #  @ sB = $s + 360
