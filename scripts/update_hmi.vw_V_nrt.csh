@@ -30,7 +30,7 @@ set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
 
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
-set qsubname = VWV$timestr
+set qsubname = NVWV$timestr
 
 set LOG = $HERE/runlog
 set CMD = $HERE/$qsubname
