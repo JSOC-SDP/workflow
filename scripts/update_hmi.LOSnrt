@@ -92,4 +92,8 @@ set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -e $TEMPLOG -o $TEMPLOG -sync yes -q $QUE $TEMPCMD
 
 set retstatus = `cat $HERE/retstatus`
+if ($retstatus == 0 ) then
+  set VW_TICKET = `$WFCODE/maketicket.csh gate=hmi.vw_V_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+endif
+
 exit $retstatus
