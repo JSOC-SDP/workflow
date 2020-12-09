@@ -156,6 +156,7 @@ if ( $retstatus == 0 ) then
     @ t = $end + 1
   end
   set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set S_TICKET = `$WFCODE/maketicket.csh gate=hmi.S_5760s wantlow=$wantlow wanthigh = $wahthigh action=5`
 #  @ indexhigh++
   set vfisvhigh = `index_convert ds=$product $key"_index"=$indexhigh`
 #  @ tv = `time_convert time=$WANTHIGH + 360`
