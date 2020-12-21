@@ -70,7 +70,7 @@ if ( $update_lag > 600 ) then
 endif
 #echo "Content-type: text/html" >$TMP
 echo '<\!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">' >$TMP
-echo '<html><head><title>JSOC Processing Status</title><meta http-equiv="Refresh" content="60"></head><body link=black>' >>$TMP
+echo '<html><head><title>JSOC Processing Status</title><meta http-equiv="refresh" content="60" url="http://jsoc.stanford.edu/data/jsoc_proc_status.html"></head><body link=black>' >>$TMP
 echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> $TMP
 echo -n "Last Update "$now"_UTC -- " >>$TMP
 date >>$TMP
