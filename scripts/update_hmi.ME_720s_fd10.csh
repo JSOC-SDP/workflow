@@ -73,7 +73,7 @@ echo "sleep 10" >> $TEMPCMD
 echo 'set VFnrtstatus=0' >>&$TEMPCMD
 
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
-  echo "$MPIEXEC -n 8 $VFISV -f out=hmi.ME_720s_fd10 in=hmi.S_720s\["$T"] in5=hmi.M_720s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
+  echo "$MPIEXEC -n 8 $VFISV -f -L out=hmi.ME_720s_fd10 in=hmi.S_720s\["$T"] in5=hmi.M_720s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
 end
 
 echo 'set VFnrtstatus = $?' >>$TEMPCMD
