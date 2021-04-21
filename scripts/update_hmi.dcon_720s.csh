@@ -35,8 +35,8 @@ set S = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/stokes_dcon
 set OBS =  /home/jsoc/cvs/Development/JSOC/bin/linux_avx/HMI_observables_dconS
 
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+@ indexlow = `index_convert ds=$product $key=$WANTLOW`
+@ indexhigh = `index_convert ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
 set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
