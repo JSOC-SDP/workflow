@@ -15,7 +15,6 @@ endif
 set low = 2010.05.01
 set high = 2010.02.02
 
-set echo
 cd /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
 set last_year = `ls -1d 20* | tail -1 | cut -c1-4`
 cd $last_year
