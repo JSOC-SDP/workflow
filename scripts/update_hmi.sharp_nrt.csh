@@ -56,7 +56,7 @@ end
 if ( $num > 0 && $bigEnough == 1 ) then
   set HERE = $cwd
   set TEMPLOG = $HERE/runlog
-  set CMD = $HERE/SHP_nrt
+  set CMD = $HERE/$qsubname
   echo 6 > $HERE/retstatus
 
 # make qsub script
