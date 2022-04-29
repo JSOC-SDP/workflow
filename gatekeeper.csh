@@ -24,7 +24,7 @@ echo $HOST'.'$$ > Keep_running
 set keep_running = 1
 
 while ($keep_running > 0) # KEEPRUNNING LOOP
-
+    sed -i 's/STATUS=[0-9]/STATUS=0/' $WFDIR/ticket.test
     echo " "
     echo " "
     echo " "
@@ -412,10 +412,11 @@ ALL_GATES_DONE:
     if (!(-e Keep_running)) then
 	set keep_running = 0
     else
+        sed -i 's/STATUS=[0-9]/STATUS=5/ $WFDIR/ticket.test
         echo "XXXXXXXXXXXXXXXXX Start Sleeping XXXXXXXXXXXXXXXX"
         sleep $CADENCE
     endif
-
+ 
 end # KEEPRUNNING LOOP
 
 echo Gate_Keeper Exit
