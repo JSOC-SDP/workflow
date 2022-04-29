@@ -412,7 +412,7 @@ ALL_GATES_DONE:
     if (!(-e Keep_running)) then
 	set keep_running = 0
     else
-        sed -i 's/STATUS=[0-9]/STATUS=5/ $WFDIR/ticket.test'
+        sed -i 's/STATUS=[0-9]/STATUS=5/' $WFDIR/ticket.test
         echo "XXXXXXXXXXXXXXXXX Start Sleeping XXXXXXXXXXXXXXXX"
         sleep $CADENCE
     endif
