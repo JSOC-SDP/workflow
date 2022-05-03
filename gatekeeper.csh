@@ -307,11 +307,12 @@ continue # NEXT TICKET
             # check expire time on working tickets
 	    if ( ($STATUS == 3 || $STATUS == 2) && $EXPIRES_t < $now) then
                 if ($verbosemode) echo GATEKEEPER TIMEOUT of ticket $ticket
-                ex - active_tickets/$ticket <<!
-/STATUS/d
-w
-q
-!
+		sed -i 's/STATUS=[0-9]//' $donetask/ticket
+#                ex - active_tickets/$ticket <<!
+#/STATUS/d
+#w
+#q
+#!
 		echo "STATUS=4" >> active_tickets/$ticket
                 set STATUS=4
 	        set task = `echo $TASKID | sed -e 's/-.*//'`
@@ -354,11 +355,12 @@ continue # NEXT TICKET
 		    endif
 		    if ($ACTION == 3  && $WANTLOW_t >= $low_t && $WANTHIGH_t <= $high_t ) then
 		        if ( $verbosemode ) echo "GATEKEEPER ACTION = 3, waiting done"
-                        ex - active_tickets/$ticket << !
-/STATUS/d
-w
-q
-!
+			sed -i 's/STATUS=[0-9]//' $donetask/ticket
+#                        ex - active_tickets/$ticket << !
+#/STATUS/d
+#w
+#q
+#!
 		        echo "GATELOW=$WANTLOW" >> active_tickets/$ticket
 		        echo "GATEHIGH=$WANTHIGH" >> active_tickets/$ticket
 		        echo "STATUS=0" >> active_tickets/$ticket
@@ -368,11 +370,12 @@ q
 		        if ($verbosemode) echo "GATEKEEPER ACTION = 6"
 		        # XXXXX this logic will need to change when coverage map implemented
 	                if ($low != "NaN" && $high != "NaN") then # Coverage map must be complete now
-                        ex - active_tickets/$ticket <<!
-/STATUS/d
-w
-q
-!
+			sed -i 's/STATUS=[0-9]//' $donetask/ticket
+#                        ex - active_tickets/$ticket <<!
+#/STATUS/d
+#w
+#q
+#!
 		        echo "GATELOW=$low" >> active_tickets/$ticket
 		        echo "GATEHIGH=$high" >> active_tickets/$ticket
 		        echo "STATUS=0" >> active_tickets/$ticket
