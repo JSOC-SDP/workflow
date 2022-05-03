@@ -245,11 +245,12 @@ continue # NEXT TICKET
             set parenttask = $TASKID:s/-/./:r
             if ($TICKET != VOID) rm -f ../logs/$TICKET/manager.pid
             if ($verbosemode) echo "GATEKEEPER parent task is $parenttask"
-	    ex - $donetask/ticket <<!
-/STATUS/d
-w
-q
-!
+            sed -i 's/STATUS=[0-9]//' $donetask/ticket
+#	    ex - $donetask/ticket <<!
+#/STATUS/d
+#w
+#q
+#!
             if ($debugmode) ls -l $donetask/ticket
 	    set taskstate = `cat $donetask/state`
 	    if ($taskstate == 0) then
