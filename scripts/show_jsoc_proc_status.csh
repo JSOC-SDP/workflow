@@ -23,6 +23,8 @@ set USERDB2=hmidb2
 @ sixdays = 6 * 1440
 @ oneweek = 7 * 1440
 @ eightdays = 8 * 1440
+@ ninedays = 9 * 1440
+@ tendays = 10 * 1440
 
 # HMI products
 set hproduct = ( hmi.lev0a hmi.lev1_nrt hmi.V_45s_nrt hmi.V_720s_nrt hmi_images hmi.MHarp_720s_nrt hmi.lev1 hmi.cosmic_rays hmi.V_45s hmi.V_720s hmi.B_720s)
@@ -31,10 +33,10 @@ set hyellow = ( 4  10  60  85 60 120 $fivedays $fivedays $sixdays $sixdays $onew
 set hred =    ( 8  20 120 150 150 150 $sixdays  $sixdays  $oneweek $oneweek $eightdays)
 
 # AIA products
-set aproduct = ( aia.lev0 aia.lev1_nrt2 aia_test.lev1p5 aia.lev1 )
-set agreen = ( 3  6 15 $fivedays )
-set ayellow = ( 4  10 20 $fivedays )
-set ared    = (8  20 40 $sixdays )
+set aproduct = ( aia.lev0 aia.lev1_nrt2 aia_test.lev1p5 aia.lev1 aia_synoptic_nrt_images aia_synoptic_images)
+set agreen = ( 3 6 15 $fivedays 60 $eightdays)
+set ayellow = ( 4 10 20 $fivedays 90 $ninedays)
+set ared    = (8 20 40 $sixdays 120 $tendays)
 
 # IRIS products
 set iproduct = ( iris.lev0 iris.lev1_nrt)
@@ -100,6 +102,15 @@ while ($iprod <= $nprod)
       set times = ` head -1 /web/jsoc/htdocs/data/hmi/images/image_times`
     endif
     set times = `echo $times[2] | awk --  'BEGIN {FIELDWIDTHS = "4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%s_TAI",$1,$2,$3,$5,$6,$7)}'`
+  else if ($prod == aia_synoptic_nrt_images) then
+# #  set file = /web/jsoc/htdocs/data/aia/synoptic/mostrecent/AIAsynoptic0131.fits
+# #  set times = `listhead $file | grep T_OBS | grep -v CRLT | awk '{print $3}' | sed s/\'//g`
+# #  set times = `echo $times | awk -- 'BEGIN {FIELDWIDTHS = "4 1 2 1 2 1 2 1 2 1 2 1 2 "} {printf("%s.%s.%s_%s:%s:%s:%sZ",$1,$3,$5,$7,$9,$11,$13)}'`
+  #  set times = `$SHOW_INFO lm_jps.synoptic3'[$][131]' -q key=t_obs | awk -- 'BEGIN {FIELDWIDTHS = "4 1 2 1 2 1 2 1 2 1 2 1 2 "} {printf("%s.%s.%s_%s:%s:%s:%sZ",$1,$3,$5,$7,$9,$11,$13)}'`
+     set times = `head -1 /home/jsoc/aia/synoptic/mostrecent/image_times | awk '{print $2}' | awk -- 'BEGIN {FIELDWIDTHS = "4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%sZ",$1,$2,$3,$5,$6,$7)}'`
+  else if ($prod == aia_synoptic_images) then
+    set times = `grep synoptic /web/jsoc/htdocs/data/aia/synoptic/image_times | awk '{print $2}' | awk -F\/ '{print $11}'`
+    set times = `echo $times | awk -- 'BEGIN {FIELDWIDTHS = "3 4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%sZ",$2,$3,$4,$6,$7,$8,$9)}'`
   else if ($prod == hmi.MHarp_720s_nrt ) then
     set Z = `$SHOW_INFO -q key=T_OBS $prod'[][$][? T_OBS > 0 ?]' -c`
     if ( $Z == 1 ) then
@@ -226,6 +237,10 @@ while ($iprod <= $nprod)
     set note = "HMI nrt web images"
   else if ($prod == hmi.B_720s) then
     set note = "Full-disk Milne-Eddington inversion"
+  else if ($prod ==  aia_synoptic_nrt_images) then
+    set note = "AIA nrt synoptic images"
+  else if ($prod == aia_synoptic_images) then
+    set note = "AIA synoptic images"
   else
     set note = `$SHOW_SERIES -p '^'$prod'$' | grep "Note:" | head -1 | sed -e 's/"/'"'/"`
     shift note
@@ -312,7 +327,8 @@ echo "$db_diff"'s </td><td>Lag between hmidb and hmidb2</td></tr>' >>$TMP
 set count1 = `wget -O - -q 'http://jsoc2.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
 #echo -n $count1
 set count2 = `wget -O - -q 'http://jsoc.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
-set count3 = `/SGE/bin/lx24-amd64/qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
+#set count3 = `/SGE/bin/lx24-amd64/qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
+set count3 = `qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
  
 echo -n '<tr><td>Exports Pending </td><td' >> $TMP
 
