@@ -95,6 +95,10 @@ while ($iprod <= $nprod)
     set times = `$SHOW_INFO key=T_OBS -q aia.lev0'[? T_OBS > 0 ?]' n=-1`
   else if ($prod == hmi_images) then
     set times = ` head -1 /web/jsoc/htdocs/data/hmi/images/image_times`
+    if ( $#times != 2 ) then
+      cp /web/jsoc/htdocs/data/hmi/images/image_times.BACKUP /web/jsoc/htdocs/data/hmi/images/image_times
+      set times = ` head -1 /web/jsoc/htdocs/data/hmi/images/image_times`
+    endif
     set times = `echo $times[2] | awk --  'BEGIN {FIELDWIDTHS = "4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%s_TAI",$1,$2,$3,$5,$6,$7)}'`
   else if ($prod == hmi.MHarp_720s_nrt ) then
     set Z = `$SHOW_INFO -q key=T_OBS $prod'[][$][? T_OBS > 0 ?]' -c`
