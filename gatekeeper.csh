@@ -308,12 +308,13 @@ q
             # check expire time on working tickets
 	    if ( ($STATUS == 3 || $STATUS == 2) && $EXPIRES_t < $now) then
                 if ($verbosemode) echo GATEKEEPER TIMEOUT of ticket $ticket
-                ex - active_tickets/$ticket <<!
-/STATUS/d
-w
-q
-!
-		echo "STATUS=4" >> active_tickets/$ticket
+#                ex - active_tickets/$ticket <<!
+#/STATUS/d
+#w
+#q
+#!
+#		echo "STATUS=4" >> active_tickets/$ticket
+		sed -i 's/STATUS=[0-9]/STATUS=4/' active_tickets/ticket
                 set STATUS=4
 	        set task = `echo $TASKID | sed -e 's/-.*//'`
                 if (-e WFDIR/tasks/$task/active/$TASKID) then
