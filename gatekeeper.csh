@@ -356,28 +356,30 @@ continue # NEXT TICKET
 		    endif
 		    if ($ACTION == 3  && $WANTLOW_t >= $low_t && $WANTHIGH_t <= $high_t ) then
 		        if ( $verbosemode ) echo "GATEKEEPER ACTION = 3, waiting done"
-                        ex - active_tickets/$ticket << !
-/STATUS/d
-w
-q
-!
+#                        ex - active_tickets/$ticket << !
+#/STATUS/d
+#w
+#q
+#!
 		        echo "GATELOW=$WANTLOW" >> active_tickets/$ticket
 		        echo "GATEHIGH=$WANTHIGH" >> active_tickets/$ticket
-		        echo "STATUS=0" >> active_tickets/$ticket
+#		        echo "STATUS=0" >> active_tickets/$ticket
+		        sed -i 's/STATUS=[0-9]/STATUS=0/' active_tickets/ticket
 		        set STATUS = 0
 		    else if ($ACTION == 6) then
 		        # ACTION == 6
 		        if ($verbosemode) echo "GATEKEEPER ACTION = 6"
 		        # XXXXX this logic will need to change when coverage map implemented
 	                if ($low != "NaN" && $high != "NaN") then # Coverage map must be complete now
-                        ex - active_tickets/$ticket <<!
-/STATUS/d
-w
-q
-!
+#                        ex - active_tickets/$ticket <<!
+#/STATUS/d
+#w
+#q
+#!
 		        echo "GATELOW=$low" >> active_tickets/$ticket
 		        echo "GATEHIGH=$high" >> active_tickets/$ticket
-		        echo "STATUS=0" >> active_tickets/$ticket
+#		        echo "STATUS=0" >> active_tickets/$ticket
+			sed -i 's/STATUS=[0-9]/STATUS=0/' $donetask/ticket
 		        set STATUS = 0
 		    endif
 	        endif
