@@ -22,8 +22,8 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   @ THREADS = 1
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-#  set QUE = p4.q
-  set QUE = k.q
+  set QUE = p4.q
+#  set QUE = k.q
   @ THREADS = 4
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
@@ -69,7 +69,7 @@ set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
 # check for eclipse quality bits to be set in lev1_nrt
-#$ECLIPSEscript $wantlow $wanthigh nrt
+$ECLIPSEscript $wantlow $wanthigh nrt
 
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
@@ -124,8 +124,8 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 # execute qsub script
 touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-#$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD 
-$QSUB -pe smp $THREADS -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
+$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD 
+#$QSUB -pe smp $THREADS -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
