@@ -69,7 +69,7 @@ set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
 # check for eclipse quality bits to be set in lev1_nrt
-$ECLIPSEscript $wantlow $wanthigh nrt
+#$ECLIPSEscript $wantlow $wanthigh nrt
 
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
