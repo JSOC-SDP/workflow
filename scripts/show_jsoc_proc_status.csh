@@ -25,7 +25,7 @@ set USERDB2=hmidb2
 @ eightdays = 8 * 1440
 @ ninedays = 9 * 1440
 @ tendays = 10 * 1440
-
+@ twentydays = 20 * 1440 
 # HMI products
 set hproduct = ( hmi.lev0a hmi.lev1_nrt hmi.V_45s_nrt hmi.V_720s_nrt hmi_images hmi.MHarp_720s_nrt hmi.lev1 hmi.cosmic_rays hmi.V_45s hmi.V_720s hmi.B_720s)
 set hgreen =  ( 2  7  30  73 51 90 $fivedays $fivedays $sixdays $sixdays $oneweek)
@@ -36,7 +36,9 @@ set hred =    ( 8  20 120 150 150 150 $sixdays  $sixdays  $oneweek $oneweek $eig
 set aproduct = ( aia.lev0 aia.lev1_nrt2 aia_test.lev1p5 aia.lev1 aia_synoptic_nrt_images aia_synoptic_images)
 set agreen = ( 3 6 15 $fivedays 60 $eightdays)
 set ayellow = ( 4 10 20 $fivedays 90 $ninedays)
-set ared    = (8 20 40 $sixdays 120 $tendays)
+#set ared    = (8 20 40 $sixdays 120 $tendays)
+set ared    = (8 20 40 $sixdays 120 $twentydays)
+
 
 # IRIS products
 set iproduct = ( iris.lev0 iris.lev1_nrt)
