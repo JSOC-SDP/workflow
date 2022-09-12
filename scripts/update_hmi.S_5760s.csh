@@ -40,7 +40,9 @@ set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_IQUV_ave
 # round times to a slot
 set indexlow = `index_convert ds=$product $key=$WANTLOW`
 set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
-@ indexhigh = $indexhigh - 1
+if ( $indexhigh != $indexlow ) then
+  @ indexhigh = $indexhigh - 1
+endif
 set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
 set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
