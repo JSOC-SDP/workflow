@@ -1,0 +1,47 @@
+#! /bin/csh -f
+#
+# these lines for all products
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_DATA
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+
+cd $WFDIR
+rm -f Keep_running
+while (-e GATEKEEPERBUSY)
+  echo waiting for gatekeeper to quit.
+  sleep 5
+  end
+
+# begin section for this product
+
+# make test gates and tasks for HMI limb_fit
+# This includes the several input series.
+
+# remove prior versions
+
+cd $WFDIR/gates
+rm -rf hmi.Limb_Fit
+
+cd $WFDIR/tasks
+rm -rf update_hmi.Limb_Fit
+
+# Make tasks and set preconditions
+
+# NOTE the "command" script used below must be available and executable when this script is run
+cd $WFDIR
+$WFCODE/maketask.csh task=update_hmi.Limb_Fit manager=taskmanager.csh target=hmi.Limb_Fit \
+		command=scripts/update_hmi.Limb_Fit.csh maxrange=1440 parallelOK=10
+
+
+
+cd $WFDIR
+$WFCODE/makegate.csh gate_name=hmi.Limb_Fit product=hmi.Limbfit_set type=time key=T_REC project=HMI \
+		 actiontask=update_hmi.Limb_Fit statustask=scripts/status-general.csh
+
+# initialize the gates
+$WFCODE/maketicket.csh gate=hmi.Limb_Fit wantlow=NaN wanthigh=NaN action=6
+

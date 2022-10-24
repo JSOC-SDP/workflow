@@ -1,0 +1,54 @@
+#! /bin/csh -f
+#
+# make test gates and tasks for HMI line-of-sight NRT observables
+
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_DATA
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+
+# Stop the gatekeeper in case it is running.
+
+cd $WFDIR
+rm -f Keep_running
+while (-e GATEKEEPERBUSY)
+  echo waiting for gatekeeper to quit.
+  sleep 5
+  end
+
+cd $WFDIR/gates
+rm -rf hmi.LOSnrt
+
+cd $WFDIR/tasks
+rm -rf update_hmi.LOSnrt
+
+# Make any user tasks
+
+cd $WFDIR
+$WFCODE/maketask.csh task=update_hmi.LOSnrt \
+		manager=taskmanager.csh \
+		target=hmi.LOSnrt \
+		command=scripts/update_hmi.LOSnrt \
+		maxrange=1200 \
+		parallelOK=5
+set PRECOND = $WFDIR/tasks/update_hmi.LOSnrt/preconditions/hmi.lev1nrt
+mkdir $PRECOND
+echo "set ACTION = 3" > $PRECOND/prepare_ticket
+
+# Now make any user gates.
+
+cd $WFDIR
+# use type time and let the status and action tasks convert to DSDS seriesnumbers
+$WFCODE/makegate.csh gate_name=hmi.LOSnrt \
+		 product=hmi.M_45s_nrt \
+		 type=time \
+		 key=T_REC \
+		 project=HMI \
+		 actiontask=update_hmi.LOSnrt \
+		 statustask=scripts/status-general.csh
+
+$WFCODE/maketicket.csh gate=hmi.LOSnrt wantlow=NaN wanthigh=NaN action=6
+

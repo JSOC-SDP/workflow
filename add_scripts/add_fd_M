@@ -1,0 +1,75 @@
+#! /bin/csh -f
+#
+# make test gates and tasks for mdi.fd_M one minute data at lev1.8
+# If the tasks and gates directories exist only the test gates and tasks will be rebuilt.
+# If the gates and tasks diretories are not present, they will be created.
+
+if ($?WORKFLOW_ROOT) then
+  set WFDIR = $WORKFLOW_DATA
+  set WFCODE = $WORKFLOW_ROOT
+else
+  echo Need WORKFLOW_ROOT variable to be set.
+  exit 1
+endif
+
+# Stop the gatekeeper in case it is running.
+
+cd $WFDIR
+rm -f Keep_running
+while (-e GATEKEEPERBUSY)
+  echo waiting for gatekeeper to quit.
+  sleep 5
+  end
+
+cd $WFDIR/gates
+rm -rf mdi.fdM dsds.fdM
+
+cd $WFDIR/tasks
+rm -rf update_mdi.fd_M stage_dsds.fd_M
+
+# Make any user tasks
+
+cd $WFDIR
+$WFCODE/maketask.csh task=update_mdi.fd_M \
+		manager=taskmanager.csh \
+		target=mdi.fdM \
+		command=scripts/update-mdi.fd_M \
+		maxrange=864000 \
+		parallelOK=5
+set PRECOND = tasks/update_mdi.fd_M/preconditions/dsds.fdM
+mkdir $PRECOND
+echo "set ACTION = 5" > $PRECOND/prepare_ticket
+
+$WFCODE/maketask.csh task=stage_dsds.fd_M \
+		manager=taskmanager.csh \
+		target=dsds.fdM \
+		command=scripts/stage-dsds_hourly_data.csh \
+		maxrange=864000
+
+# Now make any user gates.
+
+cd $WFDIR
+# use type time and let the status and action tasks convert to DSDS seriesnumbers
+$WFCODE/makegate.csh gate_name=dsds.fdM \
+		 product=dsds.mdi__lev1_8__fd_M_01h \
+		 type=time \
+		 key=snum \
+		 project=MDI \
+		 actiontask=stage_dsds.fd_M \
+		 statustask=scripts/status-dsds_hourly.csh
+
+$WFCODE/makegate.csh gate_name=mdi.fdM \
+		 product=mdi.fd_M_lev18 \
+		 type=time \
+		 key=T_REC \
+		 project=MDI \
+		 actiontask=update_mdi.fd_M \
+		 statustask=scripts/status-general.csh
+
+# Now, to get things started, initialize the new gates.  this is not strictly necessary if the nextupdate
+# times are defaulted to now.
+
+cd $WFDIR
+$WFCODE/maketicket.csh gate=mdi.fdM action=6 wantlow=NaN wanthigh=NaN
+$WFCODE/maketicket.csh gate=dsds.fdM  action=6 wantlow=NaN wanthigh=NaN
+
