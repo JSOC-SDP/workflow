@@ -1,7 +1,9 @@
 # Standard things
-sp 		:= $(sp).x
+sp 							:= $(sp).x
 dirstack_$(sp)	:= $(d)
-d		:= $(dir)
+d								:= $(dir)
+
+PROJECT_$(d)	:= $(call GET_PROJECT,$(d))
 
 # Subdirectories. Directory-specific rules are optional here. The
 # order DOES matter, always define libraries before applications
@@ -9,9 +11,12 @@ d		:= $(dir)
 dir		:= $(d)/apps
 -include	$(SRCDIR)/$(dir)/Rules.mk
 
-.PHONY:		workflow_
-workflow_:	workflow_apps
+.PHONY:		$(PROJECT_$(d))_all
+$(PROJECT_$(d))_all::		;
+
+.PHONY:		install_$(PROJECT_$(d))_all
+install_$(PROJECT_$(d))_all::	;
 
 # Standard things
 d		:= $(dirstack_$(sp))
-sp		:= $(basename $(sp))
+sp	:= $(basename $(sp))
