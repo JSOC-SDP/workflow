@@ -17,6 +17,9 @@ $(PROJECT_$(d))_all::		;
 .PHONY:		install_$(PROJECT_$(d))_all
 install_$(PROJECT_$(d))_all::	;
 
+universe::					$(PROJECT_$(d))_all
+install_universe::	install_$(PROJECT_$(d))_all
+
 # Standard things
 d		:= $(dirstack_$(sp))
 sp	:= $(basename $(sp))
