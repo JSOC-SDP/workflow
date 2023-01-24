@@ -245,7 +245,7 @@ echo 'DONE:' >>$CMD
 echo 'echo $MHarpstatus >retstatus' >> $CMD
 #echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
 #echo "/home/jsoc/pipeline/scripts/harp_nrt_movies.csh" >> $CMD
-#echo "/home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/harp_nrt_movies.csh" >> $CMD
+echo "/home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/harp_nrt_movies.csh" >> $CMD
 echo 'echo $MHarpstatus >retstatus' >>$CMD
 echo "rm $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
 

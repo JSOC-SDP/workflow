@@ -632,6 +632,7 @@ else
   echo "</td></tr>" >>$TMP
 endif
 
+#echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBAD > 0 ) then
   rm /tmp/camera_bad
   @ o = 1
