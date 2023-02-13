@@ -3,3 +3,6 @@
 # be included)
 
 $(eval $(call register_install_dirs,$(PROJECT),,,))
+
+# apps
+$(call REGISTER_APPLICATION,$(PROJECT),GetNextID,$(PROJECT)/apps/GetNextID)
