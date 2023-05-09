@@ -6,3 +6,9 @@ $(eval $(call register_install_dirs,$(PROJECT),,,))
 
 # apps
 $(call REGISTER_APPLICATION,$(PROJECT),GetNextID,$(PROJECT)/apps/GetNextID)
+
+$(eval $(call register_installation,$(PROJECT)))
+INSTALLATION_CMDS_$(PROJECT) := $(INSTALLATION_CMDS_$(PROJECT))
+
+install::
+	$(INSTALLATION_CMDS_workflow)
