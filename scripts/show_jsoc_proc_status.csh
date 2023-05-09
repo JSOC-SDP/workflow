@@ -33,13 +33,13 @@ set hyellow = ( 4  10  60  85 60 120 $fivedays $fivedays $sixdays $sixdays $onew
 set hred =    ( 8  20 120 150 150 150 $sixdays  $sixdays  $oneweek $oneweek $eightdays)
 
 # AIA products
-set aproduct = ( aia.lev0 aia.lev1_nrt2 aia_test.lev1p5 aia.lev1 aia_synoptic_nrt_images aia_synoptic_images)
+set aproduct = ( aia.lev0 aia.lev1_nrt2 aia_test.lev1p5 aia.lev1 aia_synoptic_nrt_images aia_synoptic_images aia.lev1_euv_12s )
 #set agreen = ( 3 6 15 $fivedays 60 $eightdays)
-set agreen = ( 3 6 15 $fivedays 60 $twentydays)
+set agreen = ( 3 6 15 $fivedays 60 $tendays $oneweek)
 #set ayellow = ( 4 10 20 $fivedays 90 $ninedays)
-set ayellow = ( 4 10 20 $fivedays 90 $twentydays)
+set ayellow = ( 4 10 20 $fivedays 90 $twentydays $eightdays)
 #set ared    = (8 20 40 $sixdays 120 $tendays)
-set ared    = (8 20 40 $sixdays 120 $twentydays)
+set ared    = (8 20 40 $sixdays 120 $twentydays $ninedays)
 
 
 # IRIS products
