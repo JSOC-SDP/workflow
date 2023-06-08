@@ -13,7 +13,6 @@ APPLICATION_TARGETS_$(d)		:= $(foreach application,$(notdir $(APPLICATIONS_$(d))
 $(call MAKE_BUILT_APPLICATION_PREREQS,$(APPLICATION_TARGETS_$(d)))
 
 $(PROJECT_$(d))_all::			   $(APPLICATION_TARGETS_$(d))
-install_$(PROJECT_$(d))_all::	   $(foreach application_target,$(APPLICATION_TARGETS_$(d)),install_$(application_target))
 
 PROJ_CEXE						:= $(PROJ_CEXE) $(CEXE_$(d))
 
@@ -43,14 +42,6 @@ $(OBJ_$(d)):					   CF_TGT := $(CF_TGT) $(INCS_FLAGS_$(d)) -I$(SRCDIR)/$(d)/src/
 $(APPLICATIONS_$(d)):			   LL_TGT := $(LL_TGT) $(LINK_LIBS_FLAGS_$(d))
 $(APPLICATIONS_$(d)):			   PREREQS := $(PREREQS) $(DEPENDENCY_PREREQS_$(d))
 $(APPLICATIONS_$(d)):			   $(DEPENDENCY_PREREQS_$(d))
-
-.PHONY:	$(foreach application_target,$(APPLICATION_TARGETS_$(d)),install_$(application_target) install_$(application_target)_bins)
-$(foreach application_target,$(APPLICATION_TARGETS_$(d)),install_$(application_target)):	install_%:	install_%_bins
-INSTALLED_BINS_$(d)				:= $(addprefix $(BINS_DIR_$(PROJECT_$(d)))/, $(notdir $(foreach application_target,$(APPLICATION_TARGETS_$(d)),$($(application_target)))))
-
-$(call MAKE_INSTALLED_APPLICATION_PREREQS,$(APPLICATION_TARGETS_$(d)))
-$(INSTALLED_BINS_$(d)):			   $(BINS_DIR_$(PROJECT_$(d)))/%:	$(d)/%
-								   cp $< $@
 
 # Shortcuts
 .PHONY:		$(S_$(d))
