@@ -2,12 +2,14 @@
 # which gets included in tree-traversal order (so a Rules.mk needed by a second Rules.mk might not yet
 # be included)
 
-$(eval $(call register_install_dirs,$(PROJECT),,,))
+$(eval $(call register_install_dirs,$(PROJECT),,,,))
 
 # apps
 $(call REGISTER_APPLICATION,$(PROJECT),GetNextID,$(PROJECT)/apps/GetNextID)
 
 $(call REGISTER_SCRIPTS,$(PROJECT),workflow,../$(PROJECT)/scripts)
+
+$(call REGISTER_SOURCE,$(PROJECT),$(PROJECT),$(PROJECT))
 
 $(eval $(call register_installation,$(PROJECT)))
 
@@ -16,10 +18,17 @@ INSTALL_INCS_CMD_$(PROJECT) := $(INSTALL_INCS_CMD_$(PROJECT))
 INSTALL_LIBS_CMD_$(PROJECT) := $(INSTALL_LIBS_CMD_$(PROJECT))
 INSTALL_LIBINCS_CMD_$(PROJECT) := $(INSTALL_LIBINCS_CMD_$(PROJECT))
 INSTALL_SCRS_CMD_$(PROJECT) := $(INSTALL_SCRS_CMD_$(PROJECT))
+INSTALL_SRC_CMD_$(PROJECT) := $(INSTALL_SRC_CMD_$(PROJECT))
 
 install::
+	@echo INCS_INSTALL_DIR_workflow=$(INCS_INSTALL_DIR_workflow)
+	@echo BINS_INSTALL_DIR_workflow=$(BINS_INSTALL_DIR_workflow)
+	@echo LIBS_INSTALL_DIR_workflow=$(LIBS_INSTALL_DIR_workflow)
+	@echo SCRS_INSTALL_DIR_workflow=$(SCRS_INSTALL_DIR_workflow)
+	@echo SRC_INSTALL_DIR_workflow=$(SRC_INSTALL_DIR_workflow)
 	$(INSTALL_BINS_CMD_workflow)
 	$(INSTALL_INCS_CMD_workflow)
 	$(INSTALL_LIBS_CMD_workflow)
 	$(INSTALL_LIBINCS_CMD_workflow)
 	$(INSTALL_SCRS_CMD_workflow)
+	$(INSTALL_SRC_CMD_workflow)
