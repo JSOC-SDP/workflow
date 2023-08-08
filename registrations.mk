@@ -2,8 +2,6 @@
 # which gets included in tree-traversal order (so a Rules.mk needed by a second Rules.mk might not yet
 # be included)
 
-$(eval $(call register_install_dirs,$(PROJECT),,,,))
-
 # apps
 $(call REGISTER_APPLICATION,$(PROJECT),GetNextID,$(PROJECT)/apps/GetNextID)
 
@@ -21,11 +19,7 @@ INSTALL_SCRS_CMD_$(PROJECT) := $(INSTALL_SCRS_CMD_$(PROJECT))
 INSTALL_SRC_CMD_$(PROJECT) := $(INSTALL_SRC_CMD_$(PROJECT))
 
 install::
-	@echo INCS_INSTALL_DIR_workflow=$(INCS_INSTALL_DIR_workflow) | tee -a $(ENVIRONMENT_FILE)
-	@echo BINS_INSTALL_DIR_workflow=$(BINS_INSTALL_DIR_workflow) | tee -a $(ENVIRONMENT_FILE)
-	@echo LIBS_INSTALL_DIR_workflow=$(LIBS_INSTALL_DIR_workflow) | tee -a $(ENVIRONMENT_FILE)
-	@echo SCRS_INSTALL_DIR_workflow=$(SCRS_INSTALL_DIR_workflow) | tee -a $(ENVIRONMENT_FILE)
-	@echo SRC_INSTALL_DIR_workflow=$(SRC_INSTALL_DIR_workflow) | tee -a $(ENVIRONMENT_FILE)
+	@echo installing workflow
 	@$(INSTALL_BINS_CMD_workflow)
 	@$(INSTALL_INCS_CMD_workflow)
 	@$(INSTALL_LIBS_CMD_workflow)
