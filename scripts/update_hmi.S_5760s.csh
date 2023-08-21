@@ -5,6 +5,14 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
@@ -35,7 +43,7 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 set echo
 
-set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_IQUV_averaging
+set IQUVprogram = "${drms_bins_install_dir}"/HMI_IQUV_averaging
 
 # round times to a slot
 set indexlow = `index_convert ds=$product $key=$WANTLOW`

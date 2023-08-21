@@ -6,7 +6,14 @@
 # # XXXXXXXXXX test
 # # set echo
 # # XXXXXXXXXX test
-
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
@@ -29,10 +36,10 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
-set S = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/stokes_dcon
-set OBS =  /home/jsoc/cvs/Development/JSOC/bin/linux_avx/HMI_observables_dconS
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
+set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
+set S = "${drms_bins_install_dir}"/stokes_dcon
+set OBS =  "${drms_bins_install_dir}"/HMI_observables_dconS
 
 # round times to a slot
 @ indexlow = `index_convert ds=$product $key=$WANTLOW`

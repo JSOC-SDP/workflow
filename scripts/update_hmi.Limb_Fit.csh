@@ -5,6 +5,14 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
@@ -32,9 +40,9 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
 end
 
 
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
-set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/lfwrp_tas
-#set Limbprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/lfwrp
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
+set Limbprogram = "${drms_bins_install_dir}"/lfwrp_tas
+#set Limbprogram = "${drms_bins_install_dir}"/lfwrp
 
 set TMPDIR = /tmp28/jsocprod/lfwrp
 

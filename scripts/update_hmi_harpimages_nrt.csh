@@ -1,6 +1,14 @@
 #! /bin/csh -f 
 # This script creates the HARP 720s nrt web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = p.q
@@ -10,9 +18,8 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
-set SRCTREE = /home/jsoc/cvs/Development/JSOC
-set SHOWINFO = $SRCTREE'/'bin/$JSOC_MACHINE/show_info
-set SCRIPT = proj/mag/harp/scripts/track_hmi_harp_movie_driver.sh
+set SHOWINFO = "${drms_bins_install_dir}"/show_info
+set SCRIPT = "${drms_scrs_install_dir}"/track_hmi_harp_movie_driver.sh
 set CONVERT = /usr/bin/convert
 set MASKSERIES = hmi.Marmask_720s_nrt
 set HARPSERIES = hmi.Mharp_720s_nrt
@@ -61,7 +68,7 @@ echo "hostname >>&$LOG" >>$CMDFILE
 
 # Run Turmon's matlab stuff
 set echo
-echo "$SRCTREE/$SCRIPT -fE $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
+echo "$SCRIPT -fE $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $HERE/runlog" >> $CMDFILE
 
 # Now use Turmon's stuff to make other image files
 
@@ -91,6 +98,7 @@ set THUMB = $OUTDIR/thumbnail.png >> $CMDFILE
 echo 'cp $lastPNG '$TMP >> $CMDFILE
 echo "$CONVERT -define png:size=1024x1024 $TMP -thumbnail 256x256 -unsharp 0x.5 $TMP" >> $CMDFILE
 echo "mv $TMP $THUMB" >> $CMDFILE
+# UGH
 echo "/home/jeneen/latestHMI/getHarpTime.csh" >> $CMDFILE
 
 # Delete all .png files older than 60 days 

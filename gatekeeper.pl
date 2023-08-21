@@ -14,7 +14,31 @@ use Data::Dumper;
 use IO::Dir;
 use threads;
 use threads::shared;
-use lib "$Bin/../../../base/libs/perl";
+
+my $drms_bins_install_dir;
+my $drms_incs_install_dir;
+my $drms_libs_install_dir;
+my $drms_params_install_dir;
+my $drms_root_dir;
+my $drms_scrs_install_dir;
+my $drms_src_install_dir;
+my $drms_table_dir;
+
+BEGIN {
+    $drms_bins_install_dir = "$ENV{'DRMS_BINS_INSTALL_DIR'}";
+    $drms_incs_install_dir = "$ENV{'DRMS_INCS_INSTALL_DIR'}";
+    $drms_libs_install_dir = "$ENV{'DRMS_LIBS_INSTALL_DIR'}";
+    $drms_params_install_dir = "$ENV{'DRMS_PARAMS_INSTALL_DIR'}";
+    $drms_root_dir = "$ENV{'DRMS_ROOT_DIR'}";
+    $drms_scrs_install_dir = "$ENV{'DRMS_SCRS_INSTALL_DIR'}";
+    $drms_src_install_dir = "$ENV{'DRMS_SRC_INSTALL_DIR'}";
+    $drms_table_dir = "$ENV{'DRMS_TABLE_DIR'}";
+}
+
+use lib $drms_params_install_dir;
+use drmsparams;
+
+use lib "$drms_src_install_dir/base/libs/perl"
 use drmsNetLocks;
 use drmsArgs;
 use drmsSysRun;
@@ -33,7 +57,7 @@ use constant kSleepShort       => 10;
 use constant kSleepLong        => 60;
 use constant kLockFile         => "/home/jsoc/locks/gatekeeperlck.txt";
 use constant kDefDataDir       => "/home/jsoc/pipeline";
-use constant kDefCodeDir       => "/home/jsoc/cvs/Development/JSOC/proj/workflow";
+use constant kDefCodeDir       => "$drms_src_install_dir/workflow";
 use constant kGateDir          => "gates";
 use constant kLogDir           => "/home/jsoc/jsoclogs/pipeline";
 use constant kRestartLog       => "restartlog.txt";

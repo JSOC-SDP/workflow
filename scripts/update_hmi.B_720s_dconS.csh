@@ -5,6 +5,14 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
@@ -52,8 +60,8 @@ set LOG = $HERE/runlog
 set CMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
-set DIS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig_v3
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
+set DIS = "${drms_bins_install_dir}"/disambig_v3
 set ARGS = "AMBNEQ=100 AMBTFCTR=0.98 OFFSET=150 AMBNPAD=200 AMBNTX=30 AMBNTY=30 AMBNAP=10 AMBSEED=4 errlog=$LOG" 
 
 # make qsub script

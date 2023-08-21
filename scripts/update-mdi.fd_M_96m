@@ -14,6 +14,7 @@ set SUM_SER = "dsds.mdi__lev1_8__fd_M_96m_01d"
 # new DRMS series of records
 set NEW_SER = mdi.fd_M_96m_lev18
 # control file for ingest_dsds_a
+# UGH
 set INGESTMAP =  /home/phil/jsoc/proj/myproj/apps/fd_M_96m/fd_M_96m.map
 
 set TEMP = temp.DIRS

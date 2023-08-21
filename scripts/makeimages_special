@@ -4,6 +4,15 @@
 
  set echo
 
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 set wantlow = $1
 set wanthigh = $2
 
@@ -14,11 +23,10 @@ echo Make images for $wantlow to $wanthigh
 #set CADENCE = 15
 set CADENCE = 45
 
-set WF = /jsoc/cvs/Development/JSOC/proj/workflow
-#setenv RGBDEF /home/phil/jsoc/proj/workflow/scripts/rgb.txt
+set WF = "${drms_src_install_dir}"/workflow
 setenv RGBDEF $WF/scripts/rgb.txt
-set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/render_image
-set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_limbdark
+set RENDER_IMAGE = "${drms_bins_install_dir}"/render_image
+set HMI_LIMBDARK = "${drms_bins_install_dir}"/hmi_limbdark
 
 set obslist = (Ic Ic_flat M)
 set minlist = (20000 0.3 -1500)
@@ -128,7 +136,6 @@ exit
 
 if ($end_movie_t > 0) then
   set end_movie = `time_convert s=$end_movie_t zone=TAI`
-#  /home/phil/jsoc/proj/workflow/scripts/makeIcmovie $end_movie
   $WF/scripts/makeIcmovie $end_movie
 
   set hhmmss = `echo $end_movie | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`

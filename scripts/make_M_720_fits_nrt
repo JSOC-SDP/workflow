@@ -4,6 +4,14 @@
 
 # set echo
 # use NRT data.
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set wantlow = $1
 set wanthigh = $2
@@ -15,10 +23,10 @@ echo Make images for $wantlow to $wanthigh
 # start with hourly files
 set CADENCE = 60
 
-set JSOC_REBIN = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jsoc_rebin
-set JSOC_AS_FITS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jsoc_export_as_fits
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
+set JSOC_REBIN = "${drms_bins_install_dir}"/jsoc_rebin
+set JSOC_AS_FITS = "${drms_bins_install_dir}"/jsoc_export_as_fits
+set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
 
 set obslist = (M)
 set flaglist = (-c)

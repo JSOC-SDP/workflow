@@ -5,6 +5,15 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 set noglob
 
 set HERE = $cwd 
@@ -36,13 +45,13 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
-set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_IQUV_averaging
-set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables
-set HMI_limbdark = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_limbdark
-set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_segment_module
-set JV2TS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jv2ts
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
+set ECLIPSEscript = "${drms_scrs_install_dir}"/eclipse.pl
+set IQUVprogram = "${drms_bins_install_dir}"/HMI_IQUV_averaging
+set HMIprogram = "${drms_bins_install_dir}"/HMI_observables
+set HMI_limbdark = "${drms_bins_install_dir}"/hmi_limbdark
+set HMI_segment = "${drms_bins_install_dir}"/hmi_segment_module
+set JV2TS = "${drms_bins_install_dir}"/jv2ts
+set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
 
 set IQUV_args = "wavelength=3 camid=0 cadence=90.0 npol=8 size=48 lev1=hmi.lev1_nrt quicklook=1 linearity=1"
 set OBS_args = "-V levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=3 cadence=720.0 lev1=hmi.lev1_nrt smooth=1 linearity=1" 
@@ -108,8 +117,8 @@ echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=hmi
 
 echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=2 in=hmi.M_720s_nrt\["$wantlow"/"$t"] v2hout=hmi.Mr_hiresmap_720s_nrt histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 >>&$TEMPLOG" >>$TEMPCMD
 
-echo "/home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/resizemappingmag in=hmi.Ml_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
-echo "/home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/resizemappingmag in=hmi.Mr_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo ""${drms_bins_install_dir}"/resizemappingmag in=hmi.Ml_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo ""${drms_bins_install_dir}"/resizemappingmag in=hmi.Mr_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $IQUVstatus >IQUVstatus' >>&$TEMPCMD

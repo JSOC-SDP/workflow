@@ -5,6 +5,14 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
@@ -52,13 +60,13 @@ set TEMPLOG = $HERE/runlog
 set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
-set DIS = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig_v3
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
+set DIS = "${drms_bins_install_dir}"/disambig_v3
 set ARGS = "-L AMBNEQ=100 AMBTFCTR=0.98 OFFSET=50 AMBNPAD=200 AMBNTX=30 AMBNTY=30 AMBNAP=10 AMBSEED=4 errlog=$TEMPLOG" 
-set MAPROJ = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/maproj3comperrorlonat02deg
+set MAPROJ = "${drms_bins_install_dir}"/maproj3comperrorlonat02deg
 set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree clat=0.0"
-set DOPPCAL = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/cgem_doppcal
-set GAPFILL = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/set_gaps_missing
+set DOPPCAL = "${drms_bins_install_dir}"/cgem_doppcal
+set GAPFILL = "${drms_bins_install_dir}"/set_gaps_missing
 
 # make qsub scripts
 
@@ -78,7 +86,6 @@ echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $HMIBstatus >retstatus' >>&$TEMPCMD
 
-#echo "/home/jeneen/fillInMissingBs/fillMissingB.csh $wantlow $wanthigh" >> $TEMPCMD
 echo "$GAPFILL ds=hmi.B_720s high=$wanthigh low=$wantlow" >> $TEMPCMD
 
 # execute qsub script

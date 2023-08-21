@@ -1,6 +1,15 @@
 #! /bin/csh -f
 
 #set echo
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 set noglob
 set HERE = $cwd
 set TEMPLOG = $HERE/runlog
@@ -8,10 +17,10 @@ echo 6 > $HERE/retstatus
 
 set WFDIR = $WORKFLOW_DATA
 set WFCODE = $WORKFLOW_ROOT
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
-set CUTOUT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/m2meharp
-set DISAMBIG = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/disambig_v3
-set SHARP = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/sharp
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
+set CUTOUT = "${drms_bins_install_dir}"/m2meharp
+set DISAMBIG = "${drms_bins_install_dir}"/disambig_v3
+set SHARP = "${drms_bins_install_dir}"/sharp
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q

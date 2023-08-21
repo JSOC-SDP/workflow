@@ -1,6 +1,14 @@
 #! /bin/csh -f
 # Script to make HMI HARPS 
 #
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 # XXXXXXXXXX test
  set echo
@@ -32,7 +40,7 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set HARPS = /home/jsoc/cvs/Development/JSOC/proj/mag/harp/scripts/track_and_ingest_mharp.sh
+set HARPS = "${drms_scrs_install_dir}"/track_and_ingest_mharp.sh
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`

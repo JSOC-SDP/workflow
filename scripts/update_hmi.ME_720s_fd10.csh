@@ -5,6 +5,14 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 source /home/jsoc/.setJSOCenv
 
@@ -18,6 +26,7 @@ else
   exit 1
 endif
 
+# UGH
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = p8.q,j8.q
   set QSUB = qsub
@@ -36,9 +45,9 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
+set VFISV = "${drms_bins_install_dir}"/vfisv
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
+set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
 
 #set indexlow = `index_convert ds=$product $key=$WANTLOW`
 #set indexhigh = `index_convert ds=$product $key=$WANTHIGH`

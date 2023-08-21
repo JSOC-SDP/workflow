@@ -15,6 +15,7 @@ set SUM_SER = dsds.mdi__lev1_8__vw_V_06h
 # new DRMS series of records
 set NEW_SER = mdi.vw_V_lev18
 # control file for ingest_dsds_a
+# UGH
 set INGESTMAP = /home/phil/jsoc/proj/myproj/apps/vw_V_06h/vw_V_lev18.map
 # local directory for working files
 set TEMP = temp.DIRS
