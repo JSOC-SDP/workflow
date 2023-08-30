@@ -112,12 +112,12 @@ echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
 
 # Remove limb darkening/create marmask
 
-echo ""${drms_bins_install_dir}"/hmi_limbdark in=hmi.Ic_720s'['$wantlow'-'$wanthigh'][3]'  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
+echo "${drms_bins_install_dir}"/hmi_limbdark in=hmi.Ic_720s'['$wantlow'-'$wanthigh'][3]'  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
 echo "$PolarF in=hmi.M_720s\["$wantlow"-"$wanthigh"] >>&$TEMPLOG" >>$TEMPCMD
 
 # Remap/Resize mags for synoptic charts
 
-#echo ""${drms_bins_install_dir}"/fdlos2radial in=hmi.M_720s'['$wantlow'-'$wanthigh']' out=hmi.Mr_720s >>&$TEMPLOG" >>$TEMPCMD
+#echo "${drms_bins_install_dir}"/fdlos2radial in=hmi.M_720s'['$wantlow'-'$wanthigh']' out=hmi.Mr_720s >>&$TEMPLOG" >>$TEMPCMD
 
 @ wantlow_s = `$TIME_CONVERT time=$wantlow`
 @ wanthigh_s = `$TIME_CONVERT time=$wanthigh`
@@ -133,8 +133,8 @@ echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=2 in=hmi
 
 echo "$JV2TS MAPMMAX=1800 SINBDIVS=720 LGSHIFT=3 CARRSTRETCH=1 in=hmi.Ic_noLimbDark_720s\["$wantlow"/"$t"] v2hout='hmi.Ic_noLimbDark_remap_720s' histlink=none TSTART=$wantlow TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90. MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1" >>$TEMPCMD
 
-echo ""${drms_bins_install_dir}"/resizemappingmag in=hmi.Ml_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
-echo ""${drms_bins_install_dir}"/resizemappingmag in=hmi.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "${drms_bins_install_dir}""/resizemappingmag in=hmi.Ml_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "${drms_bins_install_dir}""/resizemappingmag in=hmi.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 
 # echo 'set PATstatus = $?' >>$TEMPCMD
 # echo 'if ($PATstatus) goto DONE' >>&$TEMPCMD
