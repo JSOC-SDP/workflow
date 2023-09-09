@@ -1,9 +1,18 @@
 #! /bin/csh -f
 
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 source /home/jsoc/.setJSOCenv
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
-set SHOW_COVERAGE = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_coverage
-set SHOW_INFO = /home/jsoc/cvs/JSOC/bin/$JSOC_MACHINE/show_info
+set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
+set SHOW_COVERAGE = "${drms_bins_install_dir}"/show_coverage
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
 
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set now_t = `$TIME_CONVERT time=$now`

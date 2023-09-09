@@ -11,6 +11,15 @@
 ###  6. Run the cleanup script and delete failed directories to make it easier to check gates and tasks
 ###  7  Restart the gatekeeper
 
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 set user = $USER
 if ( $user != 'jsocprod' ) then
   echo ""
@@ -20,8 +29,7 @@ if ( $user != 'jsocprod' ) then
 endif
 
 set WORKFLOW_DATA = /home/jsoc/pipeline
-#set WORKFLOW_ROOT = /home/phil/jsoc/proj/workflow
-set WORKFLOW_ROOT = /home/jsoc/cvs/Development/JSOC/proj/workflow
+set WORKFLOW_ROOT = "${drms_src_install_dir}"/workflow
 set TASKS = $WORKFLOW_DATA/tasks
 set GATES = $WORKFLOW_GATES/gates
 
@@ -89,8 +97,7 @@ end
 
 ##  7  ##
 
-#/home/phil/jsoc/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
-/home/jsoc/cvs/Development/JSOC/proj/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
+"${drms_src_install_dir}"/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
 
 
 echo "1. Check for bad low high times in gates (should be the last thing on the screen)."

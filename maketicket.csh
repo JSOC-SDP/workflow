@@ -6,6 +6,15 @@
 # if taskid is absent then create a new taskid for the task associated
 # with the target gate and make the ticket appear to be from that taskid.
 
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 if ($?WORKFLOW_ROOT) then
   set WFDIR = $WORKFLOW_DATA
   set WFCODE = $WORKFLOW_ROOT
@@ -25,7 +34,7 @@ set wanthigh="NOT_SPECIFIED"
 set action = 4
 set special = NONE
 
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
+set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert""
 
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set nowt = `$TIME_CONVERT time=$now`

@@ -6,6 +6,16 @@
 
 # all rotations wantlow through wanthigh inclusive will be generated.
 set echo
+
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 if ($?WORKFLOW_ROOT) then
   set WFDIR = $WORKFLOW_ROOT
   set WFCODE = $WORKFLOW_ROOT
@@ -22,9 +32,10 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
-set HMISYNOP = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmisynoptic
+set HMISYNOP = "${drms_bins_install_dir}"/hmisynoptic
+# UGH
 set CTIMES = /home/wso/bin/_linux4/ctimes
-set TCONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
+set TCONVERT = "${drms_bins_install_dir}"/time_convert
 
 set now = `date +%Y.%m.%d`
 @ tExpire_s = `$TCONVERT time=$now` + 3024000  # ticket expires in 35 days

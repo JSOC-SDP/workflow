@@ -5,6 +5,14 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
@@ -32,7 +40,7 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set AIA_makelev1p5 = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/aia_lev1p5
+set AIA_makelev1p5 = "${drms_bins_install_dir}"/aia_lev1p5
 
 # Make name for qsub and get times rounded to slot
 set indexlow = `index_convert ds=$product $key=$WANTLOW`

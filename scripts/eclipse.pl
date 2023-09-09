@@ -16,10 +16,32 @@
 
 ###
 ###########################################################################################################
+my $drms_bins_install_dir;
+my $drms_incs_install_dir;
+my $drms_libs_install_dir;
+my $drms_params_install_dir;
+my $drms_root_dir;
+my $drms_scrs_install_dir;
+my $drms_src_install_dir;
+my $drms_table_dir;
 
-$TIME_CONVERT = "/home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert";
-$SHOW_INFO = "/home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info";
-$SET_INFO = "/home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/set_info";
+BEGIN {
+    $drms_bins_install_dir = "$ENV{'DRMS_BINS_INSTALL_DIR'}";
+    $drms_incs_install_dir = "$ENV{'DRMS_INCS_INSTALL_DIR'}";
+    $drms_libs_install_dir = "$ENV{'DRMS_LIBS_INSTALL_DIR'}";
+    $drms_params_install_dir = "$ENV{'DRMS_PARAMS_INSTALL_DIR'}";
+    $drms_root_dir = "$ENV{'DRMS_ROOT_DIR'}";
+    $drms_scrs_install_dir = "$ENV{'DRMS_SCRS_INSTALL_DIR'}";
+    $drms_src_install_dir = "$ENV{'DRMS_SRC_INSTALL_DIR'}";
+    $drms_table_dir = "$ENV{'DRMS_TABLE_DIR'}";
+}
+
+use lib $drms_params_install_dir;
+use drmsparams;
+
+$TIME_CONVERT = "$drms_bins_install_dir/time_convert";
+$SHOW_INFO = "$drms_bins_install_dir/show_info";
+$SET_INFO = "$drms_bins_install_dir/set_info";
 
 ### mask to compare against existing quality bits
 $M = "00002000";    

@@ -4,6 +4,14 @@
 
 # set echo
 # modified to only make new movie if NRT data.
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set wantlow = $1
 set wanthigh = $2
@@ -13,13 +21,13 @@ echo Make images for $wantlow to $wanthigh
 # from here make script that can make _nrt images in standard place
 
 set CADENCE = 3
+set WF = "${drms_src_install_dir}"/workflow
 
-set WF = /home/jsoc/cvs/Development/JSOC/proj/workflow
 setenv RGBDEF $WF/scripts/rgb.txt
-set RENDER_IMAGE = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/render_image
-set HMI_LIMBDARK = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_limbdark
-set TIME_CONVERT = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/time_convert
-set SHOW_INFO = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/show_info
+set RENDER_IMAGE = "${drms_bins_install_dir}"/render_image
+set HMI_LIMBDARK = "${drms_bins_install_dir}"/hmi_limbdark
+set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
+set SHOW_INFO = "${drms_bins_install_dir}"/show_info
 
 set obslist = (Ic) 
 #set minlist = (20000)
@@ -153,11 +161,5 @@ if ($finalimagetime != NONE) then
 endif
 
 unset echo
-
-#if ($end_movie_t > 0 && $isNRT ) then
-#  set end_movie = `$TIME_CONVERT s=$end_movie_t zone=TAI`
-#  /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/makeIcmovie $end_movie
-#  set exitstatus = $?
-#endif
 
 exit $exitstatus

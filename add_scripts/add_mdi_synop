@@ -44,6 +44,7 @@ $WFCODE/maketask.csh task=mdi.Synop \
 set TICKDIR = tasks/mdi.Synop/preconditions/mdi.Blos_Remap
 mkdir $TICKDIR
 echo "set ACTION=4" > $TICKDIR/prepare_ticket
+# UGH
 echo 'set USELOW = `/home/wso/bin/_linux4/ctimes -j  "CT"$WANTLOW":360"`' >> $TICKDIR/prepare_ticket
 echo 'set USEHIGH = `/home/wso/bin/_linux4/ctimes -j "CT"$WANTHIGH":0"`' >> $TICKDIR/prepare_ticket
 

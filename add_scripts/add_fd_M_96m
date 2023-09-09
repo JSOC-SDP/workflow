@@ -40,7 +40,6 @@ $WFCODE/maketask.csh task=update_mdi.fd_M_96m \
 		manager=taskmanager.csh \
 		target=mdi.fdM_96m \
 		command=scripts/update-mdi.fd_M_96m \
-		# command=/home/phil/jsoc/proj/myproj/apps/fd_M_96m/update-mdi.fd_M_96m \
 		maxrange=864000 \
 		parallelOK=10
 mkdir                   tasks/update_mdi.fd_M_96m/preconditions/dsds.fdM_96m

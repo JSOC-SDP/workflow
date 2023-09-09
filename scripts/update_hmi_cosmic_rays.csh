@@ -4,6 +4,15 @@
 # this is run in the task instance directory where there is a 'ticket' file that specifies
 # the request.
 
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
@@ -161,9 +170,8 @@ set mmdd = `echo $yyyymmdd | sed -e "s/.....//" -e "s/://" `
 
 mkdir CRlogs
 set CRLOG = $HERE/CRlogs
-# set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/module_flatfield
-set module_flatfield = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/module_flatfield
-set cosmic_ray_post = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/cosmic_ray_post
+set module_flatfield = "${drms_bins_install_dir}"/module_flatfield
+set cosmic_ray_post = "${drms_bins_install_dir}"/cosmic_ray_post
 
 set QSUBCMD = CRY_$mmdd
 set QSTAT = $HERE/CRY_status

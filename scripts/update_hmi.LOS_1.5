@@ -5,6 +5,14 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
@@ -35,14 +43,14 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
-set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables
+set HMIprogram = "${drms_bins_install_dir}"/HMI_observables
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
 set camera = 1
 set nrt = 0
 set cadence = 45
 set input = hmi.lev1
-#set otherargs = "levin="lev1" levout="lev15" wavelength=3 dpath=/home/couvidat/cvs/JSOC/proj/lev1.5_hmi/apps"
+#set otherargs = "levin="lev1" levout="lev15" wavelength=3 dpath="${drms_src_install_dir}"/lev1.5_hmi/apps"
 #set otherargs = "levin="lev1" levout="lev15" wavelength=3 "
 ## CHANGED on 10/16/2012 for Sebastien's new observables code
 set otherargs = "levin="lev1" levout="lev15" wavelength=3 smooth=1 linearity=1 "

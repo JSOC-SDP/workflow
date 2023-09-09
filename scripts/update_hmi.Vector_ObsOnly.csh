@@ -5,6 +5,14 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
@@ -32,13 +40,13 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set IQUVprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_IQUV_averaging
-set HMIprogram = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/HMI_observables
-set HMI_segment = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_segment_module
-set HMI_patch = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/hmi_patch_module
+set IQUVprogram = "${drms_bins_install_dir}"/HMI_IQUV_averaging
+set HMIprogram = "${drms_bins_install_dir}"/HMI_observables
+set HMI_segment = "${drms_bins_install_dir}"/hmi_segment_module
+set HMI_patch = "${drms_bins_install_dir}"/hmi_patch_module
 
-# set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1 quicklook=0 dpath=/home/couvidat/cvs/JSOC/proj/lev1.5_hmi/apps"
-#set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1 dpath=/home/couvidat/cvs/JSOC/proj/lev1.5_hmi/apps" 
+# set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1 quicklook=0 dpath="${drms_src_install_dir}"/lev1.5_hmi/apps"
+#set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1 dpath="${drms_src_install_dir}"/lev1.5_hmi/apps" 
 set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1"
 set SEG_args = "beta=0.7 alpha=[0,-4] T=[1,1,0.9,0] y=hmi.Marmask_720s"
 set PATCH_args = "bb=hmi.Mpatch_720s"

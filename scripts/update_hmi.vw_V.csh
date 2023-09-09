@@ -1,5 +1,14 @@
 #! /bin/csh -f
 
+set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
+set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
+set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
+set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
+set drms_root_dir = "${DRMS_ROOT_DIR}"
+set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
+set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
+set drms_table_dir = "${DRMS_TABLE_DIR}"
+
 set HERE = $cwd 
 
 if ($?WORKFLOW_ROOT) then
@@ -36,7 +45,7 @@ set LOG = $HERE/runlog
 set CMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
-set JREBINSMOOTH = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/jrebinsmooth
+set JREBINSMOOTH = "${drms_bins_install_dir}"/jrebinsmooth
 
 set params = "out=hmi.vw_V_45s IBIN=1 NBIN=4 BIN_XOFF=14 BIN_YOFF=-1 BIN_FILL=nan IGAUSS=1 GAUSS_WID=10 GAUSS_SIG=2.8284271248 GAUSS_NSUB=5 GAUSS_XOFF=1 GAUSS_YOFF=1 GAUSS_FILL=nan -L"
 
