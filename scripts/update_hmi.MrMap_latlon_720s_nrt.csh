@@ -41,8 +41,8 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set MAPROJ = "${drms_bins_install_dir}"/maprojlonat02deg
-set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree -R clat=0.0"
+set MAPROJ = "${drms_bins_install_dir}"/maproj
+set MAPARGS = "-L cols=900 rows=900 scale=0.2 map=carree -R clat=0.0"
 
 set wantlow = $WANTLOW
 set wanthigh = $WANTHIGH

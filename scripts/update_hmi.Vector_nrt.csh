@@ -31,7 +31,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   @ THREADS = 1
   set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = p4.q
+  set QUE = k.q
   @ THREADS = 4
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
@@ -138,7 +138,8 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 # execute qsub script
 touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD 
+#$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD 
+$QSUB -sync yes -pe smp 4 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD     <---use this command if using k.q
 
 @ count = `$SHOW_INFO -qc hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality > 0 ?]'`
 

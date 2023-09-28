@@ -585,22 +585,22 @@ else
   echo "$totalBF"' </td><td> ' >>$TMP 
   if ( $BF1 > 0 ) then
     echo "AIA Camera 1: $BF1    ">>$TMP
-    echo "Bit Flip Camera Anomaly for AIA Camera 1" >> /tmp/camera_anomaly
+    echo "Possible bit flip camera anomaly for AIA Camera 1:  $BF1 bad images." >> /tmp/camera_anomaly
     echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF2 > 0 ) then
     echo "AIA Camera 2: $BF2    " >>$TMP
-    echo "Bit Flip Camera Anomaly for AIA Camera 2" >> /tmp/camera_anomaly
+    echo "Possible bit flip camera anomaly for AIA Camera 2:  $BF2 bad images." >> /tmp/camera_anomaly
     echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF3 > 0 ) then
     echo "AIA Camera 3: $BF3    " >>$TMP
-    echo "Bit Flip Camera Anomaly for AIA Camera 3" >> /tmp/camera_anomaly
+    echo "Possible bit flip camera anomaly for AIA Camera 3:  $BF3 bad images." >> /tmp/camera_anomaly
     echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF4 > 0 ) then
     echo "AIA Camera 4: $BF4    " >>$TMP
-    echo "Bit Flip Camera Anomaly for AIA Camera 4" >> /tmp/camera_anomaly
+    echo "Possible bit flip camera anomaly for AIA Camera 4:  $BF4 bad images." >> /tmp/camera_anomaly
     echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   echo "</td></tr>" >>$TMP
@@ -631,12 +631,12 @@ else
   echo "$totalBF"' </td><td> ' >>$TMP
   if ( $BF1 > 0 ) then
     echo "HMI Camera 1: $BF1    ">>$TMP
-    echo "Bit Flip Camera Anomaly for HMI Camera 1" >> /tmp/camera_anomaly
+    echo "Possible bit flip camera anomaly for HMI Camera 1:  $BF1 bad images." >> /tmp/camera_anomaly
     echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   if ( $BF2 > 0 ) then
     echo "HMI Camera 2: $BF2    " >>$TMP
-    echo "Bit Flip Camera Anomaly for HMI Camera 2" >> /tmp/camera_anomaly
+    echo "Possible bit flip camera anomaly for HMI Camera 2:  $BF2 bad images." >> /tmp/camera_anomaly
     echo "Be sure to remove tmp files in ~jeneen when problem is fixed." > /tmp/camera_anomaly_reminder
   endif
   echo "</td></tr>" >>$TMP

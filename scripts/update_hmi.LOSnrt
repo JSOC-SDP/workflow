@@ -27,9 +27,9 @@ else
 endif
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j8.q
-  @ THREADS = 1
-  set QSUB = qsub
+#  set QUE = j8.q
+#  @ THREADS = 1
+#  set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QUE = p4.q 
 #  set QUE = k.q
@@ -99,7 +99,7 @@ echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -e $TEMPLOG -o $TEMPLOG -sync yes -q $QUE $TEMPCMD
-#$QSUB -pe smp 4 -e $TEMPLOG -o $TEMPLOG -sync yes -q $QUE $TEMPCMD     <---use this command if using k.q
+#$QSUB -pe smp $THREADS -e $TEMPLOG -o $TEMPLOG -sync yes -q $QUE $TEMPCMD    
 
 set retstatus = `cat $HERE/retstatus`
 if ($retstatus == 0 ) then

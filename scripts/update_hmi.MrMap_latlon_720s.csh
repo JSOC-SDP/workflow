@@ -41,13 +41,10 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set MAPROJ = "${drms_bins_install_dir}"/maprojlonat02deg
-set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree -R clat=0.0"
+set MAPROJ = "${drms_bins_install_dir}"/maproj
+set MAPARGS = "-L cols=900 rows=900 scale=0.2 map=carree -R clat=0.0"
 
-set wantlow = $WANTLOW
-set wanthigh = $WANTHIGH
-
-set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
+set timestr = `echo $WANTHIGH  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = MrMap
 set qsubname = $timename$timestr
 
@@ -62,7 +59,7 @@ echo "hostname >>&$LOG" >>$CMD
 echo "set echo >>&$LOG" >>$CMD
 echo 'set retstatus=6' >>&$CMD
 
-foreach T ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
+foreach T ( `$SHOW_INFO -q hmi.M_720s'['$WANTLOW'-'$WANTHIGH']' key=t_rec` )
   echo "$MAPROJ -v in=hmi.M_720s'['$T']' out=hmi.Mrmap_latlon_720s $MAPARGS" >> $CMD
 end
 echo 'set retstatus = $?' >>$CMD

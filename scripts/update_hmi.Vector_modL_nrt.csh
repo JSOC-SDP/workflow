@@ -117,8 +117,8 @@ echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=hmi
 
 echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=2 in=hmi.M_720s_nrt\["$wantlow"/"$t"] v2hout=hmi.Mr_hiresmap_720s_nrt histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 >>&$TEMPLOG" >>$TEMPCMD
 
-echo ""${drms_bins_install_dir}"/resizemappingmag in=hmi.Ml_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
-echo ""${drms_bins_install_dir}"/resizemappingmag in=hmi.Mr_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "${drms_bins_install_dir}""/resizemappingmag in=hmi.Ml_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "${drms_bins_install_dir}""/resizemappingmag in=hmi.Mr_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $IQUVstatus >IQUVstatus' >>&$TEMPCMD
@@ -134,7 +134,7 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD 
-#$QSUB -pe smp $THREADS -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
+#$QSUB -sync yes -pe smp $THREADS -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
