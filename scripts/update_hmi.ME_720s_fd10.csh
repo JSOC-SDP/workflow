@@ -14,7 +14,7 @@ set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
 set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
 set drms_table_dir = "${DRMS_TABLE_DIR}"
 
-source /home/jsoc/.setJSOCenv
+# source /home/jsoc/.setJSOCenv
 
 set HERE = $cwd 
 
@@ -32,7 +32,7 @@ if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QSUB = qsub
   set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a8.q
+  set QUE = k.q
   set QSUB = /SGE2/bin/lx-amd64/qsub
   set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
 endif
@@ -81,6 +81,8 @@ echo "sleep 10" >> $TEMPCMD
 
 echo 'set VFnrtstatus=0' >>&$TEMPCMD
 
+echo "/usr/bin/Mail -s 'normal ME script' jeneen@sun.stanford.edu"  >>$TEMPCMD
+
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
   echo "$MPIEXEC -n 8 $VFISV -f -L out=hmi.ME_720s_fd10 in=hmi.S_720s\["$T"] in5=hmi.M_720s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
 end
@@ -92,7 +94,7 @@ echo 'echo $VFnrtstatus >retstatus' >>&$TEMPCMD
 echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
 # execute qsub script
 
-$QSUB -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
+$QSUB -pe smp 8 -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
