@@ -19,7 +19,6 @@ set wanthigh = $2
 echo Make images for $wantlow to $wanthigh
 
 # from here make script that can make _nrt images in standard place
-
 set CADENCE = 15
 
 set WF = "${drms_src_install_dir}"/workflow
@@ -30,12 +29,9 @@ set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
 set SHOW_INFO = "${drms_bins_install_dir}"/show_info
 
 set obslist = (Ic Ic_flat M M_color)
-#set minlist = (20000 0.3 -1500 -1500)
-#set maxlist = (75000 1.2 1500 1500)
 set minlist = (10000 0.3 -1500 -1500)
 set maxlist = (62000 1.2 1500 1500)
 set scalinglist = (minmaxgiven minmaxgiven mag minmaxgiven)
-#set colorlist = (/home/phil/apps/heat.sao /home/phil/apps/heat.sao grey /home/priya/Colormaps/For_Todd/mag.lut)
 set colorlist = ($WF/apps/heat.sao $WF/apps/heat.sao grey $WF/apps/mag.lut)
 set namelist = (Continuum Continuum Magnetogram Magnetogram)
 set flaglist = ("" "" -c -c)
