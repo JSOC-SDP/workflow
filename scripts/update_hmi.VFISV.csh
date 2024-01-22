@@ -8,11 +8,10 @@
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 
@@ -86,6 +85,6 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
-  set B_TICKET = `$WFCODE/maketicket.csh gate=hmi.B_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set B_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.B_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 exit $retstatus

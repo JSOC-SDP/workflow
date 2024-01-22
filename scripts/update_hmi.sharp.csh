@@ -16,7 +16,6 @@ set TEMPLOG = $HERE/runlog
 echo 6 > $HERE/retstatus
 
 set WFDIR = $WORKFLOW_DATA
-set WFCODE = $WORKFLOW_ROOT
 set SHOW_INFO = "${drms_bins_install_dir}"/show_info
 set CUTOUT = "${drms_bins_install_dir}"/m2meharp
 set DISAMBIG = "${drms_bins_install_dir}"/disambig_v3

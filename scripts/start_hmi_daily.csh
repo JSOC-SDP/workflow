@@ -5,7 +5,6 @@
 # make a ticket for the first day after wanthigh to be run next.
 
 set WFDIR = $WORKFLOW_DATA
-set WFCODE = $WORKFLOW_ROOT
 
 # Note that start/stop minute are hour 23 minute 54 for LOS and 24 for vector.
 @ LOS_offset = 6 * 60
@@ -34,7 +33,7 @@ set WANTNEXTLOW = `time_convert zone=TAI s=$WANTNEXTLOW_T`  # 0 TAI of next day
 set WANTNEXTHIGH = `time_convert zone=TAI s=$WANTNEXTHIGH_T` # just before end of next day
 
 # This ticket will wait for this gate precondition of lev1 and cosmic_rays done at least to the bounding times
-$WFCODE/maketicket.csh gate=repeat_hmi_daily wantlow=$WANTNEXTLOW wanthigh=$WANTNEXTHIGH action=5
+"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=repeat_hmi_daily wantlow=$WANTNEXTLOW wanthigh=$WANTNEXTHIGH action=5
 
 # First get taskid of the current instance, it is the name of the current directory
 set TASKID = $cwd:t
@@ -65,10 +64,8 @@ while ($WORKDAY_D <= $WANTHIGH_D)
   set VECARGS = "gate=hmi.Vector taskid=$TASKID wantlow=$VECLOW wanthigh=$VECHIGH action=5"
   set LIMBARGS = "gate=hmi.LimbFit taskid=$TASKID wantlow=$LOSLOW wanthigh=$IMGHIGH action=5"
 
-  set LOS_TICKET = `$WFCODE/maketicket.csh $LOSARGS `
-  set VEC_TICKET = `$WFCODE/maketicket.csh $VECARGS `
-#  set LIMB_TICKET = `$WFCODE/maketicket.csh $LIMBARGS `
-  # set IMG_TICKET = `$WFCODE/maketicket.csh $IMGARGS `
+  set LOS_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" $LOSARGS `
+  set VEC_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" $VECARGS `
   set IMG_TICKET = NOTYET
 
   cd pending_tickets

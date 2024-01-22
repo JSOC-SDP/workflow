@@ -21,7 +21,6 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
 endif
 
 set WFDIR = $WORKFLOW_DATA
-set WFCODE = $WORKFLOW_ROOT
 set SHOW_INFO = "${drms_bins_install_dir}"/show_info
 set CUTOUT = "${drms_bins_install_dir}"/m2meharp
 #set DISAMBIG = "${drms_bins_install_dir}"/disambig

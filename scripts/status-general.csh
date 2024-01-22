@@ -3,11 +3,10 @@
 
 # echo starting $0 $*
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 

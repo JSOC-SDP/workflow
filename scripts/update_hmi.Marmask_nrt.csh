@@ -16,11 +16,10 @@ set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 
@@ -84,7 +83,5 @@ set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD 
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
-
-#set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 
 exit $retstatus

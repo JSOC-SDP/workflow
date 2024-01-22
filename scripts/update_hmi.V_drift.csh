@@ -18,11 +18,10 @@ set drms_table_dir = "${DRMS_TABLE_DIR}"
 set HERE = $cwd 
 set LOG = $HERE/runlog
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 
@@ -41,7 +40,6 @@ end
 
 # set CoefProgram = "${drms_bins_install_dir}"/correction_velocities
 # copied 29 Oct 2010 2:00 PM
-#set CoefProgram = $WFCODE/bin/correction_velocities
 set CoefProgram = "${drms_bins_install_dir}"/correction_velocities
 
 # verify that there is at least one V_drift record within 24 hours

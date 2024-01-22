@@ -18,11 +18,10 @@ set noglob
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 
@@ -145,9 +144,8 @@ $QSUB -sync yes -pe smp 4 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD     <---use t
 
 if ( -e retstatus ) set retstatus = `cat $HERE/retstatus`
 if ( ($retstatus == 0) && ($count > 0) ) then
-  set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
-  set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set FITS_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set MSK_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
-#set REMAP_TICKET = `$WFCODE/maketicket.csh gate=hmi.MrMap_latlon_720s_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 
 exit $retstatus

@@ -16,11 +16,10 @@ set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 
@@ -151,13 +150,12 @@ if ( $retstatus == 0 ) then
     @ end = $t + 3600
     set WLO = `time_convert s=$t zone=tai`
     set WHI = `time_convert s=$end zone=tai`
-    set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits wantlow=$WLO wanthigh=$WHI action=5`
+    set FITS_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.webFits wantlow=$WLO wanthigh=$WHI action=5`
     @ t = $end + 1
   end
-  set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set MSK_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.Marmask wantlow=$wantlow wanthigh=$wanthigh action=5`
   @ indexhigh++
   set vfisvhigh = `index_convert ds=$product $key"_index"=$indexhigh`
-  set VFISV_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
-#  set LATLON_TICKET = `$WFCODE/maketicket.csh gate=hmi.MrMap_latlon_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set VFISV_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
 endif
 exit $retstatus

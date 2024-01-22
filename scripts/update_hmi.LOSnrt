@@ -18,11 +18,10 @@ set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 
@@ -46,8 +45,8 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
-set HMIprogram = "${drms_bins_install_dir}"/HMI_observables
-set MAKEIMAGES = "$WFCODE/scripts/makeimageslowhigh"
+set HMIprogram = "$DRMS_BINS_INSTALL_DIR/HMI_observables"
+set MAKEIMAGES = "$DRMS_SRC_INSTALL_DIR/workflow/scripts/makeimageslowhigh"
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
 set camera = 1
@@ -103,7 +102,7 @@ $QSUB -e $TEMPLOG -o $TEMPLOG -sync yes -q $QUE $TEMPCMD
 
 set retstatus = `cat $HERE/retstatus`
 if ($retstatus == 0 ) then
-  set VW_TICKET = `$WFCODE/maketicket.csh gate=hmi.vw_V_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set VW_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.vw_V_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 
 exit $retstatus

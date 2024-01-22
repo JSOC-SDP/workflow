@@ -32,7 +32,7 @@ end
 set gate = `cat ../../target`
 set product = `cat $WORKFLOW_DATA/gates/$gate/product`
  
-$WORKFLOW_ROOT/scripts/stage_tapes_in_order.csh 10 $product'['$WANTLOW'-'$WANTHIGH']' >& stage_tapes.log
+"$DRMS_SRC_INSTALL_DIR/workflow/scripts/stage_tapes_in_order.csh" 10 $product'['$WANTLOW'-'$WANTHIGH']' >& stage_tapes.log
 
 if ($?) then
    echo $0 $* FAILED

@@ -18,11 +18,10 @@ set drms_table_dir = "${DRMS_TABLE_DIR}"
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 
@@ -101,7 +100,7 @@ if ( $retstatus == 0 ) then
   @ s = `$TIME_CONVERT time=$wanthigh`
   @ sB = $s + 360
   set BHigh = `$TIME_CONVERT s=$sB zone=TAI`
-  set B_TICKET = `$WFCODE/maketicket.csh gate=hmi.B_720s wantlow=$wantlow wanthigh=$BHigh action=5`
+  set B_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.B_720s wantlow=$wantlow wanthigh=$BHigh action=5`
 endif
 exit $retstatus
 

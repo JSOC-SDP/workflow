@@ -16,14 +16,6 @@ set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
 set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
 set drms_table_dir = "${DRMS_TABLE_DIR}"
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_ROOT
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
-endif
-
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
   set QSUB = qsub
@@ -94,11 +86,9 @@ end
 
 set echo
 set retstatus = `cat $HERE/retstatus`
-#@ last_cr = `show_info -q hmi.Synoptic_Mr_720s n=-1 key=car_rot` - 1
 
-#if ( $crot > $last_cr) then
-#  NEXT_CR = `$WORKFLOW_ROOT/maketicket.csh gate=hmi.Synop wantlow=$crot wanthigh=$crot action=5 expire=$tExpire`
-#echo "$WORKFLOW_ROOT/maketicket.csh gate=hmi.Synop wantlow=$crot wanthigh=$crot action=5 expire=$tExpire"
+# UGH
+# this file probably isn't being used, given the typo here
 i#endif
 
 exit $retstatus

@@ -18,11 +18,10 @@ source /home/jsoc/.setJSOCenv
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set.
+  echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
 
@@ -131,9 +130,7 @@ if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus ) then
   exit $retstatus
 else 
-  set SHP_TICKET = `$WFCODE/maketicket.csh gate=hmi.sharp_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set SHP_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.sharp_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
-#if ( $retstatus == 0 ) then
-#  set SHP_TICKET = `$WFCODE/maketicket.csh gate=hmi.sharp_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
-#endif
+
 exit $retstatus

@@ -56,7 +56,6 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
 endif
 
 set WFDIR = $WORKFLOW_DATA
-set WFCODE = $WORKFLOW_ROOT
 set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
 set SHOW_INFO = "${drms_bins_install_dir}"/show_info
 set MHarp = "${drms_scrs_install_dir}"/track_and_ingest_mharp.sh
@@ -278,7 +277,7 @@ if ( ($retstatus == 0) && ($num_harps > 0) ) then
   while ( $i <= $#Htimes )
     set WANT = $Htimes[$i]
     if ( $num_harps > 0 ) then
-      set ME_TICKET = `$WFCODE/maketicket.csh gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
+      set ME_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
     endif
     @ i++
   end
@@ -287,7 +286,7 @@ endif
 set min = `echo $WANTLOW | awk -F\: '{print $2}'`
 echo "Minute is $min" >> $TEMPLOG
 if ( $min == "00" ) then
-  set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
+  set HARPIMG_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
 endif
 
 
@@ -297,6 +296,6 @@ if ($retstatus == 0) then
   end
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
   sleep 60
-  set nextTicket = `$WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
+  set nextTicket = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
 endif
 

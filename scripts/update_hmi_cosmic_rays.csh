@@ -36,11 +36,10 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
-if ($?WORKFLOW_ROOT) then
+if ($?WORKFLOW_DATA) then
   set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
 else
-  echo Need WORKFLOW_ROOT variable to be set. >>$LOG
+  echo Need WORKFLOW_DATA variable to be set. >>$LOG
 env >>$LOG
   exit 1
 endif
@@ -82,8 +81,8 @@ endif
 # set QUALMASK = 0x2F000
 set QUALMASK = 192512
 
-set FFSN = `show_info hmi.lev1'['$wantlow'-'$wanthigh'][? (QUALITY & '$QUALMASK') = 0 ?]' n=1 -q key=FSN`
-set LFSN = `show_info hmi.lev1'['$wantlow'-'$wanthigh'][? (QUALITY & '$QUALMASK') = 0 ?]' n=-1 -q key=FSN`
+set FFSN = `"$DRMS_BINS_INSTALL_DIR/show_info" hmi.lev1'['$wantlow'-'$wanthigh'][? (QUALITY & '$QUALMASK') = 0 ?]' n=1 -q key=FSN`
+set LFSN = `"$DRMS_BINS_INSTALL_DIR/show_info" hmi.lev1'['$wantlow'-'$wanthigh'][? (QUALITY & '$QUALMASK') = 0 ?]' n=-1 -q key=FSN`
 
 if ($LFSN <= $FFSN) then
   echo No good records to process between $wantlow and $wanthigh >>$LOG
@@ -93,14 +92,14 @@ if ($LFSN <= $FFSN) then
 endif
 
 # get expected list of cosmic_ray records
-show_info hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000  AND HFTSACID < 2000 ?][? (QUALITY & '$QUALMASK') = 0 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_lev1
+"$DRMS_BINS_INSTALL_DIR/show_info" hmi.lev1'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000  AND HFTSACID < 2000 ?][? (QUALITY & '$QUALMASK') = 0 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_lev1
 
 set N_NOCR = 100000000
 # unless a SPECIAL arg of FIXMISSING=1 is present, just wait here until all records are present.  I.e. convert to a proper action=3
 if ($ACTION == 4 && $FIXMISSING == 0) then
   set loopcount = 0
   while ($N_NOCR > 0)
-    show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
+    "$DRMS_BINS_INSTALL_DIR/show_info" hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
     comm -23 FSN_lev1 FSN_cosmic > NOCR
     set N_NOCR = `wc -l <NOCR`
     echo "Lev1 records without cosmic ray records count = " $N_NOCR >>$LOG
@@ -119,7 +118,7 @@ if ($ACTION == 4 && $FIXMISSING == 0) then
 endif
 
 if ($ACTION == 4) then
-  show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
+  "$DRMS_BINS_INSTALL_DIR/show_info" hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
   comm -23 FSN_lev1 FSN_cosmic > NOCR
   set N_NOCR = `wc -l <NOCR`
   echo "Lev1 records without cosmic ray records count = " $N_NOCR >>$LOG
@@ -136,29 +135,29 @@ endif
 # increase range to allow preceeding and following filtergrams
 @ FIRST_FSN = $FIRST_FSN - 96
 #  set CHK_FSN1 = `show_info hmi.lev1'[? FSN = '$FIRST_FSN' ?]' n=-1 -q key=T_OBS`
-  set CHK_FSN1 = `show_info hmi.lev1'[][$FIRST_FSN]' n=1 -q key=T_OBS_index`
+  set CHK_FSN1 = `"$DRMS_BINS_INSTALL_DIR/show_info" hmi.lev1'[][$FIRST_FSN]' n=1 -q key=T_OBS_index`
     while ( $CHK_FSN1 < 0 ) 
 #      @ FIRST_FSN =  $FIRST_FSN - 1
 #      set CHK_FSN1 = `show_info hmi.lev1'[? FSN = '$FIRST_FSN' ?]' n=-1 -q key=T_OBS`
       @ FIRST_FSN =  $FIRST_FSN + 1
-      set CHK_FSN1 = `show_info hmi.lev1'[][$FIRST_FSN]' n=1 -q key=T_OBS_index` 
+      set CHK_FSN1 = `"$DRMS_BINS_INSTALL_DIR/show_info" hmi.lev1'[][$FIRST_FSN]' n=1 -q key=T_OBS_index` 
     end
 
 @ LAST_FSN = $LAST_FSN + 96
 #  set CHK_FSN2 = `show_info hmi.lev1'[? FSN = '$LAST_FSN' ?]' n=-1 -q key=T_OBS`
-  set CHK_FSN2 = `show_info hmi.lev1'[][$LAST_FSN]' n=1 -q key=T_OBS_index`
+  set CHK_FSN2 = `"$DRMS_BINS_INSTALL_DIR/show_info" hmi.lev1'[][$LAST_FSN]' n=1 -q key=T_OBS_index`
     while ( $CHK_FSN2 < 0 ) 
 #      @ LAST_FSN =  $LAST_FSN + 1
 #      set CHK_FSN2 = `show_info hmi.lev1'[? FSN = '$LAST_FSN' ?]' n=-1 -q key=T_OBS`
       @ LAST_FSN =  $LAST_FSN - 1
-      set CHK_FSN2 = `show_info hmi.lev1'[][$LAST_FSN]' n=1 -q key=T_OBS_index`
+      set CHK_FSN2 = `"$DRMS_BINS_INSTALL_DIR/show_info" hmi.lev1'[][$LAST_FSN]' n=1 -q key=T_OBS_index`
     end
 
 
 # get day of first FSN
 
 # note that there may be a missing T_OBS along with a good T_OBS for a given FSN
-set LFSNDAY = `show_info key=T_OBS -q hmi.lev1'[]['$LAST_FSN'][? T_OBS > 0 ?]'`
+set LFSNDAY = `"$DRMS_BINS_INSTALL_DIR/show_info" key=T_OBS -q hmi.lev1'[]['$LAST_FSN'][? T_OBS > 0 ?]'`
 set yyyymmdd = `printf "%.10s" $LFSNDAY`
 set mmdd = `echo $yyyymmdd | sed -e "s/.....//" -e "s/://" `
 
@@ -269,7 +268,7 @@ endif # DO_POST
 
 # verify make of cosmic ray records
 
-show_info hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
+"$DRMS_BINS_INSTALL_DIR/show_info" hmi.cosmic_rays'[]['$FFSN'-'$LFSN'][? FID >= 10050 AND FID < 11000 ?][? T_OBS > 0 ?]'"$CAMARG" -q key=FSN > FSN_cosmic
 comm -23 FSN_lev1 FSN_cosmic > NOCR
 set N_NOCR = `wc -l <NOCR`
 echo "Lev1 records now without cosmic ray records count = " $N_NOCR >>$LOG
