@@ -5,14 +5,8 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set HMI_SEGMENT = "${DRMS_BINS_INSTALL_DIR}"/hmi_segment_module
 
 set HERE = $cwd 
 
@@ -39,8 +33,6 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set HMI_segment = "${drms_bins_install_dir}"/hmi_segment_module
 
 
 set wantlow = `cat wantlow`
@@ -69,10 +61,10 @@ echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus=0' >>&$TEMPCMD
 
 foreach trec ( `$SHOW_INFO -q hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality > 0 ?]' key=t_rec` )
-  echo "$HMI_segment xm=hmi.M_720s_nrt\["$trec"] xp=hmi.Ic_noLimbDark_720s_nrt\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
+  echo "$HMI_SEGMENT xm=hmi.M_720s_nrt\["$trec"] xp=hmi.Ic_noLimbDark_720s_nrt\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
 end
 
-#echo "$HMI_segment xm=hmi.M_720s_nrt\["$wantlow"-"$wanthigh"]" "xp=hmi.Ic_noLimbDark_720s_nrt\["$wantlow"-"$wanthigh"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
+#echo "$HMI_SEGMENT xm=hmi.M_720s_nrt\["$wantlow"-"$wanthigh"]" "xp=hmi.Ic_noLimbDark_720s_nrt\["$wantlow"-"$wanthigh"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus = $?' >>$TEMPCMD
 echo 'if ($SEGstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD

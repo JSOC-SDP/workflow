@@ -1,16 +1,6 @@
 #! /bin/csh -f
 
 # Script to make HMI lev1.5 45s observables from HMI lev1 that has been scatter light corrected.
-
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
 if ($?WORKFLOW_DATA) then
@@ -31,19 +21,20 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
-set LEV1 = "${drms_bins_install_dir}"/lev1_dcon
-set OBS = "${drms_bins_install_dir}"/HMI_observables_dcon2
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set LEV1 = "${DRMS_BINS_INSTALL_DIR}"/lev1_dcon
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables_dcon2
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set LEV1_ARGS = "out=hmi.lev1_dcon psf=hmi.psf iter=25"
-set OBS_ARGS = "levin=lev1 levout=lev1.5 wavelength=3 quicklook=0 camid=1 cadence=45.0 lev1=hmi.lev1_dcon smooth=1 rotational=0 linearity=1 -L"
+set OBSERVABLES_ARGS = "levin=lev1 levout=lev1.5 wavelength=3 quicklook=0 camid=1 cadence=45.0 lev1=hmi.lev1_dcon smooth=1 rotational=0 linearity=1 -L"
 
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[.:_]//g' -e 's/^......//' -e 's/..TAI//'`
 
 set name = DC45
@@ -81,7 +72,7 @@ echo 'if ($lev1retstatus) goto DONE' >> $CMD
 echo $obsretstatus > $HERE/obsretstatus
 
 echo >> $CMD
-echo "$OBS begin=$wantlow end=$wanthigh $OBS_ARGS" >> $CMD
+echo "$$OBSERVABLES begin=$wantlow end=$wanthigh $OBSERVABLES_ARGS" >> $CMD
 echo 'set obsretstatus = $?' >>$CMD
 echo 'echo $obsretstatus >' "$HERE/obsretstatus" >>$CMD
 

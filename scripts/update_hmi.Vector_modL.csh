@@ -5,14 +5,17 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set ECLIPSE = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/eclipse.pl
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set IQUV_AVERAGING = "${DRMS_BINS_INSTALL_DIR}"/HMI_IQUV_averaging
+set JV2TS = "${DRMS_BINS_INSTALL_DIR}"/jv2ts
+set LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
+set MAKE_TICKET = "${DRMS_BINS_INSTALL_DIR}/workflow/maketicket.csh"
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
+set MEANPF = "${DRMS_BINS_INSTALL_DIR}"/meanpf
+set RESIZE_MAPPING = "${DRMS_BINS_INSTALL_DIR}"/resizemappingmag
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set HERE = $cwd 
 
@@ -41,16 +44,6 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set ECLIPSEscript = "${drms_scrs_install_dir}"/eclipse.pl
-set IQUVprogram = "${drms_bins_install_dir}"/HMI_IQUV_averaging
-set HMIprogram = "${drms_bins_install_dir}"/HMI_observables
-set PolarF = "${drms_bins_install_dir}"/meanpf
-set HMI_segment = "${drms_bins_install_dir}"/hmi_segment_module
-set HMI_patch = "${drms_bins_install_dir}"/hmi_patch_module
-set JV2TS = "${drms_bins_install_dir}"/jv2ts
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-
 #set IQUV_args = "-L wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1 quicklook=0"
 #set OBS_args = "-L levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=0 cadence=720.0 lev1=hmi.lev1"
 ## CHANGED on 2012.10.16 for Sebastien's new observables code
@@ -59,11 +52,11 @@ set OBS_args = "-L -V levin=lev1p levout=lev15 wavelength=3 quicklook=0 camid=3 
 #set PATCH_args = "-L bb=hmi.Mpatch_720s"
 
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = VEC
 set qsubname = $timename$timestr
@@ -79,7 +72,7 @@ set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
 # check for eclipse quality bits to be set in lev1_nrt
-#$ECLIPSEscript $wantlow $wanthigh
+#$ECLIPSE $wantlow $wanthigh
 
 # wait for cosmic ray completeness
 @ lev1_N = `$SHOW_INFO hmi.lev1'['$wantlow'-'$wanthigh'][? hftsacid = 1022 ?]' -qc`
@@ -102,21 +95,19 @@ echo 'set IQUVstatus=0' >>&$TEMPCMD
 echo 'set OBSstatus=0' >>&$TEMPCMD
 #echo 'set PATstatus=0' >>&$TEMPCMD
 
-echo "$IQUVprogram begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
+echo "$IQUV_AVERAGING begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set IQUVstatus = $?' >>$TEMPCMD
 echo 'if ($IQUVstatus) goto DONE' >>&$TEMPCMD
-echo "$HMIprogram begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$TEMPCMD
+echo "$OBSERVABLES begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set OBSstatus = $?' >>$TEMPCMD
 echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
 
 # Remove limb darkening/create marmask
 
-echo "${drms_bins_install_dir}"/hmi_limbdark in=hmi.Ic_720s'['$wantlow'-'$wanthigh'][3]'  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
-echo "$PolarF in=hmi.M_720s\["$wantlow"-"$wanthigh"] >>&$TEMPLOG" >>$TEMPCMD
+echo "$LIMBDARK in=hmi.Ic_720s'['$wantlow'-'$wanthigh'][3]'  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
+echo "$MEANPF in=hmi.M_720s\["$wantlow"-"$wanthigh"] >>&$TEMPLOG" >>$TEMPCMD
 
 # Remap/Resize mags for synoptic charts
-
-#echo "${drms_bins_install_dir}"/fdlos2radial in=hmi.M_720s'['$wantlow'-'$wanthigh']' out=hmi.Mr_720s >>&$TEMPLOG" >>$TEMPCMD
 
 @ wantlow_s = `$TIME_CONVERT time=$wantlow`
 @ wanthigh_s = `$TIME_CONVERT time=$wanthigh`
@@ -132,8 +123,8 @@ echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=2 in=hmi
 
 echo "$JV2TS MAPMMAX=1800 SINBDIVS=720 LGSHIFT=3 CARRSTRETCH=1 in=hmi.Ic_noLimbDark_720s\["$wantlow"/"$t"] v2hout='hmi.Ic_noLimbDark_remap_720s' histlink=none TSTART=$wantlow TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90. MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1" >>$TEMPCMD
 
-echo "${drms_bins_install_dir}""/resizemappingmag in=hmi.Ml_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
-echo "${drms_bins_install_dir}""/resizemappingmag in=hmi.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "$RESIZE_MAPPING in=hmi.Ml_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "$RESIZE_MAPPING in=hmi.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 
 # echo 'set PATstatus = $?' >>$TEMPCMD
 # echo 'if ($PATstatus) goto DONE' >>&$TEMPCMD
@@ -152,22 +143,22 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 if ( -e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
-  @ t1 = `time_convert time=$WANTLOW`
-  @ t2 = `time_convert time=$WANTHIGH - 720`
+  @ t1 = `$TIME_CONVERT time=$WANTLOW`
+  @ t2 = `$TIME_CONVERT time=$WANTHIGH - 720`
   @ t = $t1
   while ( $t <= $t2 )
     @ end = $t + 3600
-    set WLO = `time_convert s=$t zone=tai`
-    set WHI = `time_convert s=$end zone=tai`
-    set FITS_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.webFits wantlow=$WLO wanthigh=$WHI action=5`
+    set WLO = `$TIME_CONVERT s=$t zone=tai`
+    set WHI = `$TIME_CONVERT s=$end zone=tai`
+    set FITS_TICKET = `$MAKE_TICKET gate=hmi.webFits wantlow=$WLO wanthigh=$WHI action=5`
     @ t = $end + 1
   end
-  set MSK_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.Marmask wantlow=$wantlow wanthigh=$wanthigh action=5`
-  set S_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.S_5760s wantlow=$wantlow wanthigh=$wanthigh action=5`
-  set vfisvhigh = `index_convert ds=$product $key"_index"=$indexhigh`
-  set VFISV_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
+  set MSK_TICKET = `$MAKE_TICKET gate=hmi.Marmask wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set S_TICKET = `$MAKE_TICKET gate=hmi.S_5760s wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set vfisvhigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
+  set VFISV_TICKET = `$MAKE_TICKET gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
   #@ indexhigh++
-  set MrMaphigh = `index_convert ds=$product $key"_index"=$indexhigh`
-  set LATLON_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.MrMap_latlon_720s wantlow=$WANTLOW wanthigh=$MrMaphigh action=5`
+  set MrMaphigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
+  set LATLON_TICKET = `$MAKE_TICKET gate=hmi.MrMap_latlon_720s wantlow=$WANTLOW wanthigh=$MrMaphigh action=5`
 endif
 exit $retstatus

@@ -3,21 +3,14 @@
 # I think the point of this script is to write out the low, high, and lastupdate gate state files.
 # The general status script also writes out the coverage file, but I do not know what that file
 # is for - skipping for now.
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 if ($?WORKFLOW_DATA) then
     set WFDIR = $WORKFLOW_DATA
 else
     echo Need WORKFLOW_DATA variable to be set.
     exit 1
 endif
+
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set low = 2010.05.01
 set high = 2010.02.02
@@ -41,9 +34,9 @@ echo $high > high
 # Update the lastupdate state-file content.
 set nowtxt = `date -u +%Y.%m.%d_%H:%M:%S`
 echo "$nowtxt" > lastupdate
-@ now_s = `"${drms_bins_install_dir}"/time_convert time=$nowtxt`
+@ now_s = `$TIME_CONVERT time=$nowtxt`
 @ next_s = $now_s + `cat updatedelta`
-set next = `"${drms_bins_install_dir}"/time_convert s=$next_s zone=UTC`
+set next = `$TIME_CONVERT s=$next_s zone=UTC`
 echo "$next" > nextupdata
 
 rm -f statusbusy

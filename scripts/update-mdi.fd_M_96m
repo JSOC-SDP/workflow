@@ -2,7 +2,11 @@
 # general script for migrating datasets from DRMS stored DSDS datasets
 # into DRMS per record datasets using ingestdsds_a.
 
-# Works with workflow systeem
+# Works with workflow system
+set INGEST_DSDS_A = "${DRMS_BINS_INSTALL_DIR}"/ingest_dsds_a
+set SET_GAPS_MISSING = "${DRMS_BINS_INSTALL_DIR}"/set_gaps_missing
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set TIME_INDEX = "${DRMS_BINS_INSTALL_DIR}"/time_index
 
 set echo
 set noglob
@@ -29,12 +33,12 @@ endif
 
 
 set WANTLOW = `cat wantlow`
-set WANTLOW_t = `time_convert time=$WANTLOW`
-set WANTLOW = `time_convert zone=TAI s=$WANTLOW_t`
+set WANTLOW_t = `$TIME_CONVERT time=$WANTLOW`
+set WANTLOW = `$TIME_CONVERT zone=TAI s=$WANTLOW_t`
 
 set WANTHIGH = `cat wanthigh`
-set WANTHIGH_t = `time_convert time=$WANTHIGH`
-set WANTHIGH = `time_convert zone=TAI s=$WANTHIGH_t`
+set WANTHIGH_t = `$TIME_CONVERT time=$WANTHIGH`
+set WANTHIGH = `$TIME_CONVERT zone=TAI s=$WANTHIGH_t`
 
 set HERE = $cwd
 set babble = $HERE/babble
@@ -48,8 +52,8 @@ set LOG = $HERE/runlog
 #      echo -n '.' >>$babble
 #end
 
-set FDS = `time_index -d time=$WANTLOW`
-set LDS = `time_index -d time=$WANTHIGH`
+set FDS = `$TIME_INDEX -d time=$WANTLOW`
+set LDS = `$TIME_INDEX -d time=$WANTHIGH`
 
 # This block of code should be same in each 96-minute-by-day update script
 # the workflow ticket may have a "special" line in which case the FILLGAPSLOW
@@ -62,15 +66,14 @@ if ($? == 0) then
          set $SPECIALWORD
     end
 if ($?FILLGAPSLOW) then
-    set FILLGAPSLOWDS = `time_index -d time=$FILLGAPSLOW`
+    set FILLGAPSLOWDS = `$TIME_INDEX -d time=$FILLGAPSLOW`
     @ FILLGAPSHIGHDS = $FDS - 1
     if ($FILLGAPSHIGHDS >= $FILLGAPSLOWDS) then
         # some older gaps should be plugged with missing
-        set FILLGAPSHIGH_m = `time_index -m hour=$FILLGAPSHIGHDS`
+        set FILLGAPSHIGH_m = `$TIME_INDEX -m hour=$FILLGAPSHIGHDS`
         @ FILLGAPSHIGH_m = $FILLGAPSHIGH_m + 1440 - 96
-        set FILLGAPSHIGH = `time_index -t minute=$FILLGAPSHIGH_m`
-        # set_gaps_missing ds=$NEW_SER low=$FILLGAPSLOW high=$FILLGAPSHIGH > $HERE/$TEMP/gapsfilled
-        echo set_gaps_missing ds=$NEW_SER low=$FILLGAPSLOW high=$FILLGAPSHIGH
+        set FILLGAPSHIGH = `$TIME_INDEX -t minute=$FILLGAPSHIGH_m`
+        echo $SET_GAPS_MISSING ds=$NEW_SER low=$FILLGAPSLOW high=$FILLGAPSHIGH
     endif
 endif
 
@@ -93,7 +96,7 @@ else
       echo "#! /bin/csh -f " >$TEMPCMD
       echo "cd $HERE" >>$TEMPCMD
       echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-      echo 'ingest_dsds_a -v -L in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
+      echo $INGEST_DSDS_A' -v -L in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
       echo 'echo $status >retstatus' >>$TEMPCMD
       echo "rm -f $HERE/qsubs_running/$INSTANCE" >>$TEMPCMD
       

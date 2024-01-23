@@ -11,11 +11,14 @@ set WFDIR = $WORKFLOW_DATA
 @ VEC_offset = 36 * 60
 @ lev1_offset = 150
 
+set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+
 set WANTLOW = `cat wantlow`
 set WANTHIGH = `cat wanthigh`
 
-set WANTLOW_t = `time_convert time=$WANTLOW`
-set WANTHIGH_t = `time_convert time=$WANTHIGH`
+set WANTLOW_t = `$TIME_CONVERT time=$WANTLOW`
+set WANTHIGH_t = `$TIME_CONVERT time=$WANTHIGH`
 
 @ WANTLOW_D = $WANTLOW_t / 86400
 # now WANTLOW_D is TAI of day  containing WANTLOW
@@ -29,11 +32,11 @@ set WANTHIGH_t = `time_convert time=$WANTHIGH`
 @ WANTNEXTHIGH_T = $WANTNEXTLOW_T + 86400
 @ WANTNEXTHIGH_T = $WANTNEXTHIGH_T - $LOS_offset
 @ WANTNEXTHIGH_T = $WANTNEXTHIGH_T + $lev1_offset
-set WANTNEXTLOW = `time_convert zone=TAI s=$WANTNEXTLOW_T`  # 0 TAI of next day
-set WANTNEXTHIGH = `time_convert zone=TAI s=$WANTNEXTHIGH_T` # just before end of next day
+set WANTNEXTLOW = `$TIME_CONVERT zone=TAI s=$WANTNEXTLOW_T`  # 0 TAI of next day
+set WANTNEXTHIGH = `$TIME_CONVERT zone=TAI s=$WANTNEXTHIGH_T` # just before end of next day
 
 # This ticket will wait for this gate precondition of lev1 and cosmic_rays done at least to the bounding times
-"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=repeat_hmi_daily wantlow=$WANTNEXTLOW wanthigh=$WANTNEXTHIGH action=5
+$MAKE_TICKET gate=repeat_hmi_daily wantlow=$WANTNEXTLOW wanthigh=$WANTNEXTHIGH action=5
 
 # First get taskid of the current instance, it is the name of the current directory
 set TASKID = $cwd:t
@@ -41,7 +44,7 @@ set TASKID = $cwd:t
 set WORKDAY_D = $WANTLOW_D
 while ($WORKDAY_D <= $WANTHIGH_D)
   @ WORKDAY_T = $WORKDAY_D * 86400
-  set WORKDAY = `time_convert zone=TAI s=$WORKDAY_T`
+  set WORKDAY = `$TIME_CONVERT zone=TAI s=$WORKDAY_T`
   echo Start day $WORKDAY
 
   # base high
@@ -51,11 +54,11 @@ while ($WORKDAY_D <= $WANTHIGH_D)
   @ VECLOW_T = $WORKDAY_T - $VEC_offset
   @ VECHIGH_T = $VECLOW_T + 86400
   
-  set LOSLOW = `time_convert zone=TAI s=$LOSLOW_T`
-  set LOSHIGH = `time_convert zone=TAI s=$LOSHIGH_T`
-  set IMGHIGH = `time_convert zone=TAI s=$IMGHIGH_T`
-  set VECLOW = `time_convert zone=TAI s=$VECLOW_T`
-  set VECHIGH = `time_convert zone=TAI s=$VECHIGH_T`
+  set LOSLOW = `$TIME_CONVERT zone=TAI s=$LOSLOW_T`
+  set LOSHIGH = `$TIME_CONVERT zone=TAI s=$LOSHIGH_T`
+  set IMGHIGH = `$TIME_CONVERT zone=TAI s=$IMGHIGH_T`
+  set VECLOW = `$TIME_CONVERT zone=TAI s=$VECLOW_T`
+  set VECHIGH = `$TIME_CONVERT zone=TAI s=$VECHIGH_T`
 
   # now make tickets to compute the desired products for this day
   set LOSARGS = "gate=hmi.LOS       taskid=$TASKID wantlow=$LOSLOW wanthigh=$LOSHIGH action=5"
@@ -64,8 +67,8 @@ while ($WORKDAY_D <= $WANTHIGH_D)
   set VECARGS = "gate=hmi.Vector taskid=$TASKID wantlow=$VECLOW wanthigh=$VECHIGH action=5"
   set LIMBARGS = "gate=hmi.LimbFit taskid=$TASKID wantlow=$LOSLOW wanthigh=$IMGHIGH action=5"
 
-  set LOS_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" $LOSARGS `
-  set VEC_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" $VECARGS `
+  set LOS_TICKET = `$MAKE_TICKET $LOSARGS `
+  set VEC_TICKET = `$MAKE_TICKET $VECARGS `
   set IMG_TICKET = NOTYET
 
   cd pending_tickets

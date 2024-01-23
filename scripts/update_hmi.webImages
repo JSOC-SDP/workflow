@@ -1,5 +1,5 @@
 #! /bin/csh -f
-
+set MAKE_IMAGES_LOW_HIGH = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/makeimageslowhigh
 set HERE = $cwd
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
@@ -22,7 +22,7 @@ echo 0 > retstatus
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$DRMS_SRC_INSTALL_DIR/workflow/scripts/makeimageslowhigh $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
+echo "$MAKE_IMAGES_LOW_HIGH $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD

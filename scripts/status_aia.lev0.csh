@@ -12,6 +12,9 @@ else
   exit 1
 endif
 
+set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+
 cd $WFDIR/gates
 set gate = $1
 cd $gate
@@ -27,14 +30,14 @@ set nancount = 0
 if ($low == "NaN") then
     set nancount = 1
     # 0X1C000000 == 469762048
-    if (`show_info -cq $product'[? FSN < 469762048 ?]'` <= 0) then
+    if (`$SHOW_INFO -cq $product'[? FSN < 469762048 ?]'` <= 0) then
         echo $0 $* status of $product Empty Series
         echo "-1" > low
         echo "-1" > high
         set STATUS = 0
         goto EXITPLACE
     endif
-    show_info -q  $product'[^]' key=$key > low
+    $SHOW_INFO -q  $product'[^]' key=$key > low
     if ($?) then
        echo $0 $* FAILED
        set STATUS = 1
@@ -52,7 +55,7 @@ set low = `cat low`
 
 if ($high == "NaN") @ nancount = $nancount + 1
 
-show_info -q  $product'[? FSN < 469762048 ?]' n=-1 key=$key > high
+$SHOW_INFO -q  $product'[? FSN < 469762048 ?]' n=-1 key=$key > high
 if ($?) then
    echo $0 $* FAILED
    set STATUS = 1
@@ -79,9 +82,9 @@ if ($#argv > 1) then # get coverage map
     shift
   end
   if ($nancount == 2) then
-    show_coverage ds=$product low=$minlow high=$maxhigh -iq $miscargs > coverage
+    $SHOW_COVERAGE ds=$product low=$minlow high=$maxhigh -iq $miscargs > coverage
   else
-    show_coverage ds=$product low=$low high=$high -iq $miscargs
+    $SHOW_COVERAGE ds=$product low=$low high=$high -iq $miscargs
   endif
 
 endif

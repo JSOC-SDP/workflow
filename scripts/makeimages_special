@@ -2,16 +2,7 @@
 # create limb darkening removed Ic record and create image set for Ic_noLD and M for range of time
 # specified by first two arguments.
 
- set echo
-
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set echo
 
 set wantlow = $1
 set wanthigh = $2
@@ -23,10 +14,12 @@ echo Make images for $wantlow to $wanthigh
 #set CADENCE = 15
 set CADENCE = 45
 
-set WF = "${drms_src_install_dir}"/workflow
+set WF = "${DRMS_SRC_INSTALL_DIR}"/workflow
 setenv RGBDEF $WF/scripts/rgb.txt
-set RENDER_IMAGE = "${drms_bins_install_dir}"/render_image
-set HMI_LIMBDARK = "${drms_bins_install_dir}"/hmi_limbdark
+set HMI_LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
+set RENDER_IMAGE = "${DRMS_BINS_INSTALL_DIR}"/render_image
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set obslist = (Ic Ic_flat M)
 set minlist = (20000 0.3 -1500)
@@ -40,8 +33,8 @@ set flaglist = ("" "" -c)
 
 set end_movie_t = 0
 
-set wantlow_t = `time_convert time=$wantlow`
-set wanthigh_t = `time_convert time=$wanthigh`
+set wantlow_t = `$TIME_CONVERT time=$wantlow`
+set wanthigh_t = `$TIME_CONVERT time=$wanthigh`
 
 @ daylow = $wantlow_t / 86400
 @ dayhigh = $wanthigh_t / 86400
@@ -60,7 +53,7 @@ while ($day <= $dayhigh)
   @ imglow_t = $first_mod_t / $cadence
   @ imglow_t = $imglow_t + 1
   @ first_t = $imglow_t * $cadence
-  set first = `time_convert s=$first_t zone=TAI`
+  set first = `$TIME_CONVERT s=$first_t zone=TAI`
   @ last_mod_t = $last_t + $cadence
   @ imghigh_t = $last_mod_t / $cadence
   @ n_images = $imghigh_t - $imglow_t
@@ -91,8 +84,8 @@ while ($day <= $dayhigh)
   while ($img <= $#obslist)
     set obs = $obslist[$img]
     if ($obs == Ic_flat) then
-      set n_source = `show_info -cq $inseries$QRY`  # use inseries from Ic pass through this loop
-      set n_dest = `show_info -cq 'hmi.Ic_noLimbDark_45s'$QRY`
+      set n_source = `$SHOW_INFO -cq $inseries$QRY`  # use inseries from Ic pass through this loop
+      set n_dest = `$SHOW_INFO -cq 'hmi.Ic_noLimbDark_45s'$QRY`
       if ($n_source > 0 && $n_dest < $n_source) then
         $HMI_LIMBDARK in=$inseries$QRY out=hmi.Ic_noLimbDark_45s -n
       endif
@@ -100,8 +93,8 @@ while ($day <= $dayhigh)
     else
       set in_final = hmi.$obs'_45s'
       set in_nrt = hmi.$obs'_45s_nrt'
-      set n_final = `show_info -cq $in_final$QRY`
-      set n_nrt = `show_info -cq $in_nrt$QRY`
+      set n_final = `$SHOW_INFO -cq $in_final$QRY`
+      set n_nrt = `$SHOW_INFO -cq $in_nrt$QRY`
       set inseries = $in_nrt
       if ($n_final >= $n_nrt) then
       #  if ($n_final > 0) then
@@ -135,7 +128,7 @@ end
 exit
 
 if ($end_movie_t > 0) then
-  set end_movie = `time_convert s=$end_movie_t zone=TAI`
+  set end_movie = `$TIME_CONVERT s=$end_movie_t zone=TAI`
   $WF/scripts/makeIcmovie $end_movie
 
   set hhmmss = `echo $end_movie | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`

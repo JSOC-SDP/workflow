@@ -1,14 +1,9 @@
 #! /bin/csh -f 
 # This script creates the HARP 720s definitive web images. Each image is a superposition of all HARP images that have been observed
 # on a given day.
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set HARP_MOVIE_DRIVER = "${DRMS_SCRS_INSTALL_DIR}"/track_hmi_harp_movie_driver.sh
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -19,9 +14,6 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
 endif
 
 set HERE = $cwd
-set SCRIPT = "${drms_scrs_install_dir}"/track_hmi_harp_movie_driver.sh
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
 set MASKSERIES = hmi.Marmask_720s_nrt
 set HARPSERIES = hmi.Mharp_720s_nrt
 set OUTDIR = /tmp28/jsocprod/HARPS/nrt/images
@@ -68,7 +60,7 @@ echo "#! /bin/csh -f " >> $CMDFILE
 echo "cd $HERE" >> $CMDFILE
 echo "hostname >>&$log" >>$CMDFILE
 
-echo "$SCRIPT -fE $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $log" >> $CMDFILE
+echo "$$HARP_MOVIE_DRIVER -fE $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $log" >> $CMDFILE
 foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
   echo $trec
   set file = $OUTDIR/harp.$trec.png

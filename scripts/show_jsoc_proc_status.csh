@@ -1,15 +1,6 @@
 #! /bin/csh -f
 
 #set echo
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 source /home/jsoc/.setJSOCenv
 source /SGE2/default/common/settings.csh
 set TARG = /web/jsoc/htdocs/data
@@ -19,12 +10,14 @@ set noglob
 unsetenv QUERY_STRING
 umask 2
 
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set SHOW_SERIES = "${drms_bins_install_dir}"/show_series
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
+set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set SHOW_JSOC_PROC_STATUS = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/show_jsoc_proc_status.csh
+set SHOW_SERIES = "${DRMS_BINS_INSTALL_DIR}"/show_series
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 # UGH
 set ARITH = /home/phil/bin/_linux4/arith
-set SHOW_COVERAGE = "${drms_bins_install_dir}"/show_coverage
+
 set USERDB=hmidb
 set USERDB2=hmidb2
 
@@ -80,7 +73,7 @@ set last_update = `ls -l --time-style="+%Y.%m.%d_%H:%M" /web/jsoc/htdocs/data/js
 if ( $update_lag > 600 ) then
   set mail_list = jeneen,phil,kehcheng,thailand
   echo "/web/jsoc/htdocs/data/jsoc_proc_status.html is $update_lag seconds old" > /tmp/update_lag
-  echo "Run ${drms_scrs_install_dir}/workflow/scripts/show_jsoc_proc_status.csh to find error" >> /tmp/update_lag
+  echo "Run $SHOW_JSOC_PROC_STATUS to find error" >> /tmp/update_lag
   @ min = $update_lag / 60
   /usr/bin/Mail -s "Status Page Not Updated for $min minutes" $mail_list < /tmp/update_lag
 endif
@@ -418,7 +411,7 @@ endif
 ### Look for missing HMI observables ###
 
 # these showCov files are generated every 30m by a cronjob
-# on n04 as jeneen: "${drms_scrs_install_dir}"/workflow/scripts/status_show_cov.csh
+# on n04 as jeneen: "${DRMS_SCRS_INSTALL_DIR}"/workflow/scripts/status_show_cov.csh
 
 set showCov = "/web/jsoc/htdocs/data/.showCov"
 set showCovNRT = "/web/jsoc/htdocs/data/.showCovNRT" 

@@ -5,15 +5,6 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
 if ($?WORKFLOW_DATA) then
@@ -22,6 +13,14 @@ else
   echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
+
+set DISAMGIB = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
+set DOPPCAL = "${DRMS_BINS_INSTALL_DIR}"/cgem_doppcal
+set GAPFILL = "${DRMS_BINS_INSTALL_DIR}"/set_gaps_missing
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set MAPROJ = "${DRMS_BINS_INSTALL_DIR}"/maproj3comperrorlonat02deg
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -39,13 +38,13 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set low_s = `time_convert time=$WANTLOW`
-set high_s = `time_convert time=$WANTHIGH`
+set low_s = `$TIME_CONVERT time=$WANTLOW`
+set high_s = `$TIME_CONVERT time=$WANTHIGH`
 set tdiff = `$high_s - $low_s`
 if ( $tdiff <= 3600 ) then
-  set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+  set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
   @ indexlast = $indexhigh - 1
-  set wanthigh = `index_convert ds=$product $key"_index"=$indexlast`
+  set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexlast`
 else
   set wanthigh = $WANTHIGH
 endif
@@ -59,14 +58,8 @@ set TEMPLOG = $HERE/runlog
 set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set DIS = "${drms_bins_install_dir}"/disambig_v3
 set ARGS = "-L AMBNEQ=100 AMBTFCTR=0.98 OFFSET=50 AMBNPAD=200 AMBNTX=30 AMBNTY=30 AMBNAP=10 AMBSEED=4 errlog=$TEMPLOG" 
-set MAPROJ = "${drms_bins_install_dir}"/maproj3comperrorlonat02deg
 set MAPARGS = "cols=9000 rows=9000 scale=0.02 map=carree clat=0.0"
-set DOPPCAL = "${drms_bins_install_dir}"/cgem_doppcal
-set GAPFILL = "${drms_bins_install_dir}"/set_gaps_missing
-
 # make qsub scripts
 
 echo "#! /bin/csh -f " >$TEMPCMD
@@ -76,7 +69,7 @@ echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set HMIBstatus=6' >>&$TEMPCMD
 
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
-  echo "$DIS in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
+  echo "$DISAMBIG in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
 #  echo "$MAPROJ in=hmi.B_720s'['$T']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
   echo "$DOPPCAL -w in=hmi.B_720s'['$T']' out=cgem.doppcal_720s" >> $TEMPCMD
 end

@@ -32,15 +32,6 @@
 ### 1.  vi /home/jsoc/pipeline/gates/repeat_harp_nrt/gatestatus and change "ACTIVE" to "HOLD"
 ### 2.  don't change it back to ACTIVE unless you're absolutely sure everything has been cleaned up.
 ###
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set noglob
 set HERE = $cwd
 set TEMPLOG = $HERE/runlog
@@ -56,9 +47,11 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
 endif
 
 set WFDIR = $WORKFLOW_DATA
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set MHarp = "${drms_scrs_install_dir}"/track_and_ingest_mharp.sh
+set HARP_NRT_MOVIES = "${DRMS_SCRS_INSTALL_DIR}"/harp_nrt_movies.csh
+SET MAKE_TICKET = "{$DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set TRACK_AND_INGEST_MHARP = "${DRMS_SCRS_INSTALL_DIR}"/track_and_ingest_mharp.sh
 
 # Make sure there isn't a runaway process happening.  There should NEVER be more than one
 # harps nrt job running at one time!  If there is, put a hold on the gate, clean up and
@@ -240,10 +233,10 @@ while ( $nextH_s < $last_mask_s )
   else
     set Htimes = ($Htimes $nextH)
     echo "touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
-    echo "$MHarp -n -m /tmp28/jsocprod/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] hmi.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
+    echo "$TRACK_AND_INGEST_MHARP -n -m /tmp28/jsocprod/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] hmi.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
     echo 'set MHarpstatus = $?' >> $CMD
     echo 'if ($MHarpstatus) goto DONE' >>&$CMD
-    echo "${drms_scrs_install_dir}""/harp_nrt_movies.csh" >> $CMD
+    echo $HARP_NRT_MOVIES >> $CMD
     @ nextH_s = $nextH_s + 720
   endif
 end
@@ -251,7 +244,7 @@ echo 'DONE:' >>$CMD
 echo 'echo $MHarpstatus >retstatus' >> $CMD
 #echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
 #echo "/home/jsoc/pipeline/scripts/harp_nrt_movies.csh" >> $CMD
-echo "${drms_scrs_install_dir}""/harp_nrt_movies.csh" >> $CMD
+echo $HARP_NRT_MOVIES >> $CMD
 echo 'echo $MHarpstatus >retstatus' >>$CMD
 echo "rm $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
 
@@ -277,7 +270,7 @@ if ( ($retstatus == 0) && ($num_harps > 0) ) then
   while ( $i <= $#Htimes )
     set WANT = $Htimes[$i]
     if ( $num_harps > 0 ) then
-      set ME_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
+      set ME_TICKET = `$MAKE_TICKET gate=hmi.ME_720s_fd10_nrt wantlow=$WANT wanthigh=$WANT action=5`
     endif
     @ i++
   end
@@ -286,7 +279,7 @@ endif
 set min = `echo $WANTLOW | awk -F\: '{print $2}'`
 echo "Minute is $min" >> $TEMPLOG
 if ( $min == "00" ) then
-  set HARPIMG_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
+  set HARPIMG_TICKET = `$MAKE_TICKET gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
 endif
 
 
@@ -296,6 +289,6 @@ if ($retstatus == 0) then
   end
   set nextlow = `$TIME_CONVERT s=$nextH_s zone=TAI`
   sleep 60
-  set nextTicket = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
+  set nextTicket = `$MAKE_TICKET gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
 endif
 

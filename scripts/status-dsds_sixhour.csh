@@ -14,6 +14,10 @@ else
   exit 1
 endif
 
+set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+
 cd $WFDIR/gates
 set gate = $1
 cd $gate
@@ -22,17 +26,19 @@ cd $gate
 set product = `cat product`
 set key = `cat key`
 set low = `cat low`
-set low_t = `time_convert time=$low`
-set low = `time_convert zone=TAI s=$low_t`
+set low_t = `$TIME_CONVERT time=$low`
+set low = `$TIME_CONVERT zone=TAI s=$low_t`
 set high = `cat high`
-set high_t = `time_convert time=$high`
-set high = `time_convert zone=TAI s=$high_t`
+set high_t = `$TIME_CONVERT time=$high`
+set high = `$TIME_CONVERT zone=TAI s=$high_t`
 
 set nancount = 0
 
+# UGH
+# time_index not in DRMS
 if ($low == "NaN") then
     set nancount = 1
-    set low = `show_info -q  $product'[^]' key=$key`
+    set low = `$SHOW_INFO -q  $product'[^]' key=$key`
     if ($?) then
       echo $0 $* FAILED
       exit 1
@@ -44,7 +50,7 @@ endif
 
 if ($high == "NaN") @ nancount = $nancount + 1
 
-set high = `show_info -q  $product'[$]' key=$key`
+set high = `$SHOW_INFO -q  $product'[$]' key=$key`
 if ($?) then
    echo $0 $* FAILED
    exit 1
@@ -71,9 +77,9 @@ if ($#argv > 1) then # get coverage map
   set low = `time_index time=$low -6`
   set high = `time_index time=$high -6`
   if ($nancount == 2) then
-    show_coverage ds=$product low=$minlow high=$maxhigh -iq > coverage
+    $SHOW_COVERAGE ds=$product low=$minlow high=$maxhigh -iq > coverage
   else
-    show_coverage ds=$product low=$low high=$high -iq 
+    $SHOW_COVERAGE ds=$product low=$low high=$high -iq 
   endif
 
 endif

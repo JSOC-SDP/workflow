@@ -5,16 +5,7 @@
 
 # make movie of last days days at cadence cadence
 # choices if cadence must be multiple of 15m.
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 if ($#argv > 0) then
   set want = $1
@@ -124,7 +115,7 @@ foreach Quant (Ic_flat M M_color)
     @ nowtime_t = $endtime_t - $fourteen
     set nowtime = `$TIME_CONVERT zone=TAI s=$nowtime_t`
     set endtime = `$TIME_CONVERT zone=TAI s=$endtime_t`
-    "${drms_scrs_install_dir}"/makeAnyMovie $nowtime $endtime 15 $Quant 1k ""$HERE/$D14dMOVIES/$Quant"_14d.mp4"
+    "${DRMS_SCRS_INSTALL_DIR}"/makeAnyMovie $nowtime $endtime 15 $Quant 1k ""$HERE/$D14dMOVIES/$Quant"_14d.mp4"
   endif
 end
 

@@ -26,7 +26,8 @@ set key = `cat $WFDIR/gates/$GATE/key`
 
 # set HMIprogram = /home/couvidat/cvs/JSOC/bin/linux_x86_64/HMI_observables
 # copied 23 Oct 2010 2:38 PM
-set HMIprogram = "$DRMS_BINS_INSTALL_DIR/HMI_observables"
+set OBSERVABLES = "$DRMS_BINS_INSTALL_DIR/HMI_observables"
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set MAKEIMAGES = "$DRMS_SRC_INSTALL_DIR/workflow/scripts/makeimageslowhigh"
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
@@ -40,13 +41,13 @@ set otherargs = "levin="lev1" levout="lev15" wavelength=3"
 # align times in format for HMIprogram
 
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 # make qsub name from index from door opening
-set indexbase = `index_convert ds=$product $key=2010.03.24_TAI`
+set indexbase = `$INDEX_CONVERT ds=$product $key=2010.03.24_TAI`
 @ qsubname = $indexhigh - $indexbase
 
 if ($indexhigh < $indexlow) then

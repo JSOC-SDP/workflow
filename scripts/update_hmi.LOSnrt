@@ -7,14 +7,9 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 
 set HERE = $cwd 
 
@@ -45,8 +40,6 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
 set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
-set HMIprogram = "$DRMS_BINS_INSTALL_DIR/HMI_observables"
-set MAKEIMAGES = "$DRMS_SRC_INSTALL_DIR/workflow/scripts/makeimageslowhigh"
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
 set camera = 1
@@ -61,11 +54,11 @@ set otherargs = "levin="lev1" levout="lev15" wavelength=3 smooth=1 linearity=1"
 # align times in format for HMIprogram
 
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 
 set timename = NRT
@@ -90,7 +83,7 @@ echo "#! /bin/csh -f " >$TEMPCMD
 echo "setenv OMP_NUM_THREADS $THREADS" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$HMIprogram lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
+echo "$OBSERVABLES lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 
@@ -102,7 +95,7 @@ $QSUB -e $TEMPLOG -o $TEMPLOG -sync yes -q $QUE $TEMPCMD
 
 set retstatus = `cat $HERE/retstatus`
 if ($retstatus == 0 ) then
-  set VW_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.vw_V_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set VW_TICKET = `$MAKE_TICKET gate=hmi.vw_V_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 
 exit $retstatus

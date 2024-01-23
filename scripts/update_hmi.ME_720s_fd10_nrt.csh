@@ -5,14 +5,9 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv_harp
 
 source /home/jsoc/.setJSOCenv
 
@@ -44,9 +39,6 @@ end
 
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
-
-set VFISV = "${drms_bins_install_dir}"/vfisv_harp
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
@@ -130,7 +122,7 @@ if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus ) then
   exit $retstatus
 else 
-  set SHP_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.sharp_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set SHP_TICKET = `$MAKE_TICKET gate=hmi.sharp_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 
 exit $retstatus

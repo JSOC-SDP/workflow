@@ -6,15 +6,6 @@
 # # XXXXXXXXXX test
 # # set echo
 # # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
 if ($?WORKFLOW_DATA) then
@@ -23,6 +14,11 @@ else
   echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
+
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables_dconS
+set STOKES = "${DRMS_BINS_INSTALL_DIR}"/stokes_dcon
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set QUE = k.q
 set QSUB = /SGE2/bin/lx-amd64/qsub
@@ -35,17 +31,13 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
-set S = "${drms_bins_install_dir}"/stokes_dcon
-set OBS =  "${drms_bins_install_dir}"/HMI_observables_dconS
 
 # round times to a slot
-@ indexlow = `index_convert ds=$product $key=$WANTLOW`
-@ indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+@ indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+@ indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 
 # check to see if we need modC or modL observables
 
@@ -111,7 +103,7 @@ endif
 echo "hostname >>&$LOG" >$CMD
 echo "set echo >>&$LOG" >>$CMD
 echo "setenv OMP_NUM_THREADS 4" >>$CMD
-echo "$S in=hmi.S_720s'['$wantlow'-'$wanthigh'][? quality = 0 ?]' out=hmi.S_720s_dconS psf=hmi.psf " >> $CMD
+echo "$STOKES in=hmi.S_720s'['$wantlow'-'$wanthigh'][? quality = 0 ?]' out=hmi.S_720s_dconS psf=hmi.psf " >> $CMD
 echo 'set Sretstatus = $?' >>$CMD
 echo 'echo $Sretstatus >' "$HERE/Sretstatus" >>$CMD
 echo 'if ($Sretstatus) goto DONE' >> $CMD
@@ -121,7 +113,7 @@ if ( $mod == C ) then
 else if ( $mod == L ) then
   echo "echo Making ModL observables" >> $CMD
 endif
-echo "$OBS begin=$wantlow end=$wanthigh $ARGS" >> $CMD
+echo "$OBSERVABLES begin=$wantlow end=$wanthigh $ARGS" >> $CMD
 echo 'set obsretstatus = $?' >>$CMD
 echo 'echo $obsretstatus >' "$HERE/obsretstatus" >>$CMD
 

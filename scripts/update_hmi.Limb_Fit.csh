@@ -5,14 +5,8 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set LIMB_PROGRAM = "${DRMS_BINS_INSTALL_DIR}"/lfwrp_tas
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
 set HERE = $cwd 
 
@@ -38,11 +32,6 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set Limbprogram = "${drms_bins_install_dir}"/lfwrp_tas
-#set Limbprogram = "${drms_bins_install_dir}"/lfwrp
-
 set TMPDIR = /tmp28/jsocprod/lfwrp
 
 set product = `/bin/cat $WFDIR/gates/$GATE/product`
@@ -60,8 +49,7 @@ set retstatus=0
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-#echo "$Limbprogram tmpdir=/tmp29/jsocprod/lfwrp/ logdir=/tmp29/jsocprod/lfwrp/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit  >>&$TEMPLOG" >>$TEMPCMD
-echo "$Limbprogram tmpdir=$TMPDIR/ logdir=$TMPDIR/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit_tas >>&$TEMPLOG" >>$TEMPCMD
+echo "$LIMB_PROGRAM tmpdir=$TMPDIR/ logdir=$TMPDIR/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit_tas >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD

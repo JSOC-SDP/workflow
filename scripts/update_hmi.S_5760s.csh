@@ -5,14 +5,9 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set IQUV_AVERAGING = "${DRMS_BINS_INSTALL_DIR}"/HMI_IQUV_averaging
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set HERE = $cwd 
 
@@ -42,16 +37,14 @@ set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 set echo
 
-set IQUVprogram = "${drms_bins_install_dir}"/HMI_IQUV_averaging
-
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 if ( $indexhigh != $indexlow ) then
   @ indexhigh = $indexhigh - 1
 endif
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = S96
 set qsubname = $timename$timestr
@@ -61,8 +54,8 @@ if ($indexhigh < $indexlow) then
    exit 0
 endif
 
-@ T1 = `time_convert time=$wantlow`
-@ T2 = `time_convert time=$wanthigh`
+@ T1 = `$TIME_CONVERT time=$wantlow`
+@ T2 = `$TIME_CONVERT time=$wanthigh`
 
 ### Mod-L Times
 ### 2015.05.05_20:02:26.11_UTC - 2015.05.05_21:08:24.23_UTC  FSN 88858906-88861017 s=1209931381-1209935339
@@ -118,7 +111,7 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set IQUVstatus=0' >>&$TEMPCMD
 
-echo "$IQUVprogram begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
+echo "$IQUV_AVERAGING begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'if ($retstatus) goto DONE' >>&$TEMPCMD
 

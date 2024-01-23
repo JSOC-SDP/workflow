@@ -13,21 +13,23 @@ else
     exit 1
 endif
 
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+
 set gate = $1
 cd $WFDIR/gates/$gate
 
 # Check for an empty series, then update the low and high state-file contents.
-if (`show_info -iq $HARPSERIES n=1 | wc -l` <= 0) then
+if (`$SHOW_INFO -iq $HARPSERIES n=1 | wc -l` <= 0) then
     echo $0 $* $HARPSERIES is an empty series
     echo "-1" > low
     echo "-1" > high
 else
-    show_info -q  $HARPSERIES'[][^]' key=T_REC | tail -1 > low
+    $SHOW_INFO -q  $HARPSERIES'[][^]' key=T_REC | tail -1 > low
     if ($?) then
         echo Could not obtain $HARPSERIES time of first observation
         exit 1
     else
-        show_info -q  $HARPSERIES'[][$]' key=T_REC | tail -1 > high
+        $SHOW_INFO -q  $HARPSERIES'[][$]' key=T_REC | tail -1 > high
         if ($?) then
             echo Could not obtain $HARPSERIES time of last observation
             exit 1

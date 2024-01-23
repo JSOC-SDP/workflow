@@ -5,6 +5,8 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
+set MAKE_TICKET = "${DRMS_BINS_INSTALL_DIR}/workflow/maketicket.csh"
+set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
 
 set HERE = $cwd 
 
@@ -30,8 +32,6 @@ end
 
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
-
-set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
@@ -85,6 +85,6 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
-  set B_TICKET = `"$DRMS_SRC_INSTALL_DIR/workflow/maketicket.csh" gate=hmi.B_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set B_TICKET = `$MAKE_TICKET gate=hmi.B_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 exit $retstatus

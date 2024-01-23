@@ -5,15 +5,6 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
 if ($?WORKFLOW_DATA) then
@@ -22,6 +13,11 @@ else
   echo Need WORKFLOW_DATA variable to be set.
   exit 1
 endif
+
+set AIA_MAKE_LEV1 = "${DRMS_BINS_INSTALL_DIR}"/build_lev1_aia
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = p.q,j.q
@@ -39,14 +35,12 @@ end
 set product = `cat $WFDIR/gates/$GATE/product`
 set key = `cat $WFDIR/gates/$GATE/key`
 
-set AIA_makelev1 = "${drms_bins_install_dir}"/build_lev1_aia
-
 # Make name for qsub and get times rounded to slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[-:]//g' -e 's/^......//' -e 's/T/_/' -e 's/..Z//'`
 set timename = AIA
 set qsubname = $timename$timestr
@@ -57,10 +51,10 @@ if ($indexhigh < $indexlow) then
 endif
 
 # convert to FSN
-set wantlow_t =  `time_convert time=$wantlow`
-set wanthigh_t = `time_convert time=$wanthigh`
-set FSN_LOW =  `show_info -q key=FSN aia.lev0'[? T_OBS>='$wantlow_t' AND T_OBS<='$wanthigh_t' ?]' n=1`
-set FSN_HIGH = `show_info -q key=FSN aia.lev0'[? T_OBS>='$wantlow_t' AND T_OBS<='$wanthigh_t' ?]' n=-1`
+set wantlow_t =  `$TIME_CONVERT time=$wantlow`
+set wanthigh_t = `$TIME_CONVERT time=$wanthigh`
+set FSN_LOW =  `$SHOW_INFO -q key=FSN aia.lev0'[? T_OBS>='$wantlow_t' AND T_OBS<='$wanthigh_t' ?]' n=1`
+set FSN_HIGH = `$SHOW_INFO -q key=FSN aia.lev0'[? T_OBS>='$wantlow_t' AND T_OBS<='$wanthigh_t' ?]' n=-1`
 
 echo $FSN_LOW $FSN_HIGH
 
@@ -73,7 +67,7 @@ echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 # XXXXXXXXXXXXXXXXXXXXX FIX THIS
-echo "$AIA_makelev1 mode=fsn dsin=aia.lev0 dsout=$product instru=aia quicklook=0 bfsn=$FSN_LOW efsn=$FSN_HIGH logfile=run_log.lev1 >>&$TEMPLOG" >>$TEMPCMD
+echo "$AIA_MAKE_LEV1 mode=fsn dsin=aia.lev0 dsout=$product instru=aia quicklook=0 bfsn=$FSN_LOW efsn=$FSN_HIGH logfile=run_log.lev1 >>&$TEMPLOG" >>$TEMPCMD
 # XXXXXXXXXXXXXXXXXXXXX
 echo 'set RETSTATUS = $?' >>$TEMPCMD
 echo 'echo $RETSTATUS >retstatus' >>&$TEMPCMD
