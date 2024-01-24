@@ -10,7 +10,7 @@ set FASTCADENCE = $CADENCE
 set SLOWCADENCE = 60
 
 if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environemnt variable is undefined
+    echo WORKFLOW_DATA environment variable is undefined
     exit 1
 endif
 

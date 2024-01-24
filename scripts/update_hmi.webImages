@@ -3,11 +3,11 @@ set MAKE_IMAGES_LOW_HIGH = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/makeimages
 set HERE = $cwd
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q,o.q
-  set QSUB = qsub
+    set QUE = j.q,o.q
+    set QSUB = qsub
 else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = p.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+    set QUE = p.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
 set wantlow = `cat wantlow`
@@ -33,7 +33,8 @@ set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 if ( -e $HERE/qsub_running ) then
-  rm -f $HERE/qsub_running
+    rm -f $HERE/qsub_running
 endif
+
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus
