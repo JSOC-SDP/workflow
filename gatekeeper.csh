@@ -83,12 +83,14 @@ while ($keep_running > 0) # KEEPRUNNING LOOP
 
         # Do general update if it is time
 	    if ($verbosemode) echo "GATEKEEPER Gate: $gate, Starting to check for update times expired"
+        if ($verbosemode) echo "GATEKEEPER Gate: $gate, time now is $nowtxt"
+        if ($verbosemode) echo "GATEKEEPER Gate: $gate, next update time is $gate_next_update"
 
         set nextupdatetime = `$TIME_CONVERT time=$gate_next_update`
         if ($?) set nextupdatetime = now
-        if ($verbosemode) echo "GATEKEEPER Gate: $gate, now = $now"
 
         if ($now >= $nextupdatetime) then
+            if ($verbosemode) echo "GATEKEEPER Gate: $gate, time to run gate status task $WORKFLOW_DIR/$gate_status_task"
             @ nextupdatetime = $now + $gate_update_delta
             $TIME_CONVERT s=$nextupdatetime > nextupdate
             echo $nowtxt > lastupdate
@@ -96,6 +98,7 @@ while ($keep_running > 0) # KEEPRUNNING LOOP
             if ($gate == "clock_gate") then
                 $WORKFLOW_DIR/$gate_status_task $gate # do clock_gate inline
             else
+                if ($verbosemode) echo "GATEKEEPER Gate: $gate, running $WORKFLOW_DIR/$gate_status_task"
                 $WORKFLOW_DIR/$gate_status_task $gate & 
                 continue # NEXT GATE 
                 # stop with this gate until update is done
