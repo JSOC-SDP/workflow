@@ -9,6 +9,7 @@ set GET_NEXT_TICKET_ID = "${DRMS_BINS_INSTALL_DIR}"/GetNextID
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
 set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set verbosemode = 1
 
@@ -127,8 +128,8 @@ echo $WANTLOW >wantlow
 echo $WANTHIGH >wanthigh
 
 if ($gate_type == "time") then
-	set WANTLOW_t = `time_convert time=$WANTLOW `
-	set WANTHIGH_t = `time_convert time=$WANTHIGH `
+	set WANTLOW_t = `$TIME_CONVERT time=$WANTLOW `
+	set WANTHIGH_t = `$TIME_CONVERT time=$WANTHIGH `
 else
 	set WANTLOW_t = $WANTLOW
 	set WANTHIGH_t = $WANTHIGH
@@ -147,8 +148,8 @@ if ($wantrange > $maxrange) then
 		@ thishigh_t = $thislow_t + $maxrange
 		if ($thishigh_t > $WANTHIGH_t) set thishigh_t = $WANTHIGH_t
         if ($gate_type == "time") then
-			set thislow = `time_convert s=$thislow_t zone=TAI`
-			set thishigh = `time_convert s=$thishigh_t zone=TAI`
+			set thislow = `$TIME_CONVERT s=$thislow_t zone=TAI`
+			set thishigh = `$TIME_CONVERT s=$thishigh_t zone=TAI`
         else
 			set thislow = $thislow_t
 			set thishigh = $thishigh_t
