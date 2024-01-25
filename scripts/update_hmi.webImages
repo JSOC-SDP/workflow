@@ -5,6 +5,7 @@ set HERE = $cwd
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
     set QSUB = /SGE2/bin/lx-amd64/qsub
+    set SHELL_PATH_ARG = -S /bin/bash
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
         set QUE = j.q,o.q
@@ -12,6 +13,7 @@ else
     else if ( $JSOC_MACHINE == "linux_avx" ) then
         set QUE = p.q
         set QSUB = /SGE2/bin/lx-amd64/qsub
+        set SHELL_PATH_ARG = ""
     endif
 endif
 
@@ -35,7 +37,7 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 # execute qsub script
 touch qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
+$QSUB $SHELL_PATH_ARG -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 if ( -e $HERE/qsub_running ) then
     rm -f $HERE/qsub_running
