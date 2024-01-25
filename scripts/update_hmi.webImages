@@ -5,7 +5,7 @@ set HERE = $cwd
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
     set QSUB = /SGE2/bin/lx-amd64/qsub
-    set SHELL_PATH_ARG = -S /bin/bash
+    set SHELL_PATH_ARG = "-S /bin/bash"
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
         set QUE = j.q,o.q
