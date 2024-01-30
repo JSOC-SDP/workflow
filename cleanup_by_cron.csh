@@ -3,17 +3,12 @@
 source $HOME/.cshrc
 source $HOME/.login
 
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
 
-setenv WORKFLOW_DATA /home/jsoc/pipeline
-set WORKFLOW_ROOT = "${drms_src_install_dir}"/workflow
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 cd $WORKFLOW_DATA
 
@@ -22,4 +17,4 @@ cd $WORKFLOW_DATA
 # only completed tasks will have old logs removed.
 
 set NOW = `date +%Y%m%d_%H%M`
-$WORKFLOW_ROOT/cleanup.csh >& $WORKFLOW_DATA/cleanup_logs/cleanup_log.$NOW
+$WORKFLOW_DIR/cleanup.csh >& $WORKFLOW_DATA/cleanup_logs/cleanup_log.$NOW

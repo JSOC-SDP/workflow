@@ -5,35 +5,32 @@
 
 set noglob
 
-set here = $cwd
-
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-cd $WFDIR
+set here = $cwd
+
+cd $WORKFLOW_DATA
 
 set ticket = $1
 if ($#ticket < 1 || $ticket[1] == '***') then
-   echo "Invalid ticket $ticket"
-   exit 1
+    echo "Invalid ticket $ticket"
+    exit 1
 endif
 
 set gate = `echo $ticket | sed -e 's/-.*//'`
 
 if (!( -e gates/$gate)) then
-   echo "No gate matching the ticket found"
-   exit 1
+    echo "No gate matching the ticket found"
+    exit 1
 endif
 
 set task = `cat gates/$gate/actiontask`
 if (!( -e tasks/$task)) then
-   echo "No task found for the ticket's gate"
-   exit 1
+    echo "No task found for the ticket's gate"
+    exit 1
 endif
 
 # Look in the terminal places for the ticket.
@@ -50,63 +47,65 @@ endif
 set WASFOUND = 0
 
 while (1)
+    cd $WORKFLOW_DATA
+    set foundpath = "NOTFOUND"
 
-  cd $WFDIR
-  set foundpath = "NOTFOUND"
-  # first look in new_tickets
-  if (-e gates/$gate/new_tickets/$ticket) then
-    set foundpath = "PENDING"
-    set WASFOUND = 1
-    goto KEEPWAITING
-  endif
-  # next in gate's active_tickets
-  if (-e gates/$gate/active_tickets/$ticket) then
-    set foundpath = "PENDING"
-    set WASFOUND = 1
-    goto KEEPWAITING
-  endif
+    # first look in new_tickets
+    if (-e gates/$gate/new_tickets/$ticket) then
+        set foundpath = "PENDING"
+        set WASFOUND = 1
+        goto KEEPWAITING
+    endif
 
-  cd $WFDIR
-  if ($foundpath == "NOTFOUND") then
-    foreach queue ( tasks/$task/done tasks/$task/archive/ok tasks/$task/archive/failed )
-      cd $WFDIR/$queue
-      foreach taskid (`/bin/ls`)
-        if ($taskid =~ "*-root") continue
-        set thisticket = `grep TICKET  $taskid/ticket`
-        if ($#thisticket) then
-          set $thisticket  # not there is a variable TICKET containing the ticketid that casued this taskinstance
-          if ($ticket == $TICKET) then
-            set foundpath = $cwd/$taskid
-            break
-          endif
-        else
-          echo task instance at $cwd/$taskid has no ticket
-        endif
-      end
-      if ($foundpath != "NOTFOUND") break
-    end
-  endif
+    # next in gate's active_tickets
+    if (-e gates/$gate/active_tickets/$ticket) then
+        set foundpath = "PENDING"
+        set WASFOUND = 1
+        goto KEEPWAITING
+    endif
+
+    cd $WORKFLOW_DATA
+    if ($foundpath == "NOTFOUND") then
+        foreach queue ( tasks/$task/done tasks/$task/archive/ok tasks/$task/archive/failed )
+            cd $WORKFLOW_DATA/$queue
+            foreach taskid (`/bin/ls`)
+                if ($taskid =~ "*-root") continue
+                set thisticket = `grep TICKET  $taskid/ticket`
+                if ($#thisticket) then
+                    set $thisticket  # not there is a variable TICKET containing the ticketid that casued this taskinstance
+                    if ($ticket == $TICKET) then
+                        set foundpath = $cwd/$taskid
+                        break
+                    endif
+                else
+                    echo task instance at $cwd/$taskid has no ticket
+                endif
+            end
+
+            if ($foundpath != "NOTFOUND") break
+        end
+    endif
   
-  if ($foundpath != "NOTFOUND") then # Found the task instance for this ticket
-    set ticket_status = `grep STATUS $foundpath/ticket`
-    set STATUS = 999
-    if ($#ticket_status) set $ticket_status 
-  
-    cat $foundpath/ticket
-    echo TASKPATH=$foundpath
-    if ($STATUS >= 5) exit 1
-    exit 0
-  endif
+    if ($foundpath != "NOTFOUND") then # Found the task instance for this ticket
+        set ticket_status = `grep STATUS $foundpath/ticket`
+        set STATUS = 999
+        if ($#ticket_status) set $ticket_status 
+        cat $foundpath/ticket
+        echo TASKPATH=$foundpath
+        if ($STATUS >= 5) exit 1
+        exit 0
+    endif
 
 KEEPWAITING:
-  if ($foundpath == "NOTFOUND") then
-    if ($WASFOUND) then
-      echo $ticket processing complete
-    else
-      echo $ticket not active
+    if ($foundpath == "NOTFOUND") then
+        if ($WASFOUND) then
+            echo $ticket processing complete
+        else
+            echo $ticket not active
+        endif
+
+        exit 0
     endif
-    exit 0
-  endif
 
 sleep 10
 end

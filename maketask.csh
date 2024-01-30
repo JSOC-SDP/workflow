@@ -2,13 +2,12 @@
 
 echo $0 $*
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 # Call with at least task, target, and task as key=value pairs
 # e.g.   maketasks.csh task=<taskname> target=<target> command=<command>
@@ -27,59 +26,65 @@ set command = "NOT_SPECIFIED"
 set manager = taskmanager.csh
 
 while ( $#argv > 0)
-  foreach keyname (task parallelOK maxrange retain target note command manager )
-    if ($1 =~ $keyname=*) then
-       set $1
-       break
-    endif
+    foreach keyname (task parallelOK maxrange retain target note command manager )
+        if ($1 =~ $keyname=*) then
+            set $1
+            break
+        endif
     end # foreach
-  shift
-  end #while
 
-  echo $task "$task"
+    shift
+end #while
+
+echo $task "$task"
 if ("$task" == "NOT_SPECIFIED") then
-  echo task must be specified
-  exit
+    echo task must be specified
+    exit
 endif
+
 if ("$target" == "NOT_SPECIFIED") then
-  echo product must be specified
-  exit
+    echo product must be specified
+    exit
 endif
+
 if ("$command" == "NOT_SPECIFIED") then
-  echo command must be specified
-  exit
-else if (!( -x $WFCODE/$command)) then
-  echo STOP - in task $task the command $command must be executable.
-  exit 1
+    echo command must be specified
+    exit
+else if (!( -x $WORKFLOW_DIR/$command)) then
+    echo STOP - in task $task the command $command must be executable.
+    exit 1
 endif
+
 if ("$maxrange" == "NaN") then
-  echo maxrange must be specified
-  exit
+    echo maxrange must be specified
+    exit
 endif
-if (!( -x $WFCODE/$manager)) then
-  echo STOP - in task $task the taskmanager $manager must be executable.
-  exit 1
+
+if (!( -x $WORKFLOW_DIR/$manager)) then
+    echo STOP - in task $task the taskmanager $manager must be executable.
+    exit 1
 endif
 
 set isdash = `echo $task | grep '-' | wc -l`
 if ($isdash) then
-  echo STOP, the task name may not contain a dash, $task
-  exit
+    echo STOP, the task name may not contain a dash, $task
+    exit
 endif
 
 set isdash = `echo $target | grep '-' | wc -l`
 if ($isdash) then
-  echo STOP, the target gate name may not contain a dash, $target
-  exit
+    echo STOP, the target gate name may not contain a dash, $target
+    exit
 endif
 
 set taskid = $task"-19930101-000"
 
-cd $WFDIR
+cd $WORKFLOW_DATA
 if (-e tasks/$task) then
-  echo task $task already exists, remove then repeat command
-  exit
+    echo task $task already exists, remove then repeat command
+    exit
 endif
+
 mkdir tasks/$task
 cd tasks/$task
 

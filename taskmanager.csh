@@ -4,6 +4,11 @@
 #
 # Call with args task=<taskname> gate=<gatename> ticket=<ticketid>
 #
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 set GET_NEXT_TICKET_ID = "${DRMS_BINS_INSTALL_DIR}"/GetNextID
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
@@ -15,11 +20,6 @@ set verbosemode = 1
 
 if ($verbosemode) echo "TASKMANAGER called"
 # set echo
-
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
 
 cd $WORKFLOW_DATA
 

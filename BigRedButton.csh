@@ -11,27 +11,23 @@
 ###  6. Run the cleanup script and delete failed directories to make it easier to check gates and tasks
 ###  7  Restart the gatekeeper
 
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set user = $USER
 if ( $user != 'jsocprod' ) then
-  echo ""
-  echo "Must run as user jsocprod on n04."
-  echo ""
-  exit
+    echo ""
+    echo "Must run as user jsocprod on n04."
+    echo ""
+    exit
 endif
 
-set WORKFLOW_DATA = /home/jsoc/pipeline
-set WORKFLOW_ROOT = "${drms_src_install_dir}"/workflow
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set GATEKEEPER_RESTART = $WORKFLOW_DIR/gatekeeper.restart
 set TASKS = $WORKFLOW_DATA/tasks
-set GATES = $WORKFLOW_GATES/gates
+set GATES = $WORKFLOW_DATA/gates
 
 set echo 
 
@@ -44,10 +40,10 @@ rm $WORKFLOW_DATA/Keep_running
 
 @ TM_num = `ps -ef | grep taskmanager.csh | wc -l`
 while  ( $TM_num > 0 )
-  foreach TM ( `ps -ef | grep taskmanager.csh | awk '{print $2}'` ) 
-    kill -9 $TM
-  end
- e@ TM_num = `ps -ef | grep taskmanager.csh | wc -l`
+    foreach TM ( `ps -ef | grep taskmanager.csh | awk '{print $2}'` ) 
+        kill -9 $TM
+    end
+    e@ TM_num = `ps -ef | grep taskmanager.csh | wc -l`
 while  ( `ps -ef | grep taskmanager.csh | wc -l` > 0 )
 end
 
@@ -56,32 +52,32 @@ end
 
 cd $TASKS
 foreach task ( * )
-  rm -rf $task/active/*
-  echo 0 > $task/state
-  rm $task/active/$task'-root'/pending_tickets/*
+    rm -rf $task/active/*
+    echo 0 > $task/state
+    rm $task/active/$task'-root'/pending_tickets/*
 end
 
 cd $GATES
 foreach gate ( * )
-  rm $gate/active_tickets/*
-  rm $gate/new_tickets/*
+    rm $gate/active_tickets/*
+    rm $gate/new_tickets/*
 end
 
 
 ##  4  ##
 
 foreach QSub ( `qstat | grep jsocprod | egrep '(OBS|VEC|NRT|IMG|MSK|FITS|keiji)' | awk '{print $1}'` )
-  qdel $Qsub
+    qdel $Qsub
 end
 
 
 ##  5  ##
 
-cd $WORKFLOW_ROOT
+cd $WORKFLOW_DIR
 ./cleanup.csh
 cd $TASKS
 foreach task ( * )
-  rm -rf $task/archive/failed/*
+    rm -rf $task/archive/failed/*
 end
 
 
@@ -89,22 +85,18 @@ end
  
 cd $GATES
 foreach gate ( * )
-  echo $gate
-  cat $gate/low
-  cat $gate/high
-  echo ""
+    echo $gate
+    cat $gate/low
+    cat $gate/high
+    echo ""
 end
 
 ##  7  ##
 
-"${drms_src_install_dir}"/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
+$GATEKEEPER_RESTART >> $WORKFLOW_DATA/restart.log &
 
 
 echo "1. Check for bad low high times in gates (should be the last thing on the screen)."
 echo "2. Make sure there are no taskmanagers running."
 echo "3. Check gates and tasks (chechgates.csh | more, etc)."
 echo "4. Restart failed tickets or run maketickets to get things running again."
-
-
-
-

@@ -4,13 +4,12 @@ echo $0 $*
 
 #set echo
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 # Call with gatename, seriesname, key, and type as key=value pairs
 #   gate=<gatename> ds=<seriesname> key=<primekey> type=<typename>
@@ -18,7 +17,6 @@ endif
 # Any of the following keywords can be set on the calling line.
 
 # set defaults and collect args
-
 
 set gate_name = "NOT_SPECIFIED"
 set product = "NOT_SPECIFIED"
@@ -36,55 +34,62 @@ set project = "NA"
 set coverage_args = "none"
 
 while ( $#argv > 0)
-  foreach keyname (gate_name gatestatus product sequence_number low high type key lastupdate nextupdate updatedelta statustask actiontask project)
-    if ($1 =~ $keyname=*) then
-       set $1
-    endif
+    foreach keyname (gate_name gatestatus product sequence_number low high type key lastupdate nextupdate updatedelta statustask actiontask project)
+        if ($1 =~ $keyname=*) then
+            set $1
+        endif
     end # foreach
-  shift
-  end #while
+
+    shift
+end #while
 
 if ("$gate_name" == "NOT_SPECIFIED") then
-  echo gate_name must be specified
-  exit
+    echo gate_name must be specified
+    exit
 endif
+
 if ("$product" == "NOT_SPECIFIED") then
   echo product must be specified
   exit
 endif
 if ("$type" == "NOT_SPECIFIED") then
-  echo type must be specified
-  exit
+    echo type must be specified
+    exit
 endif
+
 if ("$key" == "NOT_SPECIFIED") then
-  echo key must be specified
-  exit
+    echo key must be specified
+    exit
 endif
+
 if ("$actiontask" == "NOT_SPECIFIED") then
-  echo warning - actiontask is not specified
+    echo warning - actiontask is not specified
 endif
-if (!(-x $WFCODE/$statustask)) then
-  echo STOP, the script/program statustask should be created and executable before a gate that uses it is created.
-  exit
+
+if (!(-x $WORKFLOW_DIR/$statustask)) then
+    echo STOP, the script/program statustask should be created and executable before a gate that uses it is created.
+    exit
 endif
-if (!(-x $WFDIR/tasks/$actiontask)) then
-  echo STOP, the command $actiontask should be created before a gate that uses it is created.
-  exit
+
+if (!(-x $WORKFLOW_DATA/tasks/$actiontask)) then
+    echo STOP, the command $actiontask should be created before a gate that uses it is created.
+    exit
 endif
 
 set isdash = `echo $gate_name | grep '-' | wc -l`
 if ($isdash) then
-  echo STOP, the gatename may not contain a dash, $gate_name
-  exit
+    echo STOP, the gatename may not contain a dash, $gate_name
+    exit
 endif
 
 set sequence_number = $gate_name"-19930101-000" # gate sequence number
 
-cd $WFDIR
+cd $WORKFLOW_DATA
 if (-e gates/$gate_name) then
-  echo gate $gate_name already exists, remove then repeat command
-  exit
+    echo gate $gate_name already exists, remove then repeat command
+    exit
 endif
+
 mkdir gates/$gate_name
 cd gates/$gate_name
 
@@ -106,4 +111,3 @@ echo "$coverage_args" > coverage_args
 
 mkdir new_tickets
 mkdir active_tickets
-

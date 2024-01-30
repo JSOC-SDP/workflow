@@ -5,14 +5,14 @@
 #
 # if taskid is absent then create a new taskid for the task associated
 # with the target gate and make the ticket appear to be from that taskid.
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
-set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-set GET_NEXT_TICKET_ID = "${DRMS_BINS_INSTALL_DIR}"/GetNextID
-
 if ( ! $?WORKFLOW_DATA ) then
     echo WORKFLOW_DATA environment variable is undefined
     exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set GET_NEXT_TICKET_ID = "${DRMS_BINS_INSTALL_DIR}"/GetNextID
 
 set cmdline = ($*)
 
