@@ -3,28 +3,30 @@
 # I think the point of this script is to write out the low, high, and lastupdate gate state files.
 # The general status script also writes out the coverage file, but I do not know what that file
 # is for - skipping for now.
-if ($?WORKFLOW_DATA) then
-    set WFDIR = $WORKFLOW_DATA
-else
-    echo Need WORKFLOW_DATA variable to be set.
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
     exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set low = 2010.05.01
 set high = 2010.02.02
 
+# Ugh
 cd /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive
 set last_year = `ls -1d 20* | tail -1 | cut -c1-4`
 cd $last_year
 set last_month = `ls -1 | tail -1 | cut -c1-2`
 cd $last_month
 set last_day = `ls -1 | tail -1 | cut -c1-2`
+# Ugh
 set imgDir = /web/jsoc/htdocs/doc/data/hmi/harp/harp_definitive/$last_year/$last_month/$last_day
 
 set gate = hmi_harpimages
-cd $WFDIR/gates/$gate
+cd $WORKFLOW_DATA/gates/$gate
 
 set high = `ls -1H $imgDir | grep png | tail -1 | awk -F\. '{print $2"."$3"."$4}'`
 

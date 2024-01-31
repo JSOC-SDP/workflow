@@ -1,11 +1,15 @@
 #! /bin/csh -f
 # the offset clock status task simply reflects the current time offset by a fixed amount
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
 
-set WFDIR = $WORKFLOW_DATA
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
-cd $WFDIR/gates/$1
+cd $WORKFLOW_DATA/gates/$1
 set NOW = `date +%Y.%m.%d_%H:%M:%S`
 set NOW_t = `$TIME_CONVERT time=$NOW`
 @ OLD_t = $NOW_t - 437752800

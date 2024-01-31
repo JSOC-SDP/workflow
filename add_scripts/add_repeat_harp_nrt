@@ -2,10 +2,14 @@
 
 #
 # WARNING - do not run this while gatekeeper is active
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
 
-set WFDIR = $WORKFLOW_DATA
-set WFCODE = $WORKFLOW_ROOT
-cd $WFDIR
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+cd $WORKFLOW_DATA
 
 set NEWTASK = update_hmi.harp_nrt
 set NEWGATE = repeat_harp_nrt
@@ -16,13 +20,11 @@ if (-e tasks/$NEWTASK) rm -rf tasks/$NEWTASK
 if (-e gates/$NEWGATE) rm -rf gates/$NEWGATE
 
 # finally make task 
-$WFCODE/maketask.csh task=$NEWTASK manager=taskmanager.csh target=$NEWGATE maxrange=720 \
-                command=scripts/start_hmi_harp_nrt.csh
+$WORKFLOW_DIR/maketask.csh task=$NEWTASK manager=taskmanager.csh target=$NEWGATE maxrange=720 \
+            command=scripts/start_hmi_harp_nrt.csh
 
 
-$WFCODE/makegate.csh gate_name=$NEWGATE product=none type=time key=NA \
-	low=2010.03.24_00:00:00_TAI high=2010.03.24_00:00:00_TAI \
-	actiontask=$NEWTASK statustask=scripts/status_clock.csh
-
+$WORKFLOW_DIR/makegate.csh gate_name=$NEWGATE product=none type=time key=NA \
+            low=2010.03.24_00:00:00_TAI high=2010.03.24_00:00:00_TAI \
+            actiontask=$NEWTASK statustask=scripts/status_clock.csh
 # initialization ticket not needed. 
-

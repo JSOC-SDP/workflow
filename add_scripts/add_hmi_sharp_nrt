@@ -1,15 +1,13 @@
 #! /bin/csh -f
 #
-# these lines for all products
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-cd $WFDIR
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+cd $WORKFLOW_DATA
 rm -f Keep_running
 while (-e GATEKEEPERBUSY)
   echo waiting for gatekeeper to quit.
@@ -18,26 +16,23 @@ while (-e GATEKEEPERBUSY)
 
 # begin section for this product
 
-cd $WFDIR/gates
+cd $WORKFLOW_DATA/gates
 rm -rf hmi.sharp_nrt
 
-cd $WFDIR/tasks
+cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.sharp_nrt
 
-cd $WFDIR
-$WFCODE/maketask.csh task=update_hmi.sharp_nrt manager=taskmanager.csh target=hmi.sharp_nrt \
-		command=scripts/update_hmi.sharp_nrt.csh maxrange=86400 parallelOK=10
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/maketask.csh task=update_hmi.sharp_nrt manager=taskmanager.csh target=hmi.sharp_nrt \
+            command=scripts/update_hmi.sharp_nrt.csh maxrange=86400 parallelOK=10
 
-set PRECOND = $WFDIR/tasks/update_hmi.sharp_nrt/preconditions
+set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.sharp_nrt/preconditions
 
 #mkdir $PRECOND/hmi.Vector
 #cat > $PRECOND/hmi.Vector/prepare_ticket <<STOP
 #    set ACTION = 3
 #STOP
 
-cd $WFDIR
-$WFCODE/makegate.csh gate_name=hmi.sharp_nrt product=hmi_test.sharp_nrt type=time key=T_REC project=HMI \
-		 actiontask=update_hmi.sharp_nrt statustask=scripts/status-general.csh
-
-
-
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.sharp_nrt product=hmi_test.sharp_nrt type=time key=T_REC project=HMI \
+            actiontask=update_hmi.sharp_nrt statustask=scripts/status-general.csh

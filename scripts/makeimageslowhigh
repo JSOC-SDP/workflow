@@ -4,11 +4,12 @@
 
 # set echo
 # modified to only make new movie if NRT data.
-if ( $?WORKFLOW_TEST ) then
-    set IMGROOT = /home/jsoctest/hmi/images
-else
-    set IMGROOT = /home/jsoc/hmi/images
+if ( ! $?WORKFLOW_IMG_ROOT ) then
+    echo WORKFLOW_IMG_ROOT environment variable is undefined
+    exit 1
 endif
+
+set IMGROOT = $WORKFLOW_IMG_ROOT/images
 
 set wantlow = $1
 set wanthigh = $2
@@ -165,7 +166,7 @@ if ($finalimagetime != NONE) then
 
     set hhmmss_test = `echo $hhmmss | sed -e 's/^0//'`
 
-    if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e /home/jsoc/hmi/images/$YEAR/$MON/$DAY) ) then
+    if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e $WORKFLOW_IMG_ROOT/images/$YEAR/$MON/$DAY) ) then
         set imagepath = http://jsoc.stanford.edu/data/hmi/images/$YEAR/$MON/$DAY
         set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
         echo "Time    " $latest >  $LATESTLIST

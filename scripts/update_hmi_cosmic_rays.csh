@@ -31,13 +31,13 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set. >>$LOG
-env >>$LOG
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined >>$LOG
+    env >>$LOG
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`

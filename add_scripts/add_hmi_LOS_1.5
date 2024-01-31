@@ -1,15 +1,13 @@
 #! /bin/csh -f
 #
-# these lines for all products
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-cd $WFDIR
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+cd $WORKFLOW_DATA
 rm -f Keep_running
 while (-e GATEKEEPERBUSY)
   echo waiting for gatekeeper to quit.
@@ -23,20 +21,20 @@ while (-e GATEKEEPERBUSY)
 
 # remove prior versions
 
-cd $WFDIR/gates
+cd $WORKFLOW_DATA/gates
 rm -rf hmi.LOS hmi.lev1_wait_FSN hmi.temps hmi.cosmic_rays hmi.V_drift_coefs
 
-cd $WFDIR/tasks
+cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.LOS wait_hmi.lev1_FSN wait_hmi.temps wait_hmi.cosmic_rays wait_hmi.V_drift_coefs
 
 # Make tasks and set preconditions
 
 # NOTE the "command" script used below must be available and executable when this script is run
-cd $WFDIR
-$WFCODE/maketask.csh task=update_hmi.LOS manager=taskmanager.csh target=hmi.LOS \
-		command=scripts/update_hmi.LOS_1.5 maxrange=1440 parallelOK=5
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/maketask.csh task=update_hmi.LOS manager=taskmanager.csh target=hmi.LOS \
+            command=scripts/update_hmi.LOS_1.5 maxrange=1440 parallelOK=5
 
-set PRECOND = $WFDIR/tasks/update_hmi.LOS/preconditions
+set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.LOS/preconditions
 
 mkdir $PRECOND/hmi.cosmic_rays
 cat > $PRECOND/hmi.cosmic_rays/prepare_ticket <<STOP
@@ -80,18 +78,19 @@ STOP
 
 # Prerequisite tasks
 
-$WFCODE/maketask.csh task=wait_hmi.lev1_FSN manager=taskmanager.csh target=hmi.lev1_wait_FSN \
-		command=scripts/wait_hmi.lev1_FSN.csh maxrange=86400 parallelOK=1
+$WORKFLOW_DIR/maketask.csh task=wait_hmi.lev1_FSN manager=taskmanager.csh target=hmi.lev1_wait_FSN \
+            command=scripts/wait_hmi.lev1_FSN.csh maxrange=86400 parallelOK=1
 
-$WFCODE/maketask.csh task=wait_hmi.temps manager=taskmanager.csh target=hmi.temps \
-		command=scripts/nop_task.csh maxrange=86400 parallelOK=1
+$WORKFLOW_DIR/maketask.csh task=wait_hmi.temps manager=taskmanager.csh target=hmi.temps \
+            command=scripts/nop_task.csh maxrange=86400 parallelOK=1
 
-$WFCODE/maketask.csh task=wait_hmi.cosmic_rays manager=taskmanager.csh target=hmi.cosmic_rays \
-		command=scripts/update_hmi_cosmic_rays.csh maxrange=7200 parallelOK=1
+$WORKFLOW_DIR/maketask.csh task=wait_hmi.cosmic_rays manager=taskmanager.csh target=hmi.cosmic_rays \
+            command=scripts/update_hmi_cosmic_rays.csh maxrange=7200 parallelOK=1
 
-$WFCODE/maketask.csh task=wait_hmi.V_drift_coefs manager=taskmanager.csh target=hmi.V_drift_coefs \
-		command=scripts/update_hmi.V_drift.csh maxrange=864000 parallelOK=1
-set PRECOND = $WFDIR/tasks/wait_hmi.V_drift_coefs/preconditions
+$WORKFLOW_DIR/maketask.csh task=wait_hmi.V_drift_coefs manager=taskmanager.csh target=hmi.V_drift_coefs \
+            command=scripts/update_hmi.V_drift.csh maxrange=864000 parallelOK=1
+
+set PRECOND = $WORKFLOW_DATA/tasks/wait_hmi.V_drift_coefs/preconditions
 mkdir $PRECOND/hmi.LOSnrt
 cat >$PRECOND/hmi.LOSnrt/prepare_ticket <<STOP
     # skip precondition for times before nrt data exists
@@ -110,30 +109,29 @@ STOP
 # NOTE hmi.M_45s is made at the same time as V, Ic, Ld, and Lw so only
 # one product needs to be tracked here.
 
-cd $WFDIR
-$WFCODE/makegate.csh gate_name=hmi.LOS product=hmi.M_45s type=time key=T_REC project=HMI \
-		 actiontask=update_hmi.LOS statustask=scripts/status-general.csh
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.LOS product=hmi.M_45s type=time key=T_REC project=HMI \
+            actiontask=update_hmi.LOS statustask=scripts/status-general.csh
 
 # Prerequisite gates
 
-$WFCODE/makegate.csh gate_name=hmi.lev1_wait_FSN product=hmi.lev1 type=time key=T_OBS project=HMI \
-		 actiontask=wait_hmi.lev1_FSN statustask=scripts/status_hmi_camera2.csh coverage_args=NEVER
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.lev1_wait_FSN product=hmi.lev1 type=time key=T_OBS project=HMI \
+            actiontask=wait_hmi.lev1_FSN statustask=scripts/status_hmi_camera2.csh coverage_args=NEVER
 
-$WFCODE/makegate.csh gate_name=hmi.temps product=hmi.temperature_summary_300s type=time key=T_START project=HMI \
-		 actiontask=wait_hmi.temps statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.temps product=hmi.temperature_summary_300s type=time key=T_START project=HMI \
+            actiontask=wait_hmi.temps statustask=scripts/status-general.csh
 
-$WFCODE/makegate.csh gate_name=hmi.cosmic_rays product=hmi.cosmic_rays type=time key=T_OBS project=HMI \
-		 coverage_args=NEVER actiontask=wait_hmi.cosmic_rays statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.cosmic_rays product=hmi.cosmic_rays type=time key=T_OBS project=HMI \
+            coverage_args=NEVER actiontask=wait_hmi.cosmic_rays statustask=scripts/status-general.csh
 
-$WFCODE/makegate.csh gate_name=hmi.V_drift_coefs product=hmi.coefficients type=time key=T_REC project=HMI \
-		 actiontask=wait_hmi.V_drift_coefs statustask=scripts/status-general.csh \
-                 low=2010.09.16_TAI high=NaN coverage_args=NEVER
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.V_drift_coefs product=hmi.coefficients type=time key=T_REC project=HMI \
+            actiontask=wait_hmi.V_drift_coefs statustask=scripts/status-general.csh \
+            low=2010.09.16_TAI high=NaN coverage_args=NEVER
 
 
 # initialize the gates
-$WFCODE/maketicket.csh gate=hmi.LOS wantlow=NaN wanthigh=NaN action=6
-$WFCODE/maketicket.csh gate=hmi.lev1_wait_FSN wantlow=NaN wanthigh=NaN action=6
-$WFCODE/maketicket.csh gate=hmi.temps wantlow=NaN wanthigh=NaN action=6
-$WFCODE/maketicket.csh gate=hmi.cosmic_rays wantlow=NaN wanthigh=NaN action=6
+$WORKFLOW_DIR/maketicket.csh gate=hmi.LOS wantlow=NaN wanthigh=NaN action=6
+$WORKFLOW_DIR/maketicket.csh gate=hmi.lev1_wait_FSN wantlow=NaN wanthigh=NaN action=6
+$WORKFLOW_DIR/maketicket.csh gate=hmi.temps wantlow=NaN wanthigh=NaN action=6
+$WORKFLOW_DIR/maketicket.csh gate=hmi.cosmic_rays wantlow=NaN wanthigh=NaN action=6
 # maketicket.csh gate=hmi.V_drift_coefs wantlow=NaN wanthigh=NaN action=6 NEVER DO THIS, NOT SLOTTED
-

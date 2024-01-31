@@ -7,14 +7,14 @@
 
 set Q_CAMERA = '[? CAMERA=2 ?]'
 
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-cd $WFDIR/gates
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+cd $WORKFLOW_DATA/gates
 set gate = $1
 cd $gate
 

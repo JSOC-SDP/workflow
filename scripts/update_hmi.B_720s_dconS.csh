@@ -7,12 +7,12 @@
 # XXXXXXXXXX test
 set HERE = $cwd 
 
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set DISAMGIB = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
@@ -32,8 +32,8 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set low_s = `$TIME_CONVERT time=$WANTLOW`
 set high_s = `$TIME_CONVERT time=$WANTHIGH`

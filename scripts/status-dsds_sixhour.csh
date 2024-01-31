@@ -7,18 +7,21 @@
 # echo starting $0 $*
 # set echo
 
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
-cd $WFDIR/gates
+# Ugh
+set TIME_INDEX = time_index
+
+cd $WORKFLOW_DATA/gates
 set gate = $1
 cd $gate
 # ignore already in the gate dir
@@ -43,9 +46,9 @@ if ($low == "NaN") then
       echo $0 $* FAILED
       exit 1
     endif
-    time_index six=$low -t > low
+    $TIME_INDEX six=$low -t > low
 else
-    set low = `time_index -6 time=$low`
+    set low = `$TIME_INDEX -6 time=$low`
 endif
 
 if ($high == "NaN") @ nancount = $nancount + 1
@@ -55,7 +58,7 @@ if ($?) then
    echo $0 $* FAILED
    exit 1
 endif
-time_index six=$high -t > high
+$TIME_INDEX six=$high -t > high
 
 # now low and high are hour numbers and file low and file high are matching times.
 
@@ -74,8 +77,8 @@ if ($#argv > 1) then # get coverage map
     endif
     shift
   end
-  set low = `time_index time=$low -6`
-  set high = `time_index time=$high -6`
+  set low = `$TIME_INDEX time=$low -6`
+  set high = `$TIME_INDEX time=$high -6`
   if ($nancount == 2) then
     $SHOW_COVERAGE ds=$product low=$minlow high=$maxhigh -iq > coverage
   else

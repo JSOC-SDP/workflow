@@ -4,6 +4,11 @@
 
 set echo
 
+if ( ! $?WORKFLOW_IMG_ROOT ) then
+    echo WORKFLOW_IMG_ROOT environment variable is undefined
+    exit 1
+endif
+
 set wantlow = $1
 set wanthigh = $2
 
@@ -70,7 +75,7 @@ while ($day <= $dayhigh)
   set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
   set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-  set IMGROOT = /home/jsoc/hmi/images/special
+  set IMGROOT = $WORKFLOW_IMG_ROOT/images/special
   set IMGPATH = $IMGROOT/$YEAR
   if (!(-e $IMGPATH)) mkdir $IMGPATH
   set IMGPATH = $IMGPATH/$MON

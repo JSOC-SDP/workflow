@@ -1,20 +1,18 @@
 #! /bin/csh -f
 #
-# these lines for all products
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-cd $WFDIR
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+cd $WORKFLOW_DATA
 rm -f Keep_running
 while (-e GATEKEEPERBUSY)
-  echo waiting for gatekeeper to quit.
-  sleep 5
-  end
+    echo waiting for gatekeeper to quit.
+    sleep 5
+end
 
 # begin section for this product
 
@@ -23,20 +21,20 @@ while (-e GATEKEEPERBUSY)
 
 # remove prior versions
 
-cd $WFDIR/gates
+cd $WORKFLOW_DATA/gates
 rm -rf hmi.Vector 
 
-cd $WFDIR/tasks
+cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.Vector 
 
 # Make tasks and set preconditions
 
 # NOTE the "command" script used below must be available and executable when this script is run
-cd $WFDIR
-$WFCODE/maketask.csh task=update_hmi.Vector manager=taskmanager.csh target=hmi.Vector \
-		command=scripts/update_hmi.Vector.csh maxrange=2160 parallelOK=8
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/maketask.csh task=update_hmi.Vector manager=taskmanager.csh target=hmi.Vector \
+            command=scripts/update_hmi.Vector.csh maxrange=2160 parallelOK=8
 
-set PRECOND = $WFDIR/tasks/update_hmi.Vector/preconditions
+set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.Vector/preconditions
 
 mkdir $PRECOND/hmi.cosmic_rays
 cat > $PRECOND/hmi.cosmic_rays/prepare_ticket <<STOP
@@ -68,12 +66,11 @@ STOP
 # NOTE hmi.S_720s is made at the same time as M, V, Ic, Ld, and Lw so only
 # one product needs to be tracked here.
 
-cd $WFDIR
-$WFCODE/makegate.csh gate_name=hmi.Vector product=hmi.S_720s type=time key=T_REC project=HMI \
-		 actiontask=update_hmi.Vector statustask=scripts/status-general.csh
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.Vector product=hmi.S_720s type=time key=T_REC project=HMI \
+            actiontask=update_hmi.Vector statustask=scripts/status-general.csh
 
 # Prerequisite gates made in LOS add script
 
 # initialize the gates
-$WFCODE/maketicket.csh gate=hmi.Vector wantlow=NaN wanthigh=NaN action=6
-
+$WORKFLOW_DIR/maketicket.csh gate=hmi.Vector wantlow=NaN wanthigh=NaN action=6

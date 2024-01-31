@@ -10,11 +10,9 @@ set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
@@ -34,8 +32,8 @@ end
 
 set TMPDIR = /tmp28/jsocprod/lfwrp
 
-set product = `/bin/cat $WFDIR/gates/$GATE/product`
-set key = `/bin/cat $WFDIR/gates/$GATE/key`
+set product = `/bin/cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `/bin/cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set qsubname = LIMB$WANTLOW
 set TEMPLOG = $HERE/runlog
@@ -53,7 +51,7 @@ echo "$LIMB_PROGRAM tmpdir=$TMPDIR/ logdir=$TMPDIR/logs/ bfsn=$WANTLOW efsn=$WAN
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
-echo "rm -f /home/jsoc/pipeline/tasks/update_hmi.Limb_Fit/qsub_running" >>$TEMPCMD
+echo "rm -f $WORKFLOW_DATA/tasks/update_hmi.Limb_Fit/qsub_running" >>$TEMPCMD
 
 # execute qsub script
 /bin/touch $HERE/qsub_running

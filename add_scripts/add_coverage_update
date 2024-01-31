@@ -13,10 +13,14 @@
 # computing.  It waits for the processing to be done but not for the repeat ticket.
 
 # the case here is used like cron
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
 
-set WFDIR = $WORKFLOW_DATA
-set WFCODE = $WORKFLOW_ROOT
-cd $WFDIR
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+cd $WORKFLOW_DATA
 
 set NEWTASK = repeat_web_show_coverage_task
 set NEWGATE = repeat_web_show_coverage
@@ -32,14 +36,14 @@ if (-e gates/$NEWGATE) rm -rf gates/$NEWGATE
 # set REPEAT = 7200
 
 # make the actiontask command that will start processing when current wait interval ends
-# cat >$WFCODE/scripts/$COMMANDSCRIPT << ENDSCRIPT
+# cat >$WORKFLOW_DIR/scripts/$COMMANDSCRIPT << ENDSCRIPT
 # #! /bin/csh -f
 # set NOW = \`date -u +%Y.%m.%d_%H:%M:%S\`
 # set NOW_t = \`time_convert time=\$NOW\`
 # @ NEXTWANTHIGH_t = \$NOW_t + $REPEAT 
 # set NEXTWANTHIGH = \`time_convert s=\$NEXTWANTHIGH_t\`
 # set NEXTWANTLOW = \$NOW
-# $WFCODE/maketicket.csh gate=$NEWGATE wantlow=\$NEXTWANTLOW wanthigh=\$NEXTWANTHIGH action=5
+# $WORKFLOW_DIR/maketicket.csh gate=$NEWGATE wantlow=\$NEXTWANTLOW wanthigh=\$NEXTWANTHIGH action=5
 # #
 # # now do the desired command(s)
 # /web/jsoc/htdocs/doc/data/hmi/coverage_tables/update_coverage
@@ -52,24 +56,22 @@ if (-e gates/$NEWGATE) rm -rf gates/$NEWGATE
 
 
 # finally make task 
-maketask.csh task=$NEWTASK \
-		manager=taskmanager.csh \
-		target=$NEWGATE \
-		maxrange=8640000 \
+${DRMS_SRC_INSTALL_DIR}/workflow/maketask.csh task=$NEWTASK \
+                manager=taskmanager.csh \
+                target=$NEWGATE \
+                maxrange=8640000 \
                 command=$COMMANDSCRIPT
 
 # set the precondition ticket to wait for the end of the current interval
 mkdir tasks/$NEWTASK/preconditions/clock_gate
 echo "set ACTION=3" >tasks/$NEWTASK/preconditions/clock_gate/prepare_ticket
 
-makegate.csh gate_name=$NEWGATE \
-		 product=none \
-		 type=time \
-		 key=NA \
-		 low=1993.01.01_00:00:00_TAI \
-		 high=1993.01.01_00:00:00_TAI \
-		 actiontask=$NEWTASK \
-		 statustask=scripts/status_clock.csh
-
+${DRMS_SRC_INSTALL_DIR}/workflow/makegate.csh gate_name=$NEWGATE \
+                product=none \
+                type=time \
+                key=NA \
+                low=1993.01.01_00:00:00_TAI \
+                high=1993.01.01_00:00:00_TAI \
+                actiontask=$NEWTASK \
+                statustask=${DRMS_SRC_INSTALL_DIR}/workflow/scripts/status_clock.csh
 # initialization ticket not needed. 
-

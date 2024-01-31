@@ -1,6 +1,13 @@
 #! /bin/csh -f
 
 #set echo
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set CUTOUT = "${DRMS_BINS_INSTALL_DIR}"/m2meharp
 set DISAMBIG = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
@@ -10,8 +17,6 @@ set noglob
 set HERE = $cwd
 set TEMPLOG = $HERE/runlog
 echo 6 > $HERE/retstatus
-
-set WFDIR = $WORKFLOW_DATA
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -30,8 +35,8 @@ end
 #set WANTLOW = 2012.12.01_TAI
 #set WANTHIGH = 2012.12.02_TAI
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set timestr = `echo $WANTLOW | cut -c9-10,12-13`
 set timename = SHP

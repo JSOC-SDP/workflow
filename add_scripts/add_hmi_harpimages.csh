@@ -1,28 +1,25 @@
 #! /bin/csh -f
 #
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set NEWTASK = update_hmi_harpimages
 set NEWGATE = hmi_harpimages
 set PRODUCT = hmi_harpimages
 
-# these lines for all products
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
-endif
-
-cd $WFDIR
+cd $WORKFLOW_DATA
 if (-e Keep_running) then
     rm -f Keep_running
 endif
 
 while (-e GATEKEEPERBUSY)
-  echo waiting for gatekeeper to quit.
-  sleep 5
-  end
+    echo waiting for gatekeeper to quit.
+    sleep 5
+end
 
 # begin section for this product
 
@@ -31,7 +28,7 @@ if (-e tasks/$NEWTASK) then
     rm -rf tasks/$NEWTASK
 endif
 
-$WFCODE/maketask.csh task=$NEWTASK manager=taskmanager.csh target=$NEWGATE maxrange=86400 command=scripts/update_hmi_harpimages.csh
+$WORKFLOW_DIR/maketask.csh task=$NEWTASK manager=taskmanager.csh target=$NEWGATE maxrange=86400 command=scripts/update_hmi_harpimages.csh
 
 
 # Create the gate. If the gate (implemented as a directory) already exists, then delete it first.
@@ -39,4 +36,4 @@ if (-e gates/$NEWGATE) then
     rm -rf gates/$NEWGATE
 endif
 
-$WFCODE/makegate.csh gate_name=$NEWGATE product=$PRODUCT type=time key=NA project=HMI actiontask=$NEWTASK statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=$NEWGATE product=$PRODUCT type=time key=NA project=HMI actiontask=$NEWTASK statustask=scripts/status-general.csh

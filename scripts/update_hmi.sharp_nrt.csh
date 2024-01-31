@@ -1,5 +1,12 @@
 #! /bin/csh -f
 
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
 set CUTOUT = "${DRMS_BINS_INSTALL_DIR}"/m2meharp
 set DISAMBIG = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
 set SHARP = "${DRMS_BINS_INSTALL_DIR}"/sharp
@@ -16,15 +23,13 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
-set WFDIR = $WORKFLOW_DATA
-
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set timestr = `echo $WANTLOW  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = SHP_nrt

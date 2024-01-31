@@ -9,16 +9,17 @@
 # copied 29 Oct 2010 2:00 PM
 set CORRECTION_VELOCITIES = "${DRMS_BINS_INSTALL_DIR}"/correction_velocities
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
 set HERE = $cwd 
 set LOG = $HERE/runlog
 
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -32,8 +33,6 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
 end
-
-
 
 # verify that there is at least one V_drift record within 24 hours
 # both before and after both the first and last record to be processed.
@@ -51,7 +50,7 @@ while ($need_t <= $wanthigh_t)
   set need = `$TIME_CONVERT zone=TAI s=$need_t`
   set needlow = `$TIME_CONVERT zone=TAI s=$needlow_t`
   set needhigh = `$TIME_CONVERT zone=TAI s=$needhigh_t`
-  set n = `show_info -cq hmi.coefficients'['$needlow'-'$need']'`
+  set n = `$SHOW_INFO -cq hmi.coefficients'['$needlow'-'$need']'`
   if ($n <= 0) then
     echo >>$LOG Need V_drift record for $needlow - $need 
     # make a new coef record on the nearest 06:45 or 18:45 before the needed time.
@@ -71,7 +70,7 @@ while ($need_t <= $wanthigh_t)
       goto FAILURE
     endif
   endif
-  set n = `show_info -cq hmi.coefficients'['$need'-'$needhigh']'`
+  set n = `$SHOW_INFO -cq hmi.coefficients'['$need'-'$needhigh']'`
   if ($n <= 0) then
     echo >>$LOG Need V_drift record for $need - $needhigh 
     # make a new coef record on the nearest 06:45 or 18:45 after the needed time.

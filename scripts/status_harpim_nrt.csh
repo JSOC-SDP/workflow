@@ -6,17 +6,17 @@
 
 set HARPSERIES = hmi.Mharp_720_nrt
 
-if ($?WORKFLOW_DATA) then
-    set WFDIR = $WORKFLOW_DATA
-else
-    echo Need WORKFLOW_DATA variable to be set.
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
     exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
 set gate = $1
-cd $WFDIR/gates/$gate
+cd $WORKFLOW_DATA/gates/$gate
 
 # Check for an empty series, then update the low and high state-file contents.
 if (`$SHOW_INFO -iq $HARPSERIES n=1 | wc -l` <= 0) then

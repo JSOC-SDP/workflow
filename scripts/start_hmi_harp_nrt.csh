@@ -29,10 +29,18 @@
 ###
 ### If the harps pipeline is running amok for some reason, shut down the gate:
 ### 
-### 1.  vi /home/jsoc/pipeline/gates/repeat_harp_nrt/gatestatus and change "ACTIVE" to "HOLD"
+### 1.  vi $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus and change "ACTIVE" to "HOLD"
 ### 2.  don't change it back to ACTIVE unless you're absolutely sure everything has been cleaned up.
 ###
 set noglob
+
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
 set HERE = $cwd
 set TEMPLOG = $HERE/runlog
 set CMD = $HERE/MHarp_nrt
@@ -46,7 +54,6 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
   set QSUB = /SGE2/bin/lx-amd64/qsub
 endif
 
-set WFDIR = $WORKFLOW_DATA
 set HARP_NRT_MOVIES = "${DRMS_SCRS_INSTALL_DIR}"/harp_nrt_movies.csh
 SET MAKE_TICKET = "{$DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
@@ -58,15 +65,15 @@ set TRACK_AND_INGEST_MHARP = "${DRMS_SCRS_INSTALL_DIR}"/track_and_ingest_mharp.s
 # start again.
 
 @ i = 0
-@ num_running = `ls -1 $WFDIR/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l` 
+@ num_running = `ls -1 $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l` 
 if ( $num_running > 1 ) then
   echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
   if ( -e /tmp/harps.email ) then
     rm /tmp/harps.email
   endif
-  foreach dir ( `ls -1 $WFDIR/tasks/update_hmi.harp_nrt/active | grep -v root` )
+  foreach dir ( `ls -1 $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/active | grep -v root` )
     echo $dir >> /tmp/harps.email
-    ls -l $WFDIR/tasks/update_hmi.harp_nrt/active/$dir >> /tmp/harps.email
+    ls -l $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/active/$dir >> /tmp/harps.email
   end
   /usr/bin/Mail -s "Multiple HARPS jobs running" jeneen < /tmp/harps.email
 endif    
@@ -78,12 +85,12 @@ endif
 #  else
 #    echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
 #    mv $HERE/active/update_hmi.harp_nrt-2* $HERE/done/
-#    rm $WFDIR/gates/repeat_harp_nrt/new_tickets/*
+#    rm $WORKFLOW_DATA/gates/repeat_harp_nrt/new_tickets/*
 #    echo ACTIVE > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
 #    sleep 30
-#    set num_running = `ls -1 $WFDIR/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l`
+#    set num_running = `ls -1 $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l`
 #    if ( $num_running == 0 ) then
-#      $WFCODE/maketicket.csh gate=repeat_harp_nrt wantlow=2013.01.01 wanthigh=2013.01.01 action=5
+#      $WORKFLOW_DIR/maketicket.csh gate=repeat_harp_nrt wantlow=2013.01.01 wanthigh=2013.01.01 action=5
 #      exit
 #    endif
 #  endif
@@ -94,8 +101,8 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
   set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 # NOTE:  there may be 720s mags without masks due to quality bits in the VEC data.
 
@@ -214,6 +221,7 @@ echo "cd $HERE" >>$CMD
 echo "hostname >>&$TEMPLOG" >>$CMD
 echo "set echo" >>$CMD
 
+# Ugh
 echo "setenv TMPDIR /tmp28/jsocprod/HARPS/nrt/" >>$CMD
 echo "set MHarpstatus = 0" >>&$CMD
 set Htimes
@@ -243,7 +251,7 @@ end
 echo 'DONE:' >>$CMD
 echo 'echo $MHarpstatus >retstatus' >> $CMD
 #echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
-#echo "/home/jsoc/pipeline/scripts/harp_nrt_movies.csh" >> $CMD
+#echo "$WORKFLOW_DATA/scripts/harp_nrt_movies.csh" >> $CMD
 echo $HARP_NRT_MOVIES >> $CMD
 echo 'echo $MHarpstatus >retstatus' >>$CMD
 echo "rm $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
@@ -291,4 +299,3 @@ if ($retstatus == 0) then
   sleep 60
   set nextTicket = `$MAKE_TICKET gate=repeat_harp_nrt wantlow=$nextlow wanthigh=$nextlow action=5`
 endif
-

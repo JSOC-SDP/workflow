@@ -10,12 +10,12 @@ set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
 set HERE = $cwd 
 
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -30,8 +30,8 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set MAPARGS = "-L cols=900 rows=900 scale=0.2 map=carree -R clat=0.0"
 

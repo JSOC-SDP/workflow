@@ -9,7 +9,11 @@
 # set echo
 set SET_GAPS_MISSING = "${DRMS_BINS_INSTALL_DIR}"/set_gaps_missing
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-set TIME_INDEX = "${DRMS_BINS_INSTALL_DIR}"/time_index
+set INGEST_DSDS_A = "${DRMS_BINS_INSTALL_DIR}"/ingest_dsds_a
+
+# Ugh
+# set TIME_INDEX = "${DRMS_BINS_INSTALL_DIR}"/time_index
+set TIME_INDEX = time_index
 
 set noglob
 
@@ -99,7 +103,7 @@ else
       echo "#! /bin/csh -f " >$TEMPCMD
       echo "cd $HERE" >>$TEMPCMD
       echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-      echo 'ingest_dsds_a -v -L in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
+      echo '$INGEST_DSDS_A -v -L in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
       echo 'echo $status >retstatus' >>$TEMPCMD
       echo "rm -f $HERE/qsubs_running/$INSTANCE" >>$TEMPCMD
       

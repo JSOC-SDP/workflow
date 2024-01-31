@@ -3,8 +3,12 @@
 # Generate HMI daily products for all days from wantlow to wanthigh,
 # one day at a time from standard TAI offsets.
 # make a ticket for the first day after wanthigh to be run next.
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
 
-set WFDIR = $WORKFLOW_DATA
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 # Note that start/stop minute are hour 23 minute 54 for LOS and 24 for vector.
 @ LOS_offset = 6 * 60

@@ -1,6 +1,11 @@
 #! /bin/csh -f
 
-set WFDIR = $WORKFLOW_DATA
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 SET MAKE_TICKET = "{$DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
@@ -19,7 +24,7 @@ set NEXTWANTHIGH = `$TIME_CONVERT s=$NEXTWANTHIGH_t zone=TAI`
 
 sleep 10
 $MAKE_TICKET gate=repeat_hmi_vec_nrt wantlow=$NEXTWANTLOW wanthigh=$NEXTWANTHIGH action=5
-echo -n started maketicket.csh gate=repeat_hmi_vec_nrt wantlow=$NEXTWANTLOW wanthigh=$NEXTWANTHIGH at " " >>$WFDIR/watchhminrt
+echo -n started maketicket.csh gate=repeat_hmi_vec_nrt wantlow=$NEXTWANTLOW wanthigh=$NEXTWANTHIGH at " " >>$WORKFLOW_DATA/watchhminrt
 
 # First get taskid of the current instance, it is the name of the current directory
 set TASKID = $cwd:t

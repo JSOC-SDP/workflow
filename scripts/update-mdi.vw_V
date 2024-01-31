@@ -7,9 +7,14 @@
 # with no dates given, will update from last day in new series
 
 # set echo
+set INGEST_DSDS_A = "${DRMS_BINS_INSTALL_DIR}"/ingest_dsds_a
 set SET_GAPS_MISSING = "${DRMS_BINS_INSTALL_DIR}"/set_gaps_missing
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-set TIME_INDEX = "${DRMS_BINS_INSTALL_DIR}"/time_index
+
+# Ugh
+# set TIME_INDEX = "${DRMS_BINS_INSTALL_DIR}"/time_index
+set TIME_INDEX = time_index
 
 set noglob
 
@@ -85,7 +90,7 @@ set TEMPLOG = $TEMP/LOG.$INSTANCE
 set TEMPLIST = $TEMP/LIST.$INSTANCE
 rm -f $TEMPCMD $TEMPLOG $TEMPLIST
 
-show_info -pq $SUM_SER"["$FDS-$LDS"]" >$TEMPLIST
+$SHOW_INFO -pq $SUM_SER"["$FDS-$LDS"]" >$TEMPLIST
 
 set n = `wc -l < $TEMPLIST`
 set retstatus=0
@@ -97,7 +102,7 @@ else
 	echo "#! /bin/csh -f " >$TEMPCMD
 	echo "cd $HERE" >>$TEMPCMD
 	echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-	echo 'ingest_dsds_a -v -L  in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
+	echo '$INGEST_DSDS_A -v -L  in=@'"$TEMPLIST out=$NEW_SER map=$INGESTMAP >>&$TEMPLOG" >>$TEMPCMD
   echo 'echo $status >retstatus' >>$TEMPCMD
 	echo "rm -f $HERE/qsubs_running/$INSTANCE" >>$TEMPCMD
 

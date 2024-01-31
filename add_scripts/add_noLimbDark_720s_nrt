@@ -1,54 +1,48 @@
 #! /bin/csh -f
 #
 # make test gates and tasks for HMI limb dark removed 12m data
-
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-# Stop the gatekeeper in case it is running.
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-cd $WFDIR
+cd $WORKFLOW_DATA
 rm -f Keep_running
 while (-e GATEKEEPERBUSY)
-  echo waiting for gatekeeper to quit.
-  sleep 5
-  end
+    echo waiting for gatekeeper to quit.
+    sleep 5
+end
 
-cd $WFDIR/gates
+cd $WORKFLOW_DATA/gates
 rm -rf hmi.noLD_720_nrt
 
-cd $WFDIR/tasks
+cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.noLD_720_nrt
 
 # Make task
 
-cd $WFDIR
-$WFCODE/maketask.csh task=update_hmi.noLD_720_nrt \
-		manager=taskmanager.csh \
-		target=hmi.noLD_720_nrt \
-		command=scripts/update_hmi.Ic_noLimbDark \
-		maxrange=86400 \
-		parallelOK=5
-set PRECOND = $WFDIR/tasks/update_hmi.noLD_720_nrt/preconditions/hmi.Vector
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/maketask.csh task=update_hmi.noLD_720_nrt \
+            manager=taskmanager.csh \
+            target=hmi.noLD_720_nrt \
+            command=scripts/update_hmi.Ic_noLimbDark \
+            maxrange=86400 \
+            parallelOK=5
+set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.noLD_720_nrt/preconditions/hmi.Vector
 mkdir $PRECOND
 echo "set ACTION = 3" > $PRECOND/prepare_ticket
 
 # Now make gate.
 
-cd $WFDIR
-$WFCODE/makegate.csh gate_name=hmi.noLD_720_nrt \
-		 product=hmi.Ic_noLimbDark_720s_nrt \
-		 type=time \
-		 key=T_REC \
-		 project=HMI \
-                 low=2011.03.24_TAI \
-                 high=2011.03.24_TAI \
-		 actiontask=update_hmi.noLD_720_nrt \
-		 statustask=scripts/status-general.csh
-
-
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.noLD_720_nrt \
+            product=hmi.Ic_noLimbDark_720s_nrt \
+            type=time \
+            key=T_REC \
+            project=HMI \
+            low=2011.03.24_TAI \
+            high=2011.03.24_TAI \
+            actiontask=update_hmi.noLD_720_nrt \
+            statustask=scripts/status-general.csh

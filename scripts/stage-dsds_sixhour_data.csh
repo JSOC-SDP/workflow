@@ -1,6 +1,11 @@
 #! /bin/csh -f
 
-set WFDIR = $WORKFLOW_DATA
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 echo ACTIONTASK starting $0 $*
 
@@ -26,10 +31,13 @@ end
 
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
-set WANTLOW_t = `time_convert time=$WANTLOW`
-set WANTLOW = `time_convert zone=TAI s=$WANTLOW_t`
-set WANTHIGH_t = `time_convert time=$WANTHIGH`
-set WANTHIGH = `time_convert zone=TAI s=$WANTHIGH_t`
+# Ugh
+set TIME_INDEX = time_index
+
+set WANTLOW_t = `$TIME_CONVERT time=$WANTLOW`
+set WANTLOW = `$TIME_CONVERT zone=TAI s=$WANTLOW_t`
+set WANTHIGH_t = `$TIME_CONVERT time=$WANTHIGH`
+set WANTHIGH = `$TIME_CONVERT zone=TAI s=$WANTHIGH_t`
 
 set SPECIAL = `grep SPECIAL ticket`
 foreach SPEC ($SPECIAL)
@@ -40,15 +48,15 @@ end
 # gate dir.  Follow the tree back to the gate.
 
 set gate = `cat ../../target`
-set product = `cat $WFDIR/gates/$gate/product`
+set product = `cat $WORKFLOW_DATA/gates/$gate/product`
 
 # UGH
 # time_index is not in DRMS
 # FIX times for DSDS time_index
-set LOW = `time_index time=$WANTLOW -t`
-set FSIX = `time_index time=$LOW -6`
-set HIGH = `time_index time=$WANTHIGH -t`
-set LSIX = `time_index time=$HIGH -6`
+set LOW = `$TIME_INDEX time=$WANTLOW -t`
+set FSIX = `$TIME_INDEX time=$LOW -6`
+set HIGH = `$TIME_INDEX time=$WANTHIGH -t`
+set LSIX = `$TIME_INDEX time=$HIGH -6`
 
 show_info -p $product'['$FSIX'-'$LSIX']' -i > show_info.log 
 
@@ -56,4 +64,3 @@ if ($?) then
    echo $0 $* FAILED
    exit 1
 endif
-

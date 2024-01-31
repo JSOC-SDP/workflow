@@ -4,18 +4,17 @@ set noglob
 
  echo starting $0 $*
 # set echo
-
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
-cd $WFDIR/gates
+cd $WORKFLOW_DATA/gates
 set gate = $1
 cd $gate
 
@@ -28,7 +27,7 @@ set nancount = 0
 if ($low == "NaN") then
     set nancount = 1
     #$SHOW_INFO -q  $product'[^]' key=$key > low
-echo 1996.05.01_00:00:00_TAI > low
+    echo 1996.05.01_00:00:00_TAI > low
     if ($?) then
        echo $0 $* FAILED
        exit 1

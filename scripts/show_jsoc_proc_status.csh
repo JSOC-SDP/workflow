@@ -3,6 +3,12 @@
 #set echo
 source /home/jsoc/.setJSOCenv
 source /SGE2/default/common/settings.csh
+
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
 set TARG = /web/jsoc/htdocs/data
 set TMP = $TARG/.jsoc_proc_status.tmp
 
@@ -87,8 +93,8 @@ cat /web/jsoc/htdocs/ajax/URGENT_MOTD.html >>$TMP
 echo '<p><table width=800>' >>$TMP
 echo '<tr><td>Product</td><td>Lag</td><td>Note</td></tr>' >>$TMP
 
-set lastAccess = `stat -c "%z" /home/jsoc/pipeline/tasks/update_hmi.harp_nrt/numHarps`
-@ numHarps = `cat /home/jsoc/pipeline/tasks/update_hmi.harp_nrt/numHarps`
+set lastAccess = `stat -c "%z" $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps`
+@ numHarps = `cat $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps`
 set Htime = $lastAccess[1]"_"$lastAccess[2]
 @ Htime_s = `$TIME_CONVERT time=$Htime`
 @ Htime_diff = $now_pacific_s - $Htime_s
@@ -298,6 +304,7 @@ echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
 echo -n '<tr><td>web response</td><td' >>$TMP
 set lag=$webinfo[1]
 
+# Ugh
 set mslag = `echo $lag | sed -e "s/\.//" -e "s/^0*//"`
 set lastReqId = `grep JSOC /home/jsoc/exports/RequestID`
 echo $lastReqId
@@ -413,6 +420,7 @@ endif
 # these showCov files are generated every 30m by a cronjob
 # on n04 as jeneen: "${DRMS_SCRS_INSTALL_DIR}"/workflow/scripts/status_show_cov.csh
 
+# Ugh
 set showCov = "/web/jsoc/htdocs/data/.showCov"
 set showCovNRT = "/web/jsoc/htdocs/data/.showCovNRT" 
 
@@ -479,6 +487,7 @@ endif
 
 ### Look for missing AIA lev1
 
+# Ugh
 set showCovAIA = "/web/jsoc/htdocs/data/.showCovAIA"
 set showCovAIANRT = "/web/jsoc/htdocs/data/.showCovAIANRT"
 

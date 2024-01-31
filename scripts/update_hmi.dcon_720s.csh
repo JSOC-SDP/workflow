@@ -8,12 +8,12 @@
 # # XXXXXXXXXX test
 set HERE = $cwd 
 
-if ($?WORKFLOW_DATA) then
-  set WFDIR = $WORKFLOW_DATA
-else
-  echo Need WORKFLOW_DATA variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables_dconS
@@ -28,8 +28,8 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 
 # round times to a slot
@@ -121,4 +121,3 @@ echo 'DONE:' >> $CMD
 echo "rm -f $HERE/qsub_running" >>$CMD
 
 $QSUB -sync yes -pe smp 4 -e $LOG -o $LOG -q $QUE $CMD >> $LOG
-

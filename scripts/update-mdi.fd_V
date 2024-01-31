@@ -10,7 +10,10 @@
 set INGEST_DSDS_A = "${DRMS_BINS_INSTALL_DIR}"/ingest_dsds_a
 set SET_GAPS_MISSING = "${DRMS_BINS_INSTALL_DIR}"/set_gaps_missing
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-set TIME_INDEX = "${DRMS_BINS_INSTALL_DIR}"/time_index
+
+# Ugh
+# set TIME_INDEX = "${DRMS_BINS_INSTALL_DIR}"/time_index
+set TIME_INDEX = time_index
 
 set noglob
 
