@@ -31,8 +31,12 @@ rm -rf update_hmi.VectorObsOnly
 
 # NOTE the "command" script used below must be available and executable when this script is run
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/maketask.csh task=update_hmi.VectorObsOnly manager=taskmanager.csh target=hmi.VectorObsOnly \
-            command=scripts/update_hmi.Vector_ObsOnly.csh maxrange=2160 parallelOK=5
+$WORKFLOW_DIR/maketask.csh task=update_hmi.VectorObsOnly \
+            manager=taskmanager.csh \
+            target=hmi.VectorObsOnly \
+            command=scripts/update_hmi.Vector_ObsOnly.csh \
+            maxrange=2160 \
+            parallelOK=5
 
 # Now make any user gates.
 
@@ -40,8 +44,13 @@ $WORKFLOW_DIR/maketask.csh task=update_hmi.VectorObsOnly manager=taskmanager.csh
 # one product needs to be tracked here.
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/makegate.csh gate_name=hmi.VectorObsOnly product=hmi.M_720s type=time key=T_REC project=HMI \
-            actiontask=update_hmi.VectorObsOnly statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.VectorObsOnly \
+            product=hmi.M_720s \
+            type=time \
+            key=T_REC \
+            project=HMI \
+            actiontask=update_hmi.VectorObsOnly \
+            statustask=scripts/status-general.csh
 
 # Prerequisite gates made in LOS add script
 

@@ -51,21 +51,21 @@ echo 'set USEHIGH = `/home/wso/bin/_linux4/ctimes -j "CT"$WANTHIGH":0"`' >> $TIC
 
 cd $WORKFLOW_DATA
 $WORKFLOW_DIR/makegate.csh gate_name=mdi.Blos_Remap \
-		project = MDI \
-                 product=mdi.fd_M_96m_remap \
-                 type=time \
-                 key=T_REC \
-                 low=NaN \
-                 high=NaN \
-                 actiontask=mdi.fd_Remap \
-                 statustask=scripts/status-general.csh
+            project = MDI \
+            product=mdi.fd_M_96m_remap \
+            type=time \
+            key=T_REC \
+            low=NaN \
+            high=NaN \
+            actiontask=mdi.fd_Remap \
+            statustask=scripts/status-general.csh
 
 $WORKFLOW_DIR/makegate.csh gate_name=mdi.Synop \
-		project = MDI \
-		 product=mdi.synop \
-                 key=CAR_ROT \
-                 type=CARROT \
-                 low=NaN \
-                 high=NaN \
-		 actiontask=mdi.Synop \
-		 statustask=scripts/status-general.csh
+            project = MDI \
+            product=mdi.synop \
+            key=CAR_ROT \
+            type=CARROT \
+            low=NaN \
+            high=NaN \
+            actiontask=mdi.Synop \
+            statustask=scripts/status-general.csh

@@ -23,10 +23,19 @@ cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.ME_720s_fd10_nrt
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/maketask.csh task=update_hmi.ME_720s_fd10_nrt manager=taskmanager.csh target=hmi.ME_720s_fd10_nrt \
-            command=scripts/update_hmi.ME_720s_fd10_nrt.csh maxrange=86400 parallelOK=4
+$WORKFLOW_DIR/maketask.csh task=update_hmi.ME_720s_fd10_nrt \
+            manager=taskmanager.csh \
+            target=hmi.ME_720s_fd10_nrt \
+            command=scripts/update_hmi.ME_720s_fd10_nrt.csh \
+            maxrange=86400 \
+            parallelOK=4
 
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/makegate.csh gate_name=hmi.ME_720s_fd10_nrt product=hmi.ME_720s_fd10_nrt type=time key=T_REC project=HMI \
-            actiontask=update_hmi.ME_720s_fd10_nrt statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.ME_720s_fd10_nrt \
+            product=hmi.ME_720s_fd10_nrt \
+            type=time \
+            key=T_REC \
+            project=HMI \
+            actiontask=update_hmi.ME_720s_fd10_nrt \
+            statustask=scripts/status-general.csh

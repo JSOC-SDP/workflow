@@ -56,7 +56,7 @@ if (-e gates/$NEWGATE) rm -rf gates/$NEWGATE
 
 
 # finally make task 
-${DRMS_SRC_INSTALL_DIR}/workflow/maketask.csh task=$NEWTASK \
+$WORKFLOW_DATA/maketask.csh task=$NEWTASK \
                 manager=taskmanager.csh \
                 target=$NEWGATE \
                 maxrange=8640000 \
@@ -66,12 +66,12 @@ ${DRMS_SRC_INSTALL_DIR}/workflow/maketask.csh task=$NEWTASK \
 mkdir tasks/$NEWTASK/preconditions/clock_gate
 echo "set ACTION=3" >tasks/$NEWTASK/preconditions/clock_gate/prepare_ticket
 
-${DRMS_SRC_INSTALL_DIR}/workflow/makegate.csh gate_name=$NEWGATE \
+$WORKFLOW_DIR/makegate.csh gate_name=$NEWGATE \
                 product=none \
                 type=time \
                 key=NA \
                 low=1993.01.01_00:00:00_TAI \
                 high=1993.01.01_00:00:00_TAI \
                 actiontask=$NEWTASK \
-                statustask=${DRMS_SRC_INSTALL_DIR}/workflow/scripts/status_clock.csh
+                statustask=$WORKFLOW_DIR/scripts/status_clock.csh
 # initialization ticket not needed. 

@@ -23,8 +23,12 @@ cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.Marmask 
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/maketask.csh task=update_hmi.Marmask manager=taskmanager.csh target=hmi.Marmask \
-            command=scripts/update_hmi.Marmask.csh maxrange=86400 parallelOK=20
+$WORKFLOW_DIR/maketask.csh task=update_hmi.Marmask \
+            manager=taskmanager.csh \
+            target=hmi.Marmask \
+            command=scripts/update_hmi.Marmask.csh \
+            maxrange=86400 \
+            parallelOK=20
 
 set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.Marmask/preconditions
 
@@ -34,5 +38,10 @@ cat > $PRECOND/hmi.Vector/prepare_ticket <<STOP
 STOP
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/makegate.csh gate_name=hmi.Marmask product=hmi.Marmask_720s type=time key=T_REC project=HMI \
-            actiontask=update_hmi.Marmask statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.Marmask \
+            product=hmi.Marmask_720s \
+            type=time \
+            key=T_REC \
+            project=HMI \
+            actiontask=update_hmi.Marmask \
+            statustask=scripts/status-general.csh

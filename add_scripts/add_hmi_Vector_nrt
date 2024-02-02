@@ -30,8 +30,12 @@ rm -rf update_hmi.Vector_nrt
 
 # NOTE the "command" script used below must be available and executable when this script is run
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/maketask.csh task=update_hmi.Vector_nrt manager=taskmanager.csh target=hmi.Vector_nrt \
-            command=scripts/update_hmi.Vector_nrt.csh maxrange=2160 parallelOK=4
+$WORKFLOW_DIR/maketask.csh task=update_hmi.Vector_nrt \
+            manager=taskmanager.csh \
+            target=hmi.Vector_nrt \
+            command=scripts/update_hmi.Vector_nrt.csh \
+            maxrange=2160 \
+            parallelOK=4
 
 if ($status) exit 1
 
@@ -43,8 +47,13 @@ echo "set ACTION=3" > $WORKFLOW_DATA/tasks/update_hmi.Vector_nrt/preconditions/h
 # one product needs to be tracked here.
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/makegate.csh gate_name=hmi.Vector_nrt product=hmi.S_720s_nrt type=time key=T_REC project=HMI \
-            actiontask=update_hmi.Vector_nrt statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.Vector_nrt \
+            product=hmi.S_720s_nrt \
+            type=time \
+            key=T_REC \
+            project=HMI \
+            actiontask=update_hmi.Vector_nrt \
+            statustask=scripts/status-general.csh
 if ($status) exit 1
 
 # Prerequisite gates made in LOS add script

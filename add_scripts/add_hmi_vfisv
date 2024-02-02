@@ -23,8 +23,12 @@ cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.VFISV
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/maketask.csh task=update_hmi.VFISV manager=taskmanager.csh target=hmi.VFISV \
-            command=scripts/update_hmi.VFISV.csh maxrange=86400 parallelOK=10
+$WORKFLOW_DIR/maketask.csh task=update_hmi.VFISV \
+            manager=taskmanager.csh \
+            target=hmi.VFISV \
+            command=scripts/update_hmi.VFISV.csh \
+            maxrange=86400 \
+            parallelOK=10
 
 set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.VFISV/preconditions
 
@@ -34,5 +38,10 @@ cat > $PRECOND/hmi.Vector/prepare_ticket <<STOP
 STOP
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/makegate.csh gate_name=hmi.VFISV product=hmi.ME_720s_fd10 type=time key=T_REC project=HMI \
-            actiontask=update_hmi.VFISV.csh statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.VFISV \
+            product=hmi.ME_720s_fd10 \
+            type=time \
+            key=T_REC \
+            project=HMI \
+            actiontask=update_hmi.VFISV.csh \
+            statustask=scripts/status-general.csh

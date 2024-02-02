@@ -23,8 +23,12 @@ cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.sharp
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/maketask.csh task=update_hmi.sharp manager=taskmanager.csh target=hmi.sharp \
-            command=scripts/update_hmi.sharp.csh maxrange=86400 parallelOK=10
+$WORKFLOW_DIR/maketask.csh task=update_hmi.sharp \
+            manager=taskmanager.csh \
+            target=hmi.sharp \
+            command=scripts/update_hmi.sharp.csh \
+            maxrange=86400 \
+            parallelOK=10
 
 set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.sharp/preconditions
 
@@ -34,5 +38,10 @@ set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.sharp/preconditions
 #STOP
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/makegate.csh gate_name=hmi.sharp product=hmi.sharp_720s type=time key=T_REC project=HMI \
-            actiontask=update_hmi.sharp statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.sharp \
+            product=hmi.sharp_720s \
+            type=time \
+            key=T_REC \
+            project=HMI \
+            actiontask=update_hmi.sharp \
+            statustask=scripts/status-general.csh

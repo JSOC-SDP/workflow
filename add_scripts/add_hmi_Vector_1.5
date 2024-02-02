@@ -31,8 +31,12 @@ rm -rf update_hmi.Vector
 
 # NOTE the "command" script used below must be available and executable when this script is run
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/maketask.csh task=update_hmi.Vector manager=taskmanager.csh target=hmi.Vector \
-            command=scripts/update_hmi.Vector.csh maxrange=2160 parallelOK=8
+$WORKFLOW_DIR/maketask.csh task=update_hmi.Vector \
+            manager=taskmanager.csh \
+            target=hmi.Vector \
+            command=scripts/update_hmi.Vector.csh \
+            maxrange=2160 \
+            parallelOK=8
 
 set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.Vector/preconditions
 
@@ -67,8 +71,13 @@ STOP
 # one product needs to be tracked here.
 
 cd $WORKFLOW_DATA
-$WORKFLOW_DIR/makegate.csh gate_name=hmi.Vector product=hmi.S_720s type=time key=T_REC project=HMI \
-            actiontask=update_hmi.Vector statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.Vector \
+            product=hmi.S_720s \
+            type=time \
+            key=T_REC \
+            project=HMI \
+            actiontask=update_hmi.Vector \
+            statustask=scripts/status-general.csh
 
 # Prerequisite gates made in LOS add script
 
