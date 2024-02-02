@@ -5,9 +5,6 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-
-set HARPS = "${DRMS_SCRS_INSTALL_DIR}"/track_and_ingest_mharp.sh
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
@@ -17,6 +14,7 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
+set HARPS = "${DRMS_SCRS_INSTALL_DIR}"/track_and_ingest_mharp.sh
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q

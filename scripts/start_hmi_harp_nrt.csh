@@ -55,7 +55,7 @@ else if ( $JSOC_MACHINE == "linux_avx" ) then
 endif
 
 set HARP_NRT_MOVIES = "${DRMS_SCRS_INSTALL_DIR}"/harp_nrt_movies.csh
-SET MAKE_TICKET = "{$DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
+set MAKE_TICKET = "$WORKFLOW_DIR/maketicket.csh"
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set TRACK_AND_INGEST_MHARP = "${DRMS_SCRS_INSTALL_DIR}"/track_and_ingest_mharp.sh

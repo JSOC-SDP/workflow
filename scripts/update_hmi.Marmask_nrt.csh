@@ -5,9 +5,6 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
-set HMI_SEGMENT = "${DRMS_BINS_INSTALL_DIR}"/hmi_segment_module
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
@@ -16,6 +13,9 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set HMI_SEGMENT = "${DRMS_BINS_INSTALL_DIR}"/hmi_segment_module
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = p.q,j.q

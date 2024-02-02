@@ -5,6 +5,15 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
+set HERE = $cwd 
+
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set IQUV_AVERAGING = "${DRMS_BINS_INSTALL_DIR}"/HMI_IQUV_averaging
 set JV2TS = "${DRMS_BINS_INSTALL_DIR}"/jv2ts
@@ -14,15 +23,6 @@ set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 set MEANPF = "${DRMS_BINS_INSTALL_DIR}"/meanpf
 set RESIZE_MAPPING = "${DRMS_BINS_INSTALL_DIR}"/resizemappingmag
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-
-set HERE = $cwd 
-
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
-
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q

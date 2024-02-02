@@ -5,15 +5,6 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
-set JV2TS = "${DRMS_BINS_INSTALL_DIR}"/jv2ts
-set LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
-set MAKE_TICKET = "${DRMS_BINS_INSTALL_DIR}/workflow/maketicket.csh"
-set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
-set RESIZE_MAPPING = "${DRMS_BINS_INSTALL_DIR}"/resizemappingmag
-set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
-set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
@@ -22,6 +13,15 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set JV2TS = "${DRMS_BINS_INSTALL_DIR}"/jv2ts
+set LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
+set MAKE_TICKET = "${DRMS_BINS_INSTALL_DIR}/workflow/maketicket.csh"
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
+set RESIZE_MAPPING = "${DRMS_BINS_INSTALL_DIR}"/resizemappingmag
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j8.q

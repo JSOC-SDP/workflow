@@ -17,9 +17,9 @@ echo Make images for $wantlow to $wanthigh
 # from here make script that can make _nrt images in standard place
 
 set CADENCE = 3
-set WF = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-setenv RGBDEF $WF/scripts/rgb.txt
+setenv RGBDEF $WORKFLOW_DIR/scripts/rgb.txt
 set HMI_LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
 set RENDER_IMAGE = "${DRMS_BINS_INSTALL_DIR}"/render_image
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
@@ -32,7 +32,7 @@ set minlist = (10000)
 set maxlist = (62000)
 set scalinglist = (minmaxgiven)
 #set colorlist = (/home/phil/apps/heat.sao)
-set colorlist = ($WF/apps/heat.sao)
+set colorlist = ($WORKFLOW_DIR/apps/heat.sao)
 set namelist = (Continuum)
 set flaglist = ("")
 

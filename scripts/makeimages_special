@@ -19,8 +19,8 @@ echo Make images for $wantlow to $wanthigh
 #set CADENCE = 15
 set CADENCE = 45
 
-set WF = "${DRMS_SRC_INSTALL_DIR}"/workflow
-setenv RGBDEF $WF/scripts/rgb.txt
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+setenv RGBDEF $WORKFLOW_DIR/scripts/rgb.txt
 set HMI_LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
 set RENDER_IMAGE = "${DRMS_BINS_INSTALL_DIR}"/render_image
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
@@ -31,7 +31,7 @@ set minlist = (20000 0.3 -1500)
 set maxlist = (75000 1.2 1500)
 set scalinglist = (minmaxgiven minmaxgiven mag)
 #set colorlist = (/home/phil/apps/heat.sao /home/phil/apps/heat.sao grey)
-set colorlist = ($WF/apps/heat.sao $WF/apps/heat.sao grey)
+set colorlist = ($WORKFLOW_DIR/apps/heat.sao $WORKFLOW_DIR/apps/heat.sao grey)
 
 set namelist = (Continuum Continuum Magnetogram)
 set flaglist = ("" "" -c)
@@ -134,7 +134,7 @@ exit
 
 if ($end_movie_t > 0) then
   set end_movie = `$TIME_CONVERT s=$end_movie_t zone=TAI`
-  $WF/scripts/makeIcmovie $end_movie
+  $WORKFLOW_DIR/scripts/makeIcmovie $end_movie
 
   set hhmmss = `echo $end_movie | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`
   set yyyymmdd = `echo $end_movie | sed -e 's/_.*//' -e 's/\.//g'`

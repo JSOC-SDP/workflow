@@ -5,15 +5,18 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set LIMB_PROGRAM = "${DRMS_BINS_INSTALL_DIR}"/lfwrp_tas
-set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
     echo WORKFLOW_DATA environment variable is undefined
     exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set LIMB_PROGRAM = "${DRMS_BINS_INSTALL_DIR}"/lfwrp_tas
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q

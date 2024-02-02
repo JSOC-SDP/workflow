@@ -7,7 +7,7 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-SET MAKE_TICKET = "{$DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
+SET MAKE_TICKET = "$WORKFLOW_DIR/maketicket.csh"
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set WANTLOW = `cat wantlow`

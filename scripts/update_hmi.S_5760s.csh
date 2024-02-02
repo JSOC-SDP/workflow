@@ -5,10 +5,6 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
-set IQUV_AVERAGING = "${DRMS_BINS_INSTALL_DIR}"/HMI_IQUV_averaging
-set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
@@ -17,6 +13,10 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set IQUV_AVERAGING = "${DRMS_BINS_INSTALL_DIR}"/HMI_IQUV_averaging
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q

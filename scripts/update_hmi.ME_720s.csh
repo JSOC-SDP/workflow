@@ -1,5 +1,7 @@
 #! /bin/csh -f
 
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
 set HERE = $cwd
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
@@ -24,7 +26,7 @@ echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 # UGH
 # make_vfisv doesn't exist; I think this file is obsolete
-echo "$DRMS_SRC_INSTALL_DIR/workflow/scripts/make_vfisv -f $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
+echo "$WORKFLOW_DIR/scripts/make_vfisv -f $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD

@@ -5,13 +5,6 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
-set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
-set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
-
-source /home/jsoc/.setJSOCenv
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
@@ -20,6 +13,13 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
+
+source /home/jsoc/.setJSOCenv
 
 # UGH
 if ( $JSOC_MACHINE == "linux_x86_64" ) then

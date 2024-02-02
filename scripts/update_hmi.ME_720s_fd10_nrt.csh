@@ -5,12 +5,6 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
-set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
-set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv_harp
-
-source /home/jsoc/.setJSOCenv
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
@@ -19,6 +13,12 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set MAKE_TICKET = "$WORKFLOW_DIR/maketicket.csh"
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv_harp
+
+source /home/jsoc/.setJSOCenv
 
 # UGH
 if ( $JSOC_MACHINE == "linux_x86_64" ) then

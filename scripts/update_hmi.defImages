@@ -2,7 +2,8 @@
 
 set HERE = $cwd
 
-set MAKE_IMAGES_HIGH_LOW = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/makeimageslowhigh
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set MAKE_IMAGES_HIGH_LOW = $WORKFLOW_DIR/scripts/makeimageslowhigh
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q,o.q

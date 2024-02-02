@@ -1,7 +1,4 @@
 #! /bin/csh -f
-
-set JREBINSMOOTH = "${DRMS_BINS_INSTALL_DIR}"/jrebinsmooth
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
@@ -10,6 +7,8 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set JREBINSMOOTH = "${DRMS_BINS_INSTALL_DIR}"/jrebinsmooth
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q,p.q

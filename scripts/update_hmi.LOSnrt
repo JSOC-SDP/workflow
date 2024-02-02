@@ -7,16 +7,6 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
-
-set ECLIPSE = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/eclipse.pl
-set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
-set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
-set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
-
 set HERE = $cwd 
 
 if ( ! $?WORKFLOW_DATA ) then
@@ -25,6 +15,11 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set ECLIPSE = $WORKFLOW_DIR/scripts/eclipse.pl
+set MAKE_TICKET = "$WORKFLOW_DIR/maketicket.csh"
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
 #  set QUE = j8.q

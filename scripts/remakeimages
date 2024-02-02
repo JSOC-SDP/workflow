@@ -1,8 +1,9 @@
 #! /bin/csh -f
 
 # set echo
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-set MAKE_IMAGES = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/makeimageslowhigh
+set MAKE_IMAGES = $WORKFLOW_DIR/scripts/makeimageslowhigh
 
 set start_t=`$TIME_CONVERT time=$1`
 set end_t=`$TIME_CONVERT time=$2`
