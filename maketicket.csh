@@ -5,25 +5,15 @@
 #
 # if taskid is absent then create a new taskid for the task associated
 # with the target gate and make the ticket appear to be from that taskid.
-
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-# echo $0 $* >> history.tickets
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set GET_NEXT_TICKET_ID = "${DRMS_BINS_INSTALL_DIR}"/GetNextID
+
 set cmdline = ($*)
 
 set makeSelfInstance = 0
@@ -33,8 +23,6 @@ set wantlow="NOT_SPECIFIED"
 set wanthigh="NOT_SPECIFIED"
 set action = 4
 set special = NONE
-
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert""
 
 set now = `date -u +%Y.%m.%d_%H:%M:%S`
 set nowt = `$TIME_CONVERT time=$now`
@@ -66,7 +54,7 @@ if ($gate == NOT_SPECIFIED) then
    exit 1
 endif
 
-cd $WFDIR/gates/$gate
+cd $WORKFLOW_DATA/gates/$gate
 
 # Check reasonableness of times
 # but only if gate key type is time
@@ -96,7 +84,7 @@ if ($keytype == time) then
    endif
 endif
 
-set ticket = `$WFCODE/bin/GetNextID sequence_number`
+set ticket = `$GET_NEXT_TICKET_ID sequence_number`
 # create the blank ticket
 touch $ticket
 
@@ -104,17 +92,10 @@ set SELF_TICKET = 0
 if ($taskid == NOT_SPECIFIED) then
    set SELF_TICKET = 1
    set task = `cat actiontask`
-   cd $WFDIR/tasks/$task
+   cd $WORKFLOW_DATA/tasks/$task
    set taskid = $task'-root'
-   # if (-e taskid) then
-       # set taskid = `$WFCODE/bin/GetNextID taskid`
-   # else
-       # set taskid = `$WFCODE/bin/GetNextID taskid $task'-19930101-000'`
-   # endif
    cd active
-   # mkdir active/$taskid
-   # cd active/$taskid
-   # echo 1 >state
+
    if (!(-e $taskid)) then
       mkdir $taskid
       echo 1 >$taskid/state
@@ -122,7 +103,7 @@ if ($taskid == NOT_SPECIFIED) then
       mkdir $taskid/ticket_return
 touch $taskid/ticket
    endif
-   cd $WFDIR/gates/$gate
+   cd $WORKFLOW_DATA/gates/$gate
 else
    set task = `echo $taskid | sed -e 's/-.*//'`
 endif
@@ -137,21 +118,19 @@ echo "WANTHIGH=$wanthigh"     >> $ticket
 echo "TASKID=$taskid"       >> $ticket
 
 if ($SELF_TICKET) then
-     if (!(-e $WFDIR/tasks/$task/active/$taskid/ticket)) then
-       ln $ticket $WFDIR/tasks/$task/active/$taskid/ticket
+     if (!(-e $WORKFLOW_DATA/tasks/$task/active/$taskid/ticket)) then
+       ln $ticket $WORKFLOW_DATA/tasks/$task/active/$taskid/ticket
      else
-       touch $WFDIR/tasks/$task/active/$taskid/ticket
+       touch $WORKFLOW_DATA/tasks/$task/active/$taskid/ticket
      endif
 endif
 
-echo $ticket $cmdline >> $WFDIR/tasks/$task/tickets.history
-
-# touch $WFDIR/tasks/$task/active/$taskid/pending_tickets/$ticket
+echo $ticket $cmdline >> $WORKFLOW_DATA/tasks/$task/tickets.history
 
 # the next step must be the last since the gatekeeper will takeover
 # ownership of this ticket immediately
 
 mv $ticket new_tickets
-touch $WFDIR/tasks/$task/active/$taskid/pending_tickets/$ticket
+touch $WORKFLOW_DATA/tasks/$task/active/$taskid/pending_tickets/$ticket
 
 echo $ticket

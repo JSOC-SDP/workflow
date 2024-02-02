@@ -1,26 +1,22 @@
 #! /bin/csh -f
 
 #set echo
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set CUTOUT = "${DRMS_BINS_INSTALL_DIR}"/m2meharp
+set DISAMBIG = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
+set SHARP = "${DRMS_BINS_INSTALL_DIR}"/sharp
 
 set noglob
 set HERE = $cwd
 set TEMPLOG = $HERE/runlog
 echo 6 > $HERE/retstatus
-
-set WFDIR = $WORKFLOW_DATA
-set WFCODE = $WORKFLOW_ROOT
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set CUTOUT = "${drms_bins_install_dir}"/m2meharp
-set DISAMBIG = "${drms_bins_install_dir}"/disambig_v3
-set SHARP = "${drms_bins_install_dir}"/sharp
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -39,8 +35,8 @@ end
 #set WANTLOW = 2012.12.01_TAI
 #set WANTHIGH = 2012.12.02_TAI
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set timestr = `echo $WANTLOW | cut -c9-10,12-13`
 set timename = SHP
@@ -141,4 +137,3 @@ endif
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus
-

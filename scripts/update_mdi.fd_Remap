@@ -1,5 +1,7 @@
 #! /bin/csh -f
 
+set JV2TS = "${DRMS_BINS_INSTALL_DIR}"/jv2ts
+
 set first = `cat wantlow`
 set last = `cat wanthigh`
 
@@ -30,7 +32,7 @@ echo "hostname >>& $LOG" >>$CMD
 
 #echo "jv2helio in='mdi.fd_M_96m_lev18['$first'-'$last']' out=mdi.fd_M_96m_remap MOFFSET=1 MCORLEV=1 VCORLEV=0 MAPRMAX=0.994 MAPLGMAX=90 MAPLGMIN=-90 MAPBMAX=90 LGSHIFT=2 MAPMMAX=1800 SINBDIVS=540 CARRSTRETCH=1 >>& $LOG" >>$CMD
 
-echo "jv2ts in='mdi.fd_M_96m_lev18['$first'-'$last']' v2hout=mdi.fd_M_96m_remap MOFFSET=1 MCORLEV=1 VCORLEV=0 MAPRMAX=0.994 MAPLGMAX=90 MAPLGMIN=-90 MAPBMAX=90 LGSHIFT=2 MAPMMAX=1800 SINBDIVS=540 CARRSTRETCH=1 >>& $LOG" >>$CMD
+echo "$JV2TS in='mdi.fd_M_96m_lev18['$first'-'$last']' v2hout=mdi.fd_M_96m_remap MOFFSET=1 MCORLEV=1 VCORLEV=0 MAPRMAX=0.994 MAPLGMAX=90 MAPLGMIN=-90 MAPBMAX=90 LGSHIFT=2 MAPMMAX=1800 SINBDIVS=540 CARRSTRETCH=1 >>& $LOG" >>$CMD
 echo 'set retstatus = $?' >>$CMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$CMD
 echo "rm -f $HERE/qsub_running" >>$CMD

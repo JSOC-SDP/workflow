@@ -1,17 +1,16 @@
 #! /bin/csh -f
 
 #set echo
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 source /home/jsoc/.setJSOCenv
 source /SGE2/default/common/settings.csh
+
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
 set TARG = /web/jsoc/htdocs/data
 set TMP = $TARG/.jsoc_proc_status.tmp
 
@@ -19,12 +18,14 @@ set noglob
 unsetenv QUERY_STRING
 umask 2
 
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set SHOW_SERIES = "${drms_bins_install_dir}"/show_series
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
+set SHOW_JSOC_PROC_STATUS = $WORKFLOW_DIR/scripts/show_jsoc_proc_status.csh
+set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set SHOW_SERIES = "${DRMS_BINS_INSTALL_DIR}"/show_series
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 # UGH
 set ARITH = /home/phil/bin/_linux4/arith
-set SHOW_COVERAGE = "${drms_bins_install_dir}"/show_coverage
+
 set USERDB=hmidb
 set USERDB2=hmidb2
 
@@ -80,7 +81,7 @@ set last_update = `ls -l --time-style="+%Y.%m.%d_%H:%M" /web/jsoc/htdocs/data/js
 if ( $update_lag > 600 ) then
   set mail_list = jeneen,phil,kehcheng,thailand
   echo "/web/jsoc/htdocs/data/jsoc_proc_status.html is $update_lag seconds old" > /tmp/update_lag
-  echo "Run ${drms_scrs_install_dir}/workflow/scripts/show_jsoc_proc_status.csh to find error" >> /tmp/update_lag
+  echo "Run $SHOW_JSOC_PROC_STATUS to find error" >> /tmp/update_lag
   @ min = $update_lag / 60
   /usr/bin/Mail -s "Status Page Not Updated for $min minutes" $mail_list < /tmp/update_lag
 endif
@@ -94,8 +95,8 @@ cat /web/jsoc/htdocs/ajax/URGENT_MOTD.html >>$TMP
 echo '<p><table width=800>' >>$TMP
 echo '<tr><td>Product</td><td>Lag</td><td>Note</td></tr>' >>$TMP
 
-set lastAccess = `stat -c "%z" /home/jsoc/pipeline/tasks/update_hmi.harp_nrt/numHarps`
-@ numHarps = `cat /home/jsoc/pipeline/tasks/update_hmi.harp_nrt/numHarps`
+set lastAccess = `stat -c "%z" $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps`
+@ numHarps = `cat $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps`
 set Htime = $lastAccess[1]"_"$lastAccess[2]
 @ Htime_s = `$TIME_CONVERT time=$Htime`
 @ Htime_diff = $now_pacific_s - $Htime_s
@@ -305,6 +306,7 @@ echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
 echo -n '<tr><td>web response</td><td' >>$TMP
 set lag=$webinfo[1]
 
+# Ugh
 set mslag = `echo $lag | sed -e "s/\.//" -e "s/^0*//"`
 set lastReqId = `grep JSOC /home/jsoc/exports/RequestID`
 echo $lastReqId
@@ -418,8 +420,9 @@ endif
 ### Look for missing HMI observables ###
 
 # these showCov files are generated every 30m by a cronjob
-# on n04 as jeneen: "${drms_scrs_install_dir}"/workflow/scripts/status_show_cov.csh
+# on n04 as jeneen: "${DRMS_SCRS_INSTALL_DIR}"/workflow/scripts/status_show_cov.csh
 
+# Ugh
 set showCov = "/web/jsoc/htdocs/data/.showCov"
 set showCovNRT = "/web/jsoc/htdocs/data/.showCovNRT" 
 
@@ -486,6 +489,7 @@ endif
 
 ### Look for missing AIA lev1
 
+# Ugh
 set showCovAIA = "/web/jsoc/htdocs/data/.showCovAIA"
 set showCovAIANRT = "/web/jsoc/htdocs/data/.showCovAIANRT"
 

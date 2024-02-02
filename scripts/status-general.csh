@@ -2,16 +2,17 @@
 # set echo
 
 # echo starting $0 $*
-
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-cd $WFDIR/gates
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+
+cd $WORKFLOW_DATA/gates
 set gate = $1
 cd $gate
 
@@ -26,7 +27,7 @@ set nancount = 0
 
 if ($low == "NaN") then
     set nancount = 1
-    if (`show_info -iq $product n=1 | wc -l` <= 0) then
+    if (`$SHOW_INFO -iq $product n=1 | wc -l` <= 0) then
         echo $0 $* status of $product Empty Series
         echo "-1" > low
         echo "-1" > high
@@ -34,15 +35,15 @@ if ($low == "NaN") then
         goto EXITPLACE
     endif
     if ($keytype == time) then
-#    show_info -q $product'[? $key > 0 ?]' n=1' key=$key > low
-      show_info -q  $product'[? '$key' > 0 ?]' n=1 key=$key | tail -1 > low
+#    $SHOW_INFO -q $product'[? $key > 0 ?]' n=1' key=$key > low
+      $SHOW_INFO -q  $product'[? '$key' > 0 ?]' n=1 key=$key | tail -1 > low
       if ($?) then
          echo $0 $* FAILED
          set STATUS = 1
          goto EXITPLACE
       endif
     else
-      show_info -q  $product'[^]' key=$key | tail -1 > low
+      $SHOW_INFO -q  $product'[^]' key=$key | tail -1 > low
       if ($?) then
          echo $0 $* FAILED
          set STATUS = 1
@@ -61,7 +62,7 @@ set low = `cat low`
 
 if ($high == "NaN") @ nancount = $nancount + 1
 
-show_info -q  $product'[$]' key=$key | tail -1 > high
+$SHOW_INFO -q  $product'[$]' key=$key | tail -1 > high
 if ($?) then
    echo $0 $* FAILED
    set STATUS = 1
@@ -72,7 +73,7 @@ endif
 #   set nhigh = `wc -c <high`
 #  if ($nhigh == 0) then # There are no records in the series
 #   echo #### SETTING -1 where product=$product and show_info call gives:
-#   show_info -q  $product'[$]' key=$key 
+#   $SHOW_INFO -q  $product'[$]' key=$key 
 #         echo "-1" > low
 #         echo "-1" > high
 #         set STATUS = 0
@@ -100,9 +101,9 @@ if ($#argv > 1) then # get coverage map
     shift
   end
   if ($nancount == 2) then
-    show_coverage ds=$product low=$minlow high=$maxhigh -iq $miscargs > coverage
+    $SHOW_COVERAGE ds=$product low=$minlow high=$maxhigh -iq $miscargs > coverage
   else
-    show_coverage ds=$product low=$low high=$high -iq $miscargs
+    $SHOW_COVERAGE ds=$product low=$low high=$high -iq $miscargs
   endif
 
 endif

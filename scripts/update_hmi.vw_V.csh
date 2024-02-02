@@ -1,23 +1,14 @@
 #! /bin/csh -f
-
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set JREBINSMOOTH = "${DRMS_BINS_INSTALL_DIR}"/jrebinsmooth
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q,p.q
@@ -32,8 +23,8 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
@@ -44,8 +35,6 @@ set qsubname = VWV$timestr
 set LOG = $HERE/runlog
 set CMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
-
-set JREBINSMOOTH = "${drms_bins_install_dir}"/jrebinsmooth
 
 set params = "out=hmi.vw_V_45s IBIN=1 NBIN=4 BIN_XOFF=14 BIN_YOFF=-1 BIN_FILL=nan IGAUSS=1 GAUSS_WID=10 GAUSS_SIG=2.8284271248 GAUSS_NSUB=5 GAUSS_XOFF=1 GAUSS_YOFF=1 GAUSS_FILL=nan -L"
 
@@ -65,5 +54,3 @@ $QSUB -sync yes -e $LOG -o $LOG -q $QUE $CMD
 
 set retstatus = `cat $HERE/retstatus`
 exit $retstatus
-
-

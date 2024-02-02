@@ -2,34 +2,31 @@
 #
 # make test gates and tasks for HMI line-of-sight NRT observables
 # hmi.lev1cnrt
-
-
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 # Stop the gatekeeper in case it is running.
 
-cd $WFDIR
+cd $WORKFLOW_DATA
 rm -f Keep_running
 while (-e GATEKEEPERBUSY)
-  echo waiting for gatekeeper to quit.
-  sleep 5
-  end
+    echo waiting for gatekeeper to quit.
+    sleep 5
+end
 
-cd $WFDIR/gates
+cd $WORKFLOW_DATA/gates
 rm -rf hmi.lev1cnrt
 
-cd $WFDIR/tasks
+cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.lev1cnrt
 
 # Make update script
 
-set SCRIPT = $WFCODE/scripts/update_hmi.lev1cnrt.csh
+set SCRIPT = $WORKFLOW_DIR/scripts/update_hmi.lev1cnrt.csh
 echo "#! /bin/csh -f" >$SCRIPT
 echo "# do nothing for now" >>$SCRIPT
 echo "exit 0" >>$SCRIPT
@@ -37,28 +34,28 @@ chmod +x $SCRIPT
 
 # Make any user tasks
 
-cd $WFDIR
-$WFCODE/maketask.csh task=update_hmi.lev1cnrt \
-		manager=taskmanager.csh \
-		target=hmi.lev1cnrt \
-		command=scripts/update_hmi.lev1cnrt.csh \
-		maxrange=3600 \
-		parallelOK=5
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/maketask.csh task=update_hmi.lev1cnrt \
+            manager=taskmanager.csh \
+            target=hmi.lev1cnrt \
+            command=scripts/update_hmi.lev1cnrt.csh \
+            maxrange=3600 \
+            parallelOK=5
 
 # Now make any user gates.
 
-cd $WFDIR
+cd $WORKFLOW_DATA
 # use type time and let the status and action tasks convert to DSDS seriesnumbers
-$WFCODE/makegate.csh gate_name=hmi.lev1cnrt \
-		 product=hmi.lev1c_nrt \
-		 type=time \
-		 key=T_OBS \
-		 project=HMI \
-                 updatedelta=60 \
-		 actiontask=update_hmi.lev1cnrt \
-		 statustask=scripts/status-general.csh
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.lev1cnrt \
+            product=hmi.lev1c_nrt \
+            type=time \
+            key=T_OBS \
+            project=HMI \
+            updatedelta=60 \
+            actiontask=update_hmi.lev1cnrt \
+            statustask=scripts/status-general.csh
 
-cd $WFDIR/gates/hmi.lev1cnrt
+cd $WORKFLOW_DATA/gates/hmi.lev1cnrt
 echo 2010.04.24_TAI >low
 
 # Now, to get things started, initialize the new gates.  this is not strictly necessary if the nextupdate

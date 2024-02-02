@@ -3,16 +3,12 @@
 # specified by first two arguments.
 
 # set echo
-# modified to only make new movie if NRT data.
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+if ( ! $?WORKFLOW_IMG_ROOT ) then
+    echo WORKFLOW_IMG_ROOT environment variable is undefined
+    exit 1
+endif
 
+# modified to only make new movie if NRT data.
 set wantlow = $1
 set wanthigh = $2
 
@@ -21,13 +17,13 @@ echo Make images for $wantlow to $wanthigh
 # from here make script that can make _nrt images in standard place
 
 set CADENCE = 3
-set WF = "${drms_src_install_dir}"/workflow
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-setenv RGBDEF $WF/scripts/rgb.txt
-set RENDER_IMAGE = "${drms_bins_install_dir}"/render_image
-set HMI_LIMBDARK = "${drms_bins_install_dir}"/hmi_limbdark
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
+setenv RGBDEF $WORKFLOW_DIR/scripts/rgb.txt
+set HMI_LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
+set RENDER_IMAGE = "${DRMS_BINS_INSTALL_DIR}"/render_image
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set obslist = (Ic) 
 #set minlist = (20000)
@@ -36,7 +32,7 @@ set minlist = (10000)
 set maxlist = (62000)
 set scalinglist = (minmaxgiven)
 #set colorlist = (/home/phil/apps/heat.sao)
-set colorlist = ($WF/apps/heat.sao)
+set colorlist = ($WORKFLOW_DIR/apps/heat.sao)
 set namelist = (Continuum)
 set flaglist = ("")
 
@@ -82,7 +78,7 @@ while ($day <= $dayhigh)
   set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
   set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-  set IMGROOT = /home/jsoc/hmi/hicadImages
+  set IMGROOT = $WORKFLOW_IMG_ROOT/hicadImages
   set IMGPATH = $IMGROOT/$YEAR/$MON/$DAY
   mkdir -p $IMGPATH
   cd $IMGPATH
@@ -144,7 +140,7 @@ if ($finalimagetime != NONE) then
     set prevt = `echo $prevdt | sed -e 's/.*_//' | sed -e 's/^0*//'`
   endif
   set hhmmss_test = `echo $hhmmss | sed -e 's/^[0]*//'`
-  if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e /home/jsoc/hmi/hicadImages/$YEAR/$MON/$DAY) ) then
+  if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e $WORKFLOW_IMG_ROOT/hicadImages/$YEAR/$MON/$DAY) ) then
       set imagepath = http://jsoc.stanford.edu/data/hmi/hicadImages/$YEAR/$MON/$DAY
       set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
 #     set latest = $yyyymmdd'_'$hhmmss

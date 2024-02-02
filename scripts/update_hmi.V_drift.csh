@@ -6,25 +6,20 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
+# copied 29 Oct 2010 2:00 PM
 set HERE = $cwd 
 set LOG = $HERE/runlog
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set CORRECTION_VELOCITIES = "${DRMS_BINS_INSTALL_DIR}"/correction_velocities
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -39,28 +34,23 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-# set CoefProgram = "${drms_bins_install_dir}"/correction_velocities
-# copied 29 Oct 2010 2:00 PM
-#set CoefProgram = $WFCODE/bin/correction_velocities
-set CoefProgram = "${drms_bins_install_dir}"/correction_velocities
-
 # verify that there is at least one V_drift record within 24 hours
 # both before and after both the first and last record to be processed.
 # step by 24 hour increments through the desired range, including the exact
 # end time.
 
-set wantlow_t = `time_convert time=$WANTLOW`
-set wanthigh_t = `time_convert time=$WANTHIGH`
+set wantlow_t = `$TIME_CONVERT time=$WANTLOW`
+set wanthigh_t = `$TIME_CONVERT time=$WANTHIGH`
 
 set need_t = $wantlow_t
 
 while ($need_t <= $wanthigh_t)
   @ needlow_t = $need_t - 86400
   @ needhigh_t = $need_t + 86400
-  set need = `time_convert zone=TAI s=$need_t`
-  set needlow = `time_convert zone=TAI s=$needlow_t`
-  set needhigh = `time_convert zone=TAI s=$needhigh_t`
-  set n = `show_info -cq hmi.coefficients'['$needlow'-'$need']'`
+  set need = `$TIME_CONVERT zone=TAI s=$need_t`
+  set needlow = `$TIME_CONVERT zone=TAI s=$needlow_t`
+  set needhigh = `$TIME_CONVERT zone=TAI s=$needhigh_t`
+  set n = `$SHOW_INFO -cq hmi.coefficients'['$needlow'-'$need']'`
   if ($n <= 0) then
     echo >>$LOG Need V_drift record for $needlow - $need 
     # make a new coef record on the nearest 06:45 or 18:45 before the needed time.
@@ -72,15 +62,15 @@ while ($need_t <= $wanthigh_t)
     @ targ_t = $targ_t + 24300
     @ targlow_t = $targ_t - 43200
     @ targhigh_t = $targ_t + 43200
-    set targlow = `time_convert s=$targlow_t zone=TAI`
-    set targhigh = `time_convert s=$targhigh_t zone=TAI`
-    $CoefProgram begin=$targlow end=$targhigh levin=hmi.V_45s_nrt levout=hmi.coefficients >>$LOG
+    set targlow = `$TIME_CONVERT s=$targlow_t zone=TAI`
+    set targhigh = `$TIME_CONVERT s=$targhigh_t zone=TAI`
+    $CORRECTION_VELOCITIES begin=$targlow end=$targhigh levin=hmi.V_45s_nrt levout=hmi.coefficients >>$LOG
     if ($retstatus) then
-      echo >>$LOG "FAIL $CoefProgram failed for $targ with status=$retstatus"
+      echo >>$LOG "FAIL $CORRECTION_VELOCITIES failed for $targ with status=$retstatus"
       goto FAILURE
     endif
   endif
-  set n = `show_info -cq hmi.coefficients'['$need'-'$needhigh']'`
+  set n = `$SHOW_INFO -cq hmi.coefficients'['$need'-'$needhigh']'`
   if ($n <= 0) then
     echo >>$LOG Need V_drift record for $need - $needhigh 
     # make a new coef record on the nearest 06:45 or 18:45 after the needed time.
@@ -92,12 +82,12 @@ while ($need_t <= $wanthigh_t)
     @ targ_t = $targ_t + 24300
     @ targlow_t = $targ_t - 43200
     @ targhigh_t = $targ_t + 43200
-    set targlow = `time_convert s=$targlow_t zone=TAI`
-    set targhigh = `time_convert s=$targhigh_t zone=TAI`
-    $CoefProgram begin=$targlow end=$targhigh levin=hmi.V_45s_nrt levout=hmi.coefficients >>$LOG
+    set targlow = `$TIME_CONVERT s=$targlow_t zone=TAI`
+    set targhigh = `$TIME_CONVERT s=$targhigh_t zone=TAI`
+    $CORRECTION_VELOCITIES begin=$targlow end=$targhigh levin=hmi.V_45s_nrt levout=hmi.coefficients >>$LOG
     set retstatus = $status
     if ($retstatus) then
-      echo >>$LOG "FAIL $CoefProgram failed for $targ with status=$retstatus"
+      echo >>$LOG "FAIL $CORRECTION_VELOCITIES failed for $targ with status=$retstatus"
       goto FAILURE
     endif
   endif
@@ -114,7 +104,7 @@ tail -1 $LOG > FAIL_reason
 # allow failures to be treated as OK for times before 9 Sept 2010.
 # these may need to be done by hand in an iterative fashion.
 
-set good_processing_t = `time_convert time=2010.09.09_TAI`
+set good_processing_t = `$TIME_CONVERT time=2010.09.09_TAI`
 
 if ($wantlow_t < $good_processing_t) then
   echo "Allow drift calc to fail for earliest times. >>$LOG

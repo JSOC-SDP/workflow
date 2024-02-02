@@ -5,24 +5,18 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set LIMB_PROGRAM = "${DRMS_BINS_INSTALL_DIR}"/lfwrp_tas
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -39,15 +33,10 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set Limbprogram = "${drms_bins_install_dir}"/lfwrp_tas
-#set Limbprogram = "${drms_bins_install_dir}"/lfwrp
-
 set TMPDIR = /tmp28/jsocprod/lfwrp
 
-set product = `/bin/cat $WFDIR/gates/$GATE/product`
-set key = `/bin/cat $WFDIR/gates/$GATE/key`
+set product = `/bin/cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `/bin/cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set qsubname = LIMB$WANTLOW
 set TEMPLOG = $HERE/runlog
@@ -61,12 +50,11 @@ set retstatus=0
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-#echo "$Limbprogram tmpdir=/tmp29/jsocprod/lfwrp/ logdir=/tmp29/jsocprod/lfwrp/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit  >>&$TEMPLOG" >>$TEMPCMD
-echo "$Limbprogram tmpdir=$TMPDIR/ logdir=$TMPDIR/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit_tas >>&$TEMPLOG" >>$TEMPCMD
+echo "$LIMB_PROGRAM tmpdir=$TMPDIR/ logdir=$TMPDIR/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit_tas >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
-echo "rm -f /home/jsoc/pipeline/tasks/update_hmi.Limb_Fit/qsub_running" >>$TEMPCMD
+echo "rm -f $WORKFLOW_DATA/tasks/update_hmi.Limb_Fit/qsub_running" >>$TEMPCMD
 
 # execute qsub script
 /bin/touch $HERE/qsub_running

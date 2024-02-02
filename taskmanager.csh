@@ -4,54 +4,58 @@
 #
 # Call with args task=<taskname> gate=<gatename> ticket=<ticketid>
 #
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
+set GET_NEXT_TICKET_ID = "${DRMS_BINS_INSTALL_DIR}"/GetNextID
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set verbosemode = 1
 
 if ($verbosemode) echo "TASKMANAGER called"
 # set echo
 
-if ($?WORKFLOW_ROOT) then
-  # path for tasks and gates
-  set WFDIR = $WORKFLOW_DATA  
-  # path for scripts and programs
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
-endif
+cd $WORKFLOW_DATA
 
-cd $WFDIR
-
-$WFCODE/scripts/checkDRMSnSUMS.csh
+$WORKFLOW_DIR/scripts/checkDRMSnSUMS.csh
 set DRMSstat = $?
 set DRMSwaits = 0
 while ($DRMSstat)
-  echo -n "DRMS and/or SUMS is down at " ; date
-  if ($DRMSwaits > 360) then
-    echo DRMS down for 6 hours, quit.
-    exit 1
-  endif
-  sleep 60
-  $WFCODE/scripts/checkDRMSnSUMS.csh
-  set DRMSstat = $?
-  @ DRMSwaits = $DRMSwaits + 1
+    echo -n "DRMS and/or SUMS is down at " ; date
+    if ($DRMSwaits > 360) then
+        echo DRMS down for 6 hours, quit.
+        exit 1
+    endif
+
+    sleep 60
+    $WORKFLOW_DIR/scripts/checkDRMSnSUMS.csh
+    set DRMSstat = $?
+    @ DRMSwaits = $DRMSwaits + 1
 end
 
 set task=NOT_SPECIFIED
 set gate=NOT_SPECIFIED
 set ticket=NOT_SPECIFIED
 while ( $#argv > 0)
-  foreach keyname (task gate ticket )
-    if ($1 =~ $keyname=*) then
-       set $1
-       break
-    endif
-  end # foreach
-  shift
+    foreach keyname (task gate ticket )
+        if ($1 =~ $keyname=*) then
+            set $1
+            break
+        endif
+    end # foreach
+
+    shift
 end #while
 if (task == NOT_SPECIFIED || gate == NOT_SPECIFIED || ticket == NOT_SPECIFIED) then
-  echo "TASKMANAGER call error, task=$task, gate=$gate, ticket=$ticket"
-  exit 1
+    echo "TASKMANAGER call error, task=$task, gate=$gate, ticket=$ticket"
+    exit 1
 endif
 
 if ($verbosemode) echo "TASKMANAGER called for task $task with ticket $ticket from gate $gate"
@@ -60,7 +64,7 @@ cd tasks/$task
 #  Now in task directory, get static task information
 # foreach keyfile (task maxrange parallelOK target state)
 foreach keyfile ( maxrange parallelOK target state command)
-        set $keyfile = `cat $keyfile`
+    set $keyfile = `cat $keyfile`
 end
 
 # check that this is the right task for this gate
@@ -71,14 +75,14 @@ if ($gate != $target) then
 endif
 
 # Get the path to the command
-set ACTIONCOMMAND = $WFCODE/$command
+set ACTIONCOMMAND = $WORKFLOW_DIR/$command
 
 #  Make an instance of this task and go to it
 
 if (-e taskid) then
-  set taskid = `$WFCODE/bin/GetNextID taskid`
+    set taskid = `$GET_NEXT_TICKET_ID taskid`
 else
-  set taskid = `$WFCODE/bin/GetNextID taskid $task`
+    set taskid = `$GET_NEXT_TICKET_ID taskid $task`
 endif
 
 mkdir active/$taskid
@@ -92,19 +96,20 @@ echo 2 > state
 mkdir subtasks
 mkdir pending_tickets
 mkdir ticket_return
-ln $WFDIR/gates/$gate/active_tickets/$ticket ticket
+ln $WORKFLOW_DATA/gates/$gate/active_tickets/$ticket ticket
 
 #  get some gate info, such as time type
 # set echo
-set TYPE = `cat $WFDIR/gates/$gate/type`
-set PRODUCT = `cat $WFDIR/gates/$gate/product`
-set KEY = `cat $WFDIR/gates/$gate/key`
-set STATUSTASK = `cat $WFDIR/gates/$gate/statustask`
-set STATUSCOMMAND = $WFCODE/$STATUSTASK
-if (-e $WFDIR/gates/$gate/coverage_args) then
-  set COVERAGEARGS = `cat $WFDIR/gates/$gate/coverage_args`
+set gate_type = `cat $WORKFLOW_DATA/gates/$gate/type`
+set gate_product = `cat $WORKFLOW_DATA/gates/$gate/product`
+set gate_key = `cat $WORKFLOW_DATA/gates/$gate/key`
+set gate_status_task = `cat $WORKFLOW_DATA/gates/$gate/statustask`
+set gate_status_command = $WORKFLOW_DIR/$gate_status_task
+
+if (-e $WORKFLOW_DATA/gates/$gate/coverage_args) then
+    set COVERAGEARGS = `cat $WORKFLOW_DATA/gates/$gate/coverage_args`
 else
-  set COVERAGEARGS = none
+    set COVERAGEARGS = none
 endif
 
 # unset echo
@@ -123,9 +128,9 @@ echo $TASKID >parent
 echo $WANTLOW >wantlow
 echo $WANTHIGH >wanthigh
 
-if ($TYPE == "time") then
-	set WANTLOW_t = `time_convert time=$WANTLOW `
-	set WANTHIGH_t = `time_convert time=$WANTHIGH `
+if ($gate_type == "time") then
+	set WANTLOW_t = `$TIME_CONVERT time=$WANTLOW `
+	set WANTHIGH_t = `$TIME_CONVERT time=$WANTHIGH `
 else
 	set WANTLOW_t = $WANTLOW
 	set WANTHIGH_t = $WANTHIGH
@@ -143,68 +148,73 @@ if ($wantrange > $maxrange) then
 	while ($thislow_t < $WANTHIGH_t)
 		@ thishigh_t = $thislow_t + $maxrange
 		if ($thishigh_t > $WANTHIGH_t) set thishigh_t = $WANTHIGH_t
-                if ($TYPE == "time") then
-			set thislow = `time_convert s=$thislow_t zone=TAI`
-			set thishigh = `time_convert s=$thishigh_t zone=TAI`
-                else
+        if ($gate_type == "time") then
+			set thislow = `$TIME_CONVERT s=$thislow_t zone=TAI`
+			set thishigh = `$TIME_CONVERT s=$thishigh_t zone=TAI`
+        else
 			set thislow = $thislow_t
 			set thishigh = $thishigh_t
-                endif
-                if ($verbosemode) echo "TASKMANAGER doing partial ticket, from $thislow up to $WANTHIGH"
-                if (-e pending_tickets) then
-		        set num_pending = `/bin/ls  pending_tickets | wc -l`
-                else
-                        set num_pending = 0
-                endif
-                if ($verbosemode) echo "TASKMANAGER waiting to start $thislow up to $thishigh"
+        endif
+
+        if ($verbosemode) echo "TASKMANAGER doing partial ticket, from $thislow up to $WANTHIGH"
+        if (-e pending_tickets) then
+            set num_pending = `/bin/ls  pending_tickets | wc -l`
+        else
+            set num_pending = 0
+        endif
+
+        if ($verbosemode) echo "TASKMANAGER waiting to start $thislow up to $thishigh"
 		while ($num_pending > $parallelOK)
 			if ($verbosemode) echo "TASKMANAGER Wait for $num_pending <= $parallelOK"
 			sleep 20
-			if (-e $WFDIR/Keep_running) then
+           
+			if (-e $WORKFLOW_DATA/Keep_running) then
 			else
 			    echo "TaskManager Sleeping while waiting in task $taskid for ticket $ticket"
 			endif
-		        set num_pending = `/bin/ls  pending_tickets | wc -l`
-                end
-		set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$gate wantlow=$thislow wanthigh=$thishigh action=$TICKET_ACTION special="$SPECIAL"`
+
+            set num_pending = `/bin/ls  pending_tickets | wc -l`
+        end
+
+		set newticket = `$MAKE_TICKET taskid=$taskid gate=$gate wantlow=$thislow wanthigh=$thishigh action=$TICKET_ACTION special="$SPECIAL"`
 		echo 1 >state
 		@ thislow_t = $thislow_t + $maxrange
-                if ($verbosemode) echo "TASKMANAGER new ticket $newticket registered, new wantlow = $thislow"
+        if ($verbosemode) echo "TASKMANAGER new ticket $newticket registered, new wantlow = $thislow"
 	end
 
 SUBTICKETSDONE:
-        if ($verbosemode) echo "TASKMANAGER all subrange parts done "
-        set pendcount = `/bin/ls  pending_tickets | wc -l`
+    if ($verbosemode) echo "TASKMANAGER all subrange parts done "
+    set pendcount = `/bin/ls  pending_tickets | wc -l`
 	while ($pendcount > 0)
 		echo 1 >state
 		sleep 20
-                if (-e $WFDIR/Keep_running) then
-                else
-                    echo "TaskManager Sleeping while waiting in task $task for ticket $ticket"
-                endif
+            if (-e $WORKFLOW_DATA/Keep_running) then
+            else
+                echo "TaskManager Sleeping while waiting in task $task for ticket $ticket"
+            endif
 		set pendcount = `/bin/ls  pending_tickets | wc -l`
 	end
 
-        set num_errors = 0
+    set num_errors = 0
 	foreach subticket (`/bin/ls  ticket_return/`)
 		set STATUS = 5
 		set substatus = `grep STATUS ticket_return/$subticket`
-                if ($#substatus) set $substatus
+        if ($#substatus) set $substatus
 		if ($STATUS) then
-                        @ num_errors = $num_errors + 1
-                        echo  Error code $STATUS returned from subticket $subticket >>FAIL_reason
-                        echo Failed range subticket is: >>FAIL_reason
-                        cat ticket_return/$subticket >>FAIL_reason
-                        echo " " >>FAIL_reason
-                endif
-	end
-	if ($num_errors > 0) then
-                echo $num_errors range reduction subtickets had errors.  >>FAIL_reason
-                goto FAILURE
+            @ num_errors = $num_errors + 1
+            echo  Error code $STATUS returned from subticket $subticket >>FAIL_reason
+            echo Failed range subticket is: >>FAIL_reason
+            cat ticket_return/$subticket >>FAIL_reason
+            echo " " >>FAIL_reason
         endif
+	end
 
-        goto EXITOK
-        
+	if ($num_errors > 0) then
+        echo $num_errors range reduction subtickets had errors.  >>FAIL_reason
+        goto FAILURE
+    endif
+
+    goto EXITOK    
 endif
 
 #  2. 
@@ -220,76 +230,87 @@ set echo
 
 set OTHER_SPECIAL
 if ($TICKET_ACTION == 4) then
-    if ($PRODUCT == none || $PRODUCT == NONE) then
-      goto EXITOK
+    if ($gate_product == none || $gate_product == NONE) then
+        goto EXITOK
     endif
+
     if ($COVERAGEARGS == none || $COVERAGEARGS == NONE) then
-      set MISCARGS = " "
+        set MISCARGS = " "
     else if ($COVERAGEARGS == NEVER) then
-      goto ACTION_4_OR_5
+        goto ACTION_4_OR_5
     else
-      set MISCARGS = ($COVERAGEARGS)
+        set MISCARGS = ($COVERAGEARGS)
     endif
+
     if ($SPECIAL != NONE) then
-      # look for COVERAGEARGS
-      set OLD_COVERAGE_ARGS = $COVERAGEARGS
-      set SPECIAL_ARGS = (`echo $SPECIAL | sed -e 's/,/ /g'`)
-      # now special_args contains a=b c=d
-      set NSPECARGS = $#SPECIAL_ARGS
-      set SPECARG = 1
-      while ($SPECARG <= $NSPECARGS)
-        if ($SPECIAL_ARGS[$SPECARG] =~ "COVERAGEARGS=*") then
-          set $SPECIAL_ARGS[$SPECARG]
-          set MISCARGS = ($COVERAGEARGS $MISCARGS)
-        else
-          set OTHER_SPECIAL = ($OTHER_SPECIAL $SPECIAL_ARGS[$SPECARG])
-        endif
-        @ SPECARG = $SPECARG + 1
-      end 
-      set COVERAGEARGS = $OLD_COVERAGE_ARGS 
+        # look for COVERAGEARGS
+        set OLD_COVERAGE_ARGS = $COVERAGEARGS
+        set SPECIAL_ARGS = (`echo $SPECIAL | sed -e 's/,/ /g'`)
+        # now special_args contains a=b c=d
+        set NSPECARGS = $#SPECIAL_ARGS
+        set SPECARG = 1
+
+        while ($SPECARG <= $NSPECARGS)
+            if ($SPECIAL_ARGS[$SPECARG] =~ "COVERAGEARGS=*") then
+                set $SPECIAL_ARGS[$SPECARG]
+                set MISCARGS = ($COVERAGEARGS $MISCARGS)
+            else
+                set OTHER_SPECIAL = ($OTHER_SPECIAL $SPECIAL_ARGS[$SPECARG])
+            endif
+
+            @ SPECARG = $SPECARG + 1
+        end
+
+        set COVERAGEARGS = $OLD_COVERAGE_ARGS 
     endif
+
     if ($#OTHER_SPECIAL == 0) set OTHER_SPECIAL = NONE
-echo XXXX now MISCARGS = $MISCARGS
-    #($STATUSCOMMAND $gate low=$WANTLOW high=$WANTHIGH $MISCARGS ; echo $status > stat_status) | grep UNK > gaplist
-    (show_coverage $PRODUCT -iq low=$WANTLOW high=$WANTHIGH $MISCARGS ; echo $status > stat_status) | grep UNK > gaplist
+    echo XXXX now MISCARGS = $MISCARGS
+    ($SHOW_COVERAGE $gate_product -iq low=$WANTLOW high=$WANTHIGH $MISCARGS ; echo $status > stat_status) | grep UNK > gaplist
     set stat_status = `cat stat_status`
     if ($stat_status) then
-      # if show_coverage fails, cant check for gaps
-      echo NO Show_coverage, go to ACTION=5
-      goto ACTION_4_OR_5
+        # if show_coverage fails, cant check for gaps
+        echo NO Show_coverage, go to ACTION=5
+        goto ACTION_4_OR_5
     else
-      set ngaps = `cat gaplist | wc -l`
+        set ngaps = `cat gaplist | wc -l`
     endif
+
     if ($ngaps == 0) goto EXITOK
     set igap = 1
     while ($igap <= $ngaps)
         set gapinfo = `head -n $igap gaplist | tail -1`
         set gapfirst_i = $gapinfo[2]
         set gapsize = $gapinfo[3]
-	@ gaplast_i = $gapfirst_i + $gapsize 
-        if ($TYPE == "time") then
-            set gapfirst = `index_convert ds=$PRODUCT $KEY'_index'=$gapfirst_i`
-            set gaplast = `index_convert ds=$PRODUCT $KEY'_index'=$gaplast_i`
-	else
+	    @ gaplast_i = $gapfirst_i + $gapsize 
+        if ($gate_type == "time") then
+            set gapfirst = `$INDEX_CONVERT ds=$gate_product $gate_key'_index'=$gapfirst_i`
+            set gaplast = `$INDEX_CONVERT ds=$gate_product $gate_key'_index'=$gaplast_i`
+	    else
             set gapfirst = $gapfirst_i
             set gaplast = $gaplast_i
-	endif
-	set num_pending = `/bin/ls  pending_tickets | wc -l`
-	if ($verbosemode) echo "TASKMANAGER gap filling waiting to start $gapfirst up to $gaplast"
-	while ($num_pending > $parallelOK)
-		if ($verbosemode) echo "TASKMANAGER Wait for $num_pending <= $parallelOK"
-		sleep 20
-		if (-e $WFDIR/Keep_running) then
-		else
-		    echo "TaskManager Sleeping while waiting in task $taskid for ticket $ticket"
-		endif
-		set num_pending = `/bin/ls  pending_tickets | wc -l`
-	end
-	set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$gate wantlow=$gapfirst wanthigh=$gaplast action=5 special="$OTHER_SPECIAL"`
-	echo 1 >state
-	if ($verbosemode) echo "TASKMANAGER new ticket $newticket registered, new wantlow = $gapfirst"
-	@ igap = $igap + 1
+	    endif
+
+        set num_pending = `/bin/ls  pending_tickets | wc -l`
+        if ($verbosemode) echo "TASKMANAGER gap filling waiting to start $gapfirst up to $gaplast"
+
+        while ($num_pending > $parallelOK)
+            if ($verbosemode) echo "TASKMANAGER Wait for $num_pending <= $parallelOK"
+            sleep 20
+            if (-e $WORKFLOW_DATA/Keep_running) then
+            else
+                echo "TaskManager Sleeping while waiting in task $taskid for ticket $ticket"
+            endif
+
+            set num_pending = `/bin/ls  pending_tickets | wc -l`
+	    end
+
+        set newticket = `$MAKE_TICKET taskid=$taskid gate=$gate wantlow=$gapfirst wanthigh=$gaplast action=5 special="$OTHER_SPECIAL"`
+        echo 1 >state
+        if ($verbosemode) echo "TASKMANAGER new ticket $newticket registered, new wantlow = $gapfirst"
+        @ igap = $igap + 1
     end
+
     goto SUBTICKETSDONE
 endif
 
@@ -312,19 +333,20 @@ ACTION_4_OR_5:
 # XXXXXXXXXXXXXXXX
 
 set num_pending = 0
-foreach pregate (` /bin/ls $WFDIR/tasks/$task/preconditions/ `)
+foreach pregate (` /bin/ls $WORKFLOW_DATA/tasks/$task/preconditions/ `)
 	set USELOW = $WANTLOW
 	set USEHIGH = $WANTHIGH
 	set ACTION = 4
 	set SPECIAL = "$SPECIAL" 
-        set GATEDIR = $WFDIR/gates/$pregate
-        if (-e $WFDIR/tasks/$task/preconditions/$pregate/prepare_ticket) then
-                set herewd = $cwd
-                cd $WFDIR/tasks/$task/preconditions/$pregate/
+    set GATEDIR = $WORKFLOW_DATA/gates/$pregate
+    if (-e $WORKFLOW_DATA/tasks/$task/preconditions/$pregate/prepare_ticket) then
+        set herewd = $cwd
+        cd $WORKFLOW_DATA/tasks/$task/preconditions/$pregate/
 		source prepare_ticket
 		cd $herewd
-        endif
-	set newticket = `$WFCODE/maketicket.csh taskid=$taskid gate=$pregate wantlow=$USELOW wanthigh=$USEHIGH action=$ACTION special="$SPECIAL"`
+    endif
+
+	set newticket = `$MAKE_TICKET taskid=$taskid gate=$pregate wantlow=$USELOW wanthigh=$USEHIGH action=$ACTION special="$SPECIAL"`
 end
 echo 3 >state
 
@@ -335,29 +357,31 @@ echo 3 >state
 set pendcount = `/bin/ls  pending_tickets | wc -l`
 while ($pendcount > 0)
 	sleep 20
-        if (-e $WFDIR/Keep_running) then
+    if (-e $WORKFLOW_DATA/Keep_running) then
 	else
 	    echo "TaskManager Sleeping while waiting in task $task for preconditions"
 	endif
+
 	set pendcount = `/bin/ls  pending_tickets | wc -l`
 end
 
 set num_errors = 0
 foreach subticket (`/bin/ls  ticket_return/`)
-        set STATUS = 5
+    set STATUS = 5
 	set substatus = `grep STATUS ticket_return/$subticket`
-        if ($#substatus) set $substatus
-        if ($STATUS) then
-                echo PreCondition subticket $subticket returned error code $STATUS >>FAIL_reason
-                echo Failed ticket is: >>FAIL_reason
-                cat ticket_return/$subticket >>FAIL_reason
-                echo " " >>FAIL_reason
-                @ num_errors = $num_errors + 1
-        endif
+    if ($#substatus) set $substatus
+    if ($STATUS) then
+        echo PreCondition subticket $subticket returned error code $STATUS >>FAIL_reason
+        echo Failed ticket is: >>FAIL_reason
+        cat ticket_return/$subticket >>FAIL_reason
+        echo " " >>FAIL_reason
+        @ num_errors = $num_errors + 1
+    endif
 end
+
 if ($num_errors > 0) then
-        echo "Failure in $num_errors in PreCondition ticket()s, must giveup."  >>FAIL_reason
-        goto FAILURE
+    echo "Failure in $num_errors in PreCondition ticket()s, must giveup."  >>FAIL_reason
+    goto FAILURE
 endif
 
 echo 2 >state
@@ -368,12 +392,12 @@ $ACTIONCOMMAND
 
 set command_status = $?
 if ($command_status) then
-        echo Task command script failed with error code $command_status >>FAIL_reason
-        goto FAILURE
+    echo Task command script failed with error code $command_status >>FAIL_reason
+    goto FAILURE
 endif
 
 EXITOK:
-    cd $WFDIR/tasks/$task/
+    cd $WORKFLOW_DATA/tasks/$task/
     echo 0 >active/$taskid/state
     mv active/$taskid done
     echo `/bin/ls active | wc -l` > state
@@ -383,9 +407,8 @@ QUITTING:
     exit 1
 
 FAILURE:
-    cd $WFDIR/tasks/$task/
+    cd $WORKFLOW_DATA/tasks/$task/
     echo 5 > active/$taskid/state
     mv active/$taskid done
     echo `/bin/ls active | wc -l` > state
     exit 1
-

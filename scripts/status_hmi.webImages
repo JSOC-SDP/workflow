@@ -1,24 +1,33 @@
 #! /bin/csh -f
 
+if ( ! $?WORKFLOW_IMG_ROOT ) then
+    echo WORKFLOW_IMG_ROOT environment variable is undefined
+    exit 1
+endif
+
 set low = 2010.02.11_00:00:00_TAI
-set IMGROOT = /home/jsoc/hmi/images
-#set LATESTLIST = $IMGROOT/image_times_UTC
+
+set IMGROOT = $WORKFLOW_IMG_ROOT/images
+
 set LATESTLIST = $IMGROOT/image_times
+
 set prevd = 0
 set prevt = 0
+
 if (-e $LATESTLIST) then
-  # set prevM = `grep M $LATESTLIST`
-  set prevM = `grep Time $LATESTLIST`
-  set prevdt = $prevM[2]
-  set prevd = `echo $prevdt | sed -e 's/_.*//'`
-  set prevt = `echo $prevdt | sed -e 's/.*_//'`
-  set highdate = `echo $prevd | sed -e 's/..../&./' -e 's/......./&./'`
-  set hightime = `echo $prevt | sed -e 's/../&:/' -e 's/...../&:/'`
-  set high = $highdate'_'$hightime'_TAI'
+    # set prevM = `grep M $LATESTLIST`
+    set prevM = `grep Time $LATESTLIST`
+    set prevdt = $prevM[2]
+    set prevd = `echo $prevdt | sed -e 's/_.*//'`
+    set prevt = `echo $prevdt | sed -e 's/.*_//'`
+    set highdate = `echo $prevd | sed -e 's/..../&./' -e 's/......./&./'`
+    set hightime = `echo $prevt | sed -e 's/../&:/' -e 's/...../&:/'`
+    set high = $highdate'_'$hightime'_TAI'
 else
-  set high = $low
+    set high = $low
 endif
-echo $low >low
+
+echo $low > low
 echo $high > high
 
 set nowtxt = `date -u +%Y.%m.%d_%H:%M:%S`

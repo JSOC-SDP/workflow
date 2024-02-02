@@ -2,13 +2,8 @@
 
 set HERE = $cwd
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_ROOT
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
-endif
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set MAKE_IMAGES_HIGH_LOW = $WORKFLOW_DIR/scripts/makeimageslowhigh
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q,o.q
@@ -30,8 +25,7 @@ echo 0 > retstatus
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$WFCODE/scripts/makeimageslowhigh $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
-#echo "$WFCODE/scripts/makehicadIc.csh $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
+echo "$MAKE_IMAGES_HIGH_LOW $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
@@ -47,4 +41,3 @@ if ( -e $HERE/qsub_running ) then
 endif
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus
-

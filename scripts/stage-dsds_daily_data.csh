@@ -22,10 +22,12 @@ foreach ATTR (TYPE WANTLOW WANTHIGH)
      if ($#ATTRVAL) set $ATTRVAL
 end
 
-set WANTLOW_t = `time_convert time=$WANTLOW`
-set WANTLOW = `time_convert zone=TAI s=$WANTLOW_t`
-set WANTHIGH_t = `time_convert time=$WANTHIGH`
-set WANTHIGH = `time_convert zone=TAI s=$WANTHIGH_t`
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+
+set WANTLOW_t = `$TIME_CONVERT time=$WANTLOW`
+set WANTLOW = `$TIME_CONVERT zone=TAI s=$WANTLOW_t`
+set WANTHIGH_t = `$TIME_CONVERT time=$WANTHIGH`
+set WANTHIGH = `$TIME_CONVERT zone=TAI s=$WANTHIGH_t`
 
 set SPECIAL = `grep SPECIAL ticket`
 foreach SPEC ($SPECIAL)
@@ -38,6 +40,8 @@ end
 set gate = `cat ../../target`
 set product = `cat $WORKFLOW_DATA/gates/$gate/product`
  
+# UGH
+# time_index is not in DRMS
 # FIX times for DSDS time_index
 set LOW = `time_index time=$WANTLOW -t`
 set FDAY = `time_index time=$LOW -d`

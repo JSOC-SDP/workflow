@@ -5,24 +5,16 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set HMI_limbdark = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q,p.q
@@ -43,10 +35,8 @@ else
   set SPECIAL
 endif
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
-
-set HMI_limbdark = "${drms_bins_install_dir}"/hmi_limbdark
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set LD_args = "-cnxf $SPECIAL"
 
@@ -74,7 +64,7 @@ echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus=0' >>&$TEMPCMD
-echo "$HMI_limbdark in=hmi.Ic_"$suffix"\["$WANTLOW"-"$WANTHIGH"]" out=$product $LD_args ">>&$TEMPLOG" >>$TEMPCMD
+echo "$HMI_LIMBDARK in=hmi.Ic_"$suffix"\["$WANTLOW"-"$WANTHIGH"]" out=$product $LD_args ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >retstatus' >>$TEMPCMD
 

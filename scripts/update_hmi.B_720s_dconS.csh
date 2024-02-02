@@ -5,24 +5,19 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set DISAMGIB = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -37,16 +32,16 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
-set low_s = `time_convert time=$WANTLOW`
-set high_s = `time_convert time=$WANTHIGH`
+set low_s = `$TIME_CONVERT time=$WANTLOW`
+set high_s = `$TIME_CONVERT time=$WANTHIGH`
 set tdiff = `$high_s - $low_s`
 if ( $tdiff <= 3600 ) then
-  set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+  set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
   @ indexlast = $indexhigh - 1
-  set wanthigh = `index_convert ds=$product $key"_index"=$indexlast`
+  set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexlast`
 else
   set wanthigh = $WANTHIGH
 endif
@@ -60,8 +55,6 @@ set LOG = $HERE/runlog
 set CMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set DIS = "${drms_bins_install_dir}"/disambig_v3
 set ARGS = "AMBNEQ=100 AMBTFCTR=0.98 OFFSET=150 AMBNPAD=200 AMBNTX=30 AMBNTY=30 AMBNAP=10 AMBSEED=4 errlog=$LOG" 
 
 # make qsub script
@@ -73,7 +66,7 @@ echo "set echo >>&$LOG" >>$CMD
 echo 'set HMIBstatus=6' >>&$CMD
 
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10_dconS'['$wantlow'-'$wanthigh']' -q key=T_REC` )
-  echo "$DIS in=hmi.ME_720s_fd10_dconS'['$T']' out=hmi.B_720s_dconS $ARGS " >> $CMD
+  echo "$DISAMBIG in=hmi.ME_720s_fd10_dconS'['$T']' out=hmi.B_720s_dconS $ARGS " >> $CMD
 end
 echo 'set HMIBstatus = $?' >>$CMD
 echo 'if ($HMIBstatus) goto DONE' >>&$CMD

@@ -8,23 +8,22 @@ echo This program is only used once.
 echo If you are sure you want to use it, remove the next line:
 exit 1
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 # Stop the gatekeeper in case it is running.
 
-cd $WFDIR
+cd $WORKFLOW_DIR
 rm -f Keep_running
 while (-e GATEKEEPERBUSY)
-  echo waiting for gatekeeper to quit.
-  sleep 5
-  end
+    echo waiting for gatekeeper to quit.
+    sleep 5
+end
 
 if (!(-e tasks)) mkdir tasks
 if (!(-e gates)) mkdir gates
 if (!(-e scripts)) mkdir scripts
-

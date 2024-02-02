@@ -5,24 +5,18 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+set HERE = $cwd
 
-set HERE = $cwd 
-
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set ECLIPSE = $WORKFLOW_DIR/scripts/eclipse.pl
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -39,30 +33,25 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
-
-set ECLIPSEscript = /home/jsoc/pipeline/scripts/eclipse.pl
-set HMIprogram = "${drms_bins_install_dir}"/HMI_observables
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
 set camera = 1
 set nrt = 0
 set cadence = 45
 set input = hmi.lev1
-#set otherargs = "levin="lev1" levout="lev15" wavelength=3 dpath="${drms_src_install_dir}"/lev1.5_hmi/apps"
-#set otherargs = "levin="lev1" levout="lev15" wavelength=3 "
 ## CHANGED on 10/16/2012 for Sebastien's new observables code
 set otherargs = "levin="lev1" levout="lev15" wavelength=3 smooth=1 linearity=1 "
 
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 # make qsub name from index from door opening
-# set indexbase = `index_convert ds=$product $key=2010.03.24_TAI`
+# set indexbase = `$INDEX_CONVERT ds=$product $key=2010.03.24_TAI`
 # @ qsubname = $indexhigh - $indexbase
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = OBS
@@ -79,7 +68,7 @@ set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
 # check for eclipse quality bits to be set in lev1_nrt
-#$ECLIPSEscript $wantlow $wanthigh
+#$ECLIPSE $wantlow $wanthigh
 
 
 set retstatus=0
@@ -88,7 +77,7 @@ echo "#! /bin/csh -f " >$TEMPCMD
 echo "setenv OMP_NUM_THREADS $THREADS" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$HMIprogram -L lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
+echo "$OBSERVABLES -L lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
@@ -112,8 +101,8 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ($retstatus == 0 ) then
-  set WEBIMAGE_TICKET = `$WFCODE/maketicket.csh gate=hmi.defImages wantlow=$wantlow wanthigh=$wanthigh action=5`
-  set VW_TICKET = `$WFCODE/maketicket.csh gate=hmi.vw_V wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set WEBIMAGE_TICKET = `$MAKE_TICKET gate=hmi.defImages wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set VW_TICKET = `$MAKE_TICKET gate=hmi.vw_V wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 
 exit $retstatus

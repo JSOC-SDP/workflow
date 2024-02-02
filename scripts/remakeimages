@@ -1,16 +1,19 @@
 #! /bin/csh -f
 
 # set echo
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set MAKE_IMAGES = $WORKFLOW_DIR/scripts/makeimageslowhigh
 
-set start_t=`time_convert time=$1`
-set end_t=`time_convert time=$2`
+set start_t=`$TIME_CONVERT time=$1`
+set end_t=`$TIME_CONVERT time=$2`
 set delta = 43200
 
 while ($start_t < $end_t)
   @ stop_t = $start_t + $delta - 45
   if ($stop_t >= $end_t) @ stop_t = $end_t - 45
-  set start = `time_convert s=$start_t zone=TAI`
-  set stop = `time_convert s=$stop_t zone=TAI`
-  makeimageslowhigh $start $stop
+  set start = `$TIME_CONVERT s=$start_t zone=TAI`
+  set stop = `$TIME_CONVERT s=$stop_t zone=TAI`
+  $MAKE_IMAGES $start $stop
   @ start_t = $stop_t + 45
 end

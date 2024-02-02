@@ -5,26 +5,21 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
-source /home/jsoc/.setJSOCenv
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
+
+source /home/jsoc/.setJSOCenv
 
 # UGH
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
@@ -42,12 +37,9 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
-set VFISV = "${drms_bins_install_dir}"/vfisv
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
 
 set timest = `echo $WANTLOW | cut -c9-13,15-16`
 set OLOG = $HERE/runlog
@@ -68,6 +60,7 @@ echo "unlimit" >> $TEMPCMD
 echo "limit core 0" >> $TEMPCMD
 echo "setenv OMP_NUM_THREADS 4" >> $TEMPCMD
 
+# Ugh
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD 
 endif
@@ -76,11 +69,11 @@ echo "sleep 10" >> $TEMPCMD
 echo 'set MEstatus=0' >>&$TEMPCMD
 
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 
 foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_5760s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
   echo "$MPIEXEC -n 4 $VFISV -f out=hmi.ME_5760s in=hmi.S_5760s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
@@ -96,11 +89,5 @@ echo "echo DONE >> $OLOG" >>$TEMPCMD
 $QSUB -pe smp 4 -e $ELOG -o $OLOG -q $QUE $TEMPCMD
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
-#if ( $retstatus == 0 ) then
-#  @ s = `$TIME_CONVERT time=$wanthigh`
-#  @ sB = $s + 360
-#  set BHigh = `$TIME_CONVERT s=$sB zone=TAI`
-#  set B_TICKET = `$WFCODE/maketicket.csh gate=hmi.B_5760s wantlow=$wantlow wanthigh=$BHigh action=5`
-#endif
-exit $retstatus
 
+exit $retstatus

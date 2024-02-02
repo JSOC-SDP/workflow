@@ -1,55 +1,51 @@
 #! /bin/csh -f
 #
 # make test gates and tasks for HMI line-of-sight observables
-
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-# Stop the gatekeeper in case it is running.
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-cd $WFDIR
+# Stop the gatekeeper if it is running.
+cd $WORKFLOW_DATA
 rm -f Keep_running
 while (-e GATEKEEPERBUSY)
-  echo waiting for gatekeeper to quit.
-  sleep 5
-  end
+    echo waiting for gatekeeper to quit.
+    sleep 5
+end
 
-cd $WFDIR/gates
+cd $WORKFLOW_DATA/gates
 rm -rf hmi.webFits
 
-cd $WFDIR/tasks
+cd $WORKFLOW_DATA/tasks
 rm -rf update_hmi.webFits
 
 # Make supporting scripts
 
-# $WFCODE/scripts/update_hmi.webFits made by hand
+# $WORKFLOW_DIR/scripts/update_hmi.webFits made by hand
 
 # Make task
 
-cd $WFDIR
-$WFCODE/maketask.csh task=update_hmi.webFits \
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/maketask.csh task=update_hmi.webFits \
 		manager=taskmanager.csh \
 		target=hmi.webFits \
 		command=scripts/update_hmi.webFits \
 		maxrange=86400 \
 		parallelOK=0
-set PRECOND = $WFDIR/tasks/update_hmi.webFits/preconditions/hmi.Vector
+set PRECOND = $WORKFLOW_DATA/tasks/update_hmi.webFits/preconditions/hmi.Vector
 mkdir $PRECOND
 echo "set ACTION = 3" > $PRECOND/prepare_ticket
 
 # Now make gate.
 
-cd $WFDIR
-$WFCODE/makegate.csh gate_name=hmi.webFits \
+cd $WORKFLOW_DATA
+$WORKFLOW_DIR/makegate.csh gate_name=hmi.webFits \
 		 product=hmi.M_720s_resized \
 		 type=time \
 		 key=T_REC \
 		 project=HMI \
 		 actiontask=update_hmi.webFits \
 		 statustask=scripts/status-general.csh
-

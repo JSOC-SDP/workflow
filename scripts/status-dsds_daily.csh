@@ -6,16 +6,21 @@
 
 # echo starting $0 $*
 # set echo
-
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
 
-cd $WFDIR/gates
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+
+# Ugh
+set TIME_INDEX = time_index
+
+cd $WORKFLOW_DATA/gates
 set gate = $1
 cd $gate
 # ignore already in the gate dir
@@ -24,34 +29,34 @@ set product = `cat product`
 set key = `cat key`
 
 set low = `cat low`
-set low_t = `time_convert time=$low`
-set low = `time_convert zone=TAI s=$low_t`
+set low_t = `$TIME_CONVERT time=$low`
+set low = `$TIME_CONVERT zone=TAI s=$low_t`
 set high = `cat high`
-set high_t = `time_convert time=$high`
-set high = `time_convert zone=TAI s=$high_t`
+set high_t = `$TIME_CONVERT time=$high`
+set high = `$TIME_CONVERT zone=TAI s=$high_t`
 
 set nancount = 0
 
 if ($low == "NaN") then
     set nancount = 1
-    set low = `show_info -q  $product'[^]' key=$key`
+    set low = `$SHOW_INFO -q  $product'[^]' key=$key`
     if ($?) then
       echo $0 $* FAILED
       exit 1
     endif
-    time_index day=$low -t > low
+    $TIME_INDEX day=$low -t > low
 else
-    set low = `time_index -d time=$low`
+    set low = `$TIME_INDEX -d time=$low`
 endif
 
 if ($high == "NaN") @ nancount = $nancount + 1
 
-set high = `show_info -q  $product'[$]' key=$key`
+set high = `$SHOW_INFO -q  $product'[$]' key=$key`
 if ($?) then
    echo $0 $* FAILED
    exit 1
 endif
-time_index day=$high -t > high
+$TIME_INDEX day=$high -t > high
 
 # now low and high are hour numbers and file low and file high are matching times.
 
@@ -70,12 +75,14 @@ if ($#argv > 1) then # get coverage map
     endif
   shift
   end
-  set low = `time_index time=$low -d`
-  set high = `time_index time=$high -d`
+  # UGH
+  # time_index not in DRMS
+  set low = `$TIME_INDEX time=$low -d`
+  set high = `$TIME_INDEX time=$high -d`
   if ($nancount == 2) then
-    show_coverage ds=$product low=$minlow high=$maxhigh -iq > coverage
+    $SHOW_COVERAGE ds=$product low=$minlow high=$maxhigh -iq > coverage
   else
-    show_coverage ds=$product low=$low high=$high -iq 
+    $SHOW_COVERAGE ds=$product low=$low high=$high -iq 
   endif
 
 endif

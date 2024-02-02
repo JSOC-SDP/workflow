@@ -1,20 +1,17 @@
 #! /bin/csh -f
 
-
 source $HOME/.cshrc
 source $HOME/.login
 
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
 
-setenv WORKFLOW_DATA /home/jsoc/pipeline
-set WORKFLOW_ROOT = "${drms_src_install_dir}"/workflow
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set GATEKEEPER = $WORKFLOW_DIR/gatekeeper.csh
+set GATEKEEPER_RESTART = $WORKFLOW_DIR/gatekeeper.restart
 
 cd $WORKFLOW_DATA
 # restart gatekeeper and put log in pipeline directory.
@@ -29,33 +26,35 @@ rm -f Keep_running
 set loopcount=0
 echo -n Waiting
 while (-e GATEKEEPERBUSY)
-  sleep 1
-  echo -n '.'
-  @ loopcount = $loopcount + 1
-  if ($loopcount > 120) then
-    echo Give up waiting after 2 minutes
-    rm -f GATEKEEPERBUSY
+    sleep 1
+    echo -n '.'
+    @ loopcount = $loopcount + 1
+
+    if ($loopcount > 120) then
+        echo Give up waiting after 2 minutes
+        rm -f GATEKEEPERBUSY
     endif
 end
+
 echo " "
 
 # allow extra time to simulate normal gatekeeper sleep.
 sleep 10
 
 echo -n "Gatekeeper PID = "
-"${drms_src_install_dir}"/workflow/gatekeeper.csh >& log &
+$GATEKEEPER >& log &
 
 set gatekeeper_status = $status
 
 if ($gatekeeper_status || -e GATEKEEPERBUSY) then
-  echo -n "XXX gatekeeper failed at "
-  date
-  echo "XXX Status was $gatekeeper_status"
-  rm -f GATEKEEPERBUSY
-  rm -f Keep_running
-  echo "XXX force restart"
-  "${drms_src_install_dir}"/workflow/gatekeeper.restart >> /home/jsoc/pipeline/restart.log &
+    echo -n "XXX gatekeeper failed at "
+    date
+    echo "XXX Status was $gatekeeper_status"
+    rm -f GATEKEEPERBUSY
+    rm -f Keep_running
+    echo "XXX force restart"
+    $GATEKEEPER_RESTART >> $WORKFLOW_DATA/restart.log &
 else
-  echo -n Gatekeeper stopped by operator at " "
-  date
+    echo -n Gatekeeper stopped by operator at " "
+    date
 endif

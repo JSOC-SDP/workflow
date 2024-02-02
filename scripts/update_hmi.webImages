@@ -1,22 +1,18 @@
 #! /bin/csh -f
-
+set MAKE_IMAGES_LOW_HIGH = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/makeimageslowhigh
 set HERE = $cwd
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_ROOT
-  set WFCODE = $WORKFLOW_ROOT
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
 else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
-endif
-
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q,o.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-#  set QUE = a.q
-  set QUE = p.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+        set QUE = j.q,o.q
+        set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+        set QUE = p.q
+        set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 set wantlow = `cat wantlow`
@@ -31,8 +27,7 @@ echo 0 > retstatus
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$WFCODE/scripts/makeimageslowhigh $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
-#echo "$WFCODE/scripts/makehicadIc.csh $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
+echo "$MAKE_IMAGES_LOW_HIGH $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
@@ -41,11 +36,10 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 touch qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
 $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
-#qsub -sync yes -e $TEMPLOG -o $TEMPLOG -q j.q $TEMPCMD
 
 if ( -e $HERE/qsub_running ) then
-  rm -f $HERE/qsub_running
+    rm -f $HERE/qsub_running
 endif
+
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 exit $retstatus
-

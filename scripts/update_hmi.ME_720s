@@ -5,24 +5,15 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
 
 # UGH
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
@@ -40,10 +31,8 @@ foreach ATTR (WANTLOW GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
-
-set VFISVprogram = "${drms_bins_install_dir}""/vfisv"
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set input = hmi.S_720s
 set in5 = hmi.M_720s
@@ -85,8 +74,8 @@ endif
 
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$MPIEXEC -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_2 in=$input\[$want1] in5=$in5\[$want1] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
-echo "$MPIEXEC -n 8 $VFISVprogram out=hmi.ME_720s_e15w1332_2 in=$input\[$want2] in5=$in5\[$want2] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
+echo "$MPIEXEC -n 8 $VFISV out=hmi.ME_720s_e15w1332_2 in=$input\[$want1] in5=$in5\[$want1] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
+echo "$MPIEXEC -n 8 $VFISV out=hmi.ME_720s_e15w1332_2 in=$input\[$want2] in5=$in5\[$want2] $otherargs chi2_stop=$chi >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD

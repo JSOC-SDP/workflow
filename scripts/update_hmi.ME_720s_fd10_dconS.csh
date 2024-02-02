@@ -5,26 +5,21 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
-source /home/jsoc/.setJSOCenv
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
+
+source /home/jsoc/.setJSOCenv
 
 set QUE = k.q
 set QSUB = /SGE2/bin/lx-amd64/qsub
@@ -34,12 +29,9 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
-set VFISV = "${drms_bins_install_dir}"/vfisv
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
 # UGH
 set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
 
@@ -84,8 +76,7 @@ if ( $retstatus == 0 ) then
   @ s = `$TIME_CONVERT time=$wanthigh`
   @ sB = $s + 360
   set BHigh = `$TIME_CONVERT s=$sB zone=TAI`
-  set B_TICKET = `$WFCODE/maketicket.csh gate=hmi.B_720s_dconS wantlow=$wantlow wanthigh=$BHigh action=5`
+  set B_TICKET = `$MAKE_TICKET gate=hmi.B_720s_dconS wantlow=$wantlow wanthigh=$BHigh action=5`
 endif
 
 exit $retstatus
-

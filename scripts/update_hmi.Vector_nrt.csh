@@ -5,26 +5,27 @@
 # XXXXXXXXXX test
 # set echo
 # XXXXXXXXXX test
-set drms_bins_install_dir = "${DRMS_BINS_INSTALL_DIR}"
-set drms_incs_install_dir = "${DRMS_INCS_INSTALL_DIR}"
-set drms_libs_install_dir = "${DRMS_LIBS_INSTALL_DIR}"
-set drms_params_install_dir = "${DRMS_PARAMS_INSTALL_DIR}"
-set drms_root_dir = "${DRMS_ROOT_DIR}"
-set drms_scrs_install_dir = "${DRMS_SCRS_INSTALL_DIR}"
-set drms_src_install_dir = "${DRMS_SRC_INSTALL_DIR}"
-set drms_table_dir = "${DRMS_TABLE_DIR}"
-
-set noglob
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set ECLIPSE = $WORKFLOW_DIR/scripts/eclipse.pl
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
+set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set IQUV_AVERAGING = "${DRMS_BINS_INSTALL_DIR}"/HMI_IQUV_averaging
+set JV2TS = "${DRMS_BINS_INSTALL_DIR}"/jv2ts
+set LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
+set RESIZE_MAPPING = "${DRMS_BINS_INSTALL_DIR}"/resizemappingmag
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+
+set noglob
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q
@@ -41,17 +42,8 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
-
-set ECLIPSEscript = "${drms_scrs_install_dir}"/eclipse.pl
-set IQUVprogram = "${drms_bins_install_dir}"/HMI_IQUV_averaging
-set HMIprogram = "${drms_bins_install_dir}"/HMI_observables
-set HMI_limbdark = "${drms_bins_install_dir}"/hmi_limbdark
-set HMI_segment = "${drms_bins_install_dir}"/hmi_segment_module
-set JV2TS = "${drms_bins_install_dir}"/jv2ts
-set TIME_CONVERT = "${drms_bins_install_dir}"/time_convert
-set SHOW_INFO = "${drms_bins_install_dir}"/show_info
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 #set IQUV_args = "wavelength=3 camid=0 cadence=135.0 npol=6 size=36 lev1=hmi.lev1_nrt quicklook=1"
 #set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=0 cadence=720.0 lev1=hmi.lev1_nrt"
@@ -62,11 +54,11 @@ set LD_args = "-cnxf NONE"
 #set PATCH_args = "bb=hmi.Mpatch_720s_nrt"
 
 # round times to a slot
-set indexlow = `index_convert ds=$product $key=$WANTLOW`
-set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
+set indexlow = `$INDEX_CONVERT ds=$product $key=$WANTLOW`
+set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 @ indexhigh = $indexhigh - 1
-set wantlow = `index_convert ds=$product $key"_index"=$indexlow`
-set wanthigh = `index_convert ds=$product $key"_index"=$indexhigh`
+set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
+set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 set timestr = `echo $wantlow  | sed -e 's/[.:]//g' -e 's/^......//' -e 's/.._TAI//'`
 set timename = VEC
 set qsubname = $timename$timestr
@@ -82,7 +74,7 @@ set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
 # check for eclipse quality bits to be set in lev1_nrt
-$ECLIPSEscript $wantlow $wanthigh nrt
+$ECLIPSE $wantlow $wanthigh nrt
 
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
@@ -90,26 +82,22 @@ echo "setenv OMP_NUM_THREADS $THREADS" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
-#echo "$ECLIPSEscript $wantlow $wanthigh nrt >>&$TEMPLOG" >>$TEMPCMD
 echo 'set IQUVstatus=0' >>&$TEMPCMD
 echo 'set OBSstatus=0' >>&$TEMPCMD
 echo 'set LDstatus=0' >>&$TEMPCMD
 
-echo "$IQUVprogram begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
+echo "$IQUV_AVERAGING begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set IQUVstatus = $?' >>$TEMPCMD
 echo 'if ($IQUVstatus) goto DONE' >>&$TEMPCMD
-echo "$HMIprogram begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$TEMPCMD
+echo "$OBSERVABLES begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set OBSstatus = $?' >>$TEMPCMD
 echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
-echo "$HMI_limbdark in=hmi.Ic_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ic_noLimbDark_720s_nrt "$LD_args" >>&$TEMPLOG" >>$TEMPCMD
+echo "$LIMBDARK in=hmi.Ic_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ic_noLimbDark_720s_nrt "$LD_args" >>&$TEMPLOG" >>$TEMPCMD
 echo 'set LDstatus = $?' >>$TEMPCMD
 echo 'if ($LDstatus) goto DONE' >>&$TEMPCMD
 
 
 ## Remap/Resize mags for synoptic charts
-
-#echo "${drms_bins_install_dir}""/fdlos2radial in=hmi.M_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
-
 @ wantlow_s = `$TIME_CONVERT time=$wantlow`
 @ wanthigh_s = `$TIME_CONVERT time=$wanthigh` 
 @ diff = $wanthigh_s - $wantlow_s
@@ -122,8 +110,8 @@ echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=hmi
 
 echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=2 in=hmi.M_720s_nrt\["$wantlow"/"$t"] v2hout=hmi.Mr_hiresmap_720s_nrt histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 >>&$TEMPLOG" >>$TEMPCMD
 
-echo "${drms_bins_install_dir}""/resizemappingmag in=hmi.Ml_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
-echo "${drms_bins_install_dir}""/resizemappingmag in=hmi.Mr_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "$RESIZE_MAPPING in=hmi.Ml_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "$RESIZE_MAPPING in=hmi.Mr_hiresmap_720s_nrt\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s_nrt nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $IQUVstatus >IQUVstatus' >>&$TEMPCMD
@@ -145,9 +133,8 @@ $QSUB -sync yes -pe smp 4 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD     <---use t
 
 if ( -e retstatus ) set retstatus = `cat $HERE/retstatus`
 if ( ($retstatus == 0) && ($count > 0) ) then
-  set FITS_TICKET = `$WFCODE/maketicket.csh gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
-  set MSK_TICKET = `$WFCODE/maketicket.csh gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set FITS_TICKET = `$MAKE_TICKET gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set MSK_TICKET = `$MAKE_TICKET gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
-#set REMAP_TICKET = `$WFCODE/maketicket.csh gate=hmi.MrMap_latlon_720s_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 
 exit $retstatus

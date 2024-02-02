@@ -5,16 +5,17 @@
 # XXXXXXXXXX test
  set echo
 # XXXXXXXXXX test
-
 set HERE = $cwd 
 
-if ($?WORKFLOW_ROOT) then
-  set WFDIR = $WORKFLOW_DATA
-  set WFCODE = $WORKFLOW_ROOT
-else
-  echo Need WORKFLOW_ROOT variable to be set.
-  exit 1
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
 endif
+
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
+set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j8.q
@@ -29,10 +30,8 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
-set product = `cat $WFDIR/gates/$GATE/product`
-set key = `cat $WFDIR/gates/$GATE/key`
-
-set VFISV = /home/jsoc/cvs/Development/JSOC/bin/$JSOC_MACHINE/vfisv
+set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
+set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
@@ -70,6 +69,7 @@ echo "setenv MPI_MAPPED_HEAP_SIZE 100M" >> $TEMPCMD
 echo "setenv KMP_STACKSIZE 16M" >> $TEMPCMD
 echo "unlimit" >> $TEMPCMD
 echo "limit core 0" >> $TEMPCMD
+# Ugh
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   echo "/home/jsoc/mpich2/bin/mpdboot --ncpus=8" >> $TEMPCMD
 endif
@@ -86,6 +86,6 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD >> runlog
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus == 0 ) then
-  set B_TICKET = `$WFCODE/maketicket.csh gate=hmi.B_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set B_TICKET = `$MAKE_TICKET gate=hmi.B_720s wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 exit $retstatus
