@@ -8,8 +8,10 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
-set GATEKEEPER = "${DRMS_SRC_INSTALL_DIR}"/workflow/gatekeeper.csh
-set GATEKEEPER_RESTART = "${DRMS_SRC_INSTALL_DIR}"/workflow/gatekeeper.restart
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set GATEKEEPER = $WORKFLOW_DIR/gatekeeper.csh
+set GATEKEEPER_RESTART = $WORKFLOW_DIR/gatekeeper.restart
 
 cd $WORKFLOW_DATA
 # restart gatekeeper and put log in pipeline directory.

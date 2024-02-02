@@ -9,6 +9,8 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
 set TARG = /web/jsoc/htdocs/data
 set TMP = $TARG/.jsoc_proc_status.tmp
 
@@ -16,10 +18,9 @@ set noglob
 unsetenv QUERY_STRING
 umask 2
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+set SHOW_JSOC_PROC_STATUS = $WORKFLOW_DIR/scripts/show_jsoc_proc_status.csh
 set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
-set SHOW_JSOC_PROC_STATUS = $WORKFLOW_DIR/scripts/show_jsoc_proc_status.csh
 set SHOW_SERIES = "${DRMS_BINS_INSTALL_DIR}"/show_series
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 # UGH

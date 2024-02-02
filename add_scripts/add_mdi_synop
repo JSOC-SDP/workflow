@@ -8,8 +8,6 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-set WFScripts = $WORKFLOW_DIR/scripts
-
 cd $WORKFLOW_DATA
 rm -f Keep_running
 while (-e GATEKEEPERBUSY)

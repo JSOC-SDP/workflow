@@ -14,7 +14,7 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-set MAKE_TICKET = "$WORKFLOW_DIR/maketicket.csh"
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv

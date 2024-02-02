@@ -10,9 +10,10 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set GET_NEXT_TICKET_ID = "${DRMS_BINS_INSTALL_DIR}"/GetNextID
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
-set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
 set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 

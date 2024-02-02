@@ -5,12 +5,13 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
+set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
 # Ugh
 set CTIMES = /home/wso/bin/_linux4/ctimes
-set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set WAIT_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/wait_ticket.csh"
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 cd $WORKFLOW_DIR
 

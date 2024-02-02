@@ -2,17 +2,17 @@
 # set echo
 
 # gatekeeper
+if ( ! $?WORKFLOW_DATA ) then
+    echo WORKFLOW_DATA environment variable is undefined
+    exit 1
+endif
+
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set CADENCE = 10
 set FASTCADENCE = $CADENCE
 set SLOWCADENCE = 60
-
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
 
 cd $WORKFLOW_DATA
 echo $$ >> restart.log

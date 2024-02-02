@@ -1,8 +1,9 @@
 #! /bin/csh -f
 # modified to make one run per UT day, shortly after start of UT day.
 
-set MAKE_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/maketicket.csh"
-set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set WORKFLOW_DIR = ${DRMS_SRC_INSTALL_DIR}/workflow
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
+set TIME_CONVERT = ${DRMS_BINS_INSTALL_DIR}/time_convert
 
 set NOW = `date -u +%Y.%m.%d_%H:%M:%S`
 set NOW_t = `$TIME_CONVERT time=$NOW`

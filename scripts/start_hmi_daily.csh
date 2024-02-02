@@ -15,7 +15,7 @@ set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 @ VEC_offset = 36 * 60
 @ lev1_offset = 150
 
-set MAKE_TICKET = "$WORKFLOW_DIR/maketicket.csh"
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 set WANTLOW = `cat wantlow`

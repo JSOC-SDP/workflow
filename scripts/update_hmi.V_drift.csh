@@ -7,10 +7,6 @@
 # set echo
 # XXXXXXXXXX test
 # copied 29 Oct 2010 2:00 PM
-set CORRECTION_VELOCITIES = "${DRMS_BINS_INSTALL_DIR}"/correction_velocities
-set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
-
 set HERE = $cwd 
 set LOG = $HERE/runlog
 
@@ -20,6 +16,10 @@ if ( ! $?WORKFLOW_DATA ) then
 endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+set CORRECTION_VELOCITIES = "${DRMS_BINS_INSTALL_DIR}"/correction_velocities
+set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
 if ( $JSOC_MACHINE == "linux_x86_64" ) then
   set QUE = j.q

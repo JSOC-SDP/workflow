@@ -14,10 +14,10 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set JV2TS = "${DRMS_BINS_INSTALL_DIR}"/jv2ts
 set LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
-set MAKE_TICKET = "${DRMS_BINS_INSTALL_DIR}/workflow/maketicket.csh"
 set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 set RESIZE_MAPPING = "${DRMS_BINS_INSTALL_DIR}"/resizemappingmag
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
