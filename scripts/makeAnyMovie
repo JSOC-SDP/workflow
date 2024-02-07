@@ -14,6 +14,14 @@ if ( ! $?WORKFLOW_IMG_ROOT ) then
     exit 1
 endif
 
+if (!(-e $WORKFLOW_IMG_ROOT)) then
+    mkdir $WORKFLOW_IMG_ROOT
+    if ($?) then 
+        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
+        exit 1
+    endif
+endif
+
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 @ min15 = 60 * 15
@@ -94,7 +102,17 @@ set minFileSize = 50000
 if ($Size == 256) set minFileSize = 5000
 
 set BASE = $WORKFLOW_IMG_ROOT/images
+set WORKFLOW_IMG_ROOT_MOVIES = $WORKFLOW_IMG_ROOT/movies
 set WORK = $WORKFLOW_IMG_ROOT/movies/$Quant'_movies'.$$
+
+if (!(-e $WORKFLOW_IMG_ROOT_MOVIES)) then
+    mkdir $WORKFLOW_IMG_ROOT_MOVIES
+    if ($?) then 
+        echo ERROR making image root directory $WORKFLOW_IMG_ROOT_MOVIES
+        exit 1
+    endif
+endif
+
 mkdir $WORK
 mkdir $WORK/frames
 
