@@ -83,8 +83,16 @@ while ($day <= $dayhigh)
   set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
   set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-  set IMGROOT = $WORKFLOW_IMG_ROOT/images/special
-  set IMGPATH = $IMGROOT/$YEAR
+  set special_images_dir = $WORKFLOW_IMG_ROOT/images/special
+  if (!(-e $special_images_dir)) then
+      mkdir $special_images_dir
+      if ($?) then 
+          echo ERROR making special images root directory $special_images_dir
+          exit 1
+      endif
+  endif
+
+  set IMGPATH = $special_images_dir/$YEAR
   if (!(-e $IMGPATH)) mkdir $IMGPATH
   set IMGPATH = $IMGPATH/$MON
   if (!(-e $IMGPATH)) mkdir $IMGPATH
@@ -146,8 +154,8 @@ if ($end_movie_t > 0) then
 
   set hhmmss = `echo $end_movie | sed -e 's/_TAI//' -e 's/.*_//' -e 's/://g'`
   set yyyymmdd = `echo $end_movie | sed -e 's/_.*//' -e 's/\.//g'`
-#  set LATESTLIST = $IMGROOT/image_times_UTC
-set LATESTLIST = $IMGROOT/image_times
+#  set LATESTLIST = $special_images_dir/image_times_UTC
+set LATESTLIST = $special_images_dir/image_times
   set prevd = 0
   set prevt = 0
   if (-e $LATESTLIST) then

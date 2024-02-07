@@ -37,20 +37,27 @@ set Type = jpg
 set Size = 1k
 set minFileSize = 50000
 
-set BASE = $WORKFLOW_IMG_ROOT/images
-set WORKBASE = $WORKFLOW_IMG_ROOT/movies
-
-if (!(-e $WORKBASE)) then
-    mkdir $WORKBASE
+set images_dir = $WORKFLOW_IMG_ROOT/images
+if (!(-e $images_dir)) then
+    mkdir $images_dir
     if ($?) then 
-        echo ERROR making image root directory $WORKBASE
+        echo ERROR making images root directory $images_dir
+        exit 1
+    endif
+endif
+
+set movies_dir = $WORKFLOW_IMG_ROOT/movies
+if (!(-e $movies_dir)) then
+    mkdir $movies_dir
+    if ($?) then 
+        echo ERROR making movies root directory $movies_dir
         exit 1
     endif
 endif
 
 foreach Quant (Ic_flat M M_color)
     set THISWORK = $Quant'_movies'.$$
-    set WORK = $WORKBASE/$THISWORK
+    set WORK = $movies_dir/$THISWORK
     mkdir $WORK
     mkdir $WORK/frames
 
@@ -69,7 +76,7 @@ foreach Quant (Ic_flat M M_color)
         set hhmmss = `echo $imgtime | sed -e 's/_/Q/' -e 's/.*Q//' -e 's/://g' -e 's/_TAI//'`
         set I = `printf "%04d" $i`
         set filename = $yyyymmdd'_'$hhmmss'_'$Quant'_'$Size'.'$Type
-        set Imgpath = $BASE/$YEAR/$MON/$DAY
+        set Imgpath = $images_dir/$YEAR/$MON/$DAY
         set targpath = $WORK/frames
         set Image = $Imgpath/$filename
 
@@ -121,7 +128,7 @@ foreach Quant (Ic_flat M M_color)
         mv $MOVIE $WORKFLOW_IMG_ROOT/movies/latest
     endif
 
-    cd $WORKBASE
+    cd $movies_dir
     set D14dMOVIES = .14dmovies
     if (!(-e $D14dMOVIES)) mkdir $D14dMOVIES
 
@@ -130,7 +137,7 @@ foreach Quant (Ic_flat M M_color)
     @ nowhour_t = $nowtime_t * 3600
     if ($nowhour_t == $endtime_t) then
         set THISWORK = $Quant'_movies'.$$
-        set WORK = $WORKBASE/$THISWORK
+        set WORK = $movies_dir/$THISWORK
         mkdir $WORK
         mkdir $WORK/frames
         cd $WORK/frames

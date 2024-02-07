@@ -95,23 +95,32 @@ else
   set path_given=0
 endif
 
-#   time makeAnyMovie 2011.03.17_17_TAI 2011.03.31_17_TAI 15 Ic_flat 1k $WORKFLOW_IMG_ROOT/movies/latest/Ic_flat_14d.mp4
+#   time makeAnyMovie 2011.03.17_17_TAI 2011.03.31_17_TAI 15 Ic_flat 1k $movies_dir/latest/Ic_flat_14d.mp4
   
 set Type = jpg
 set minFileSize = 50000
 if ($Size == 256) set minFileSize = 5000
 
-set BASE = $WORKFLOW_IMG_ROOT/images
-set WORKFLOW_IMG_ROOT_MOVIES = $WORKFLOW_IMG_ROOT/movies
-set WORK = $WORKFLOW_IMG_ROOT/movies/$Quant'_movies'.$$
-
-if (!(-e $WORKFLOW_IMG_ROOT_MOVIES)) then
-    mkdir $WORKFLOW_IMG_ROOT_MOVIES
+set images_dir = $WORKFLOW_IMG_ROOT/images
+if (!(-e $images_dir)) then
+    mkdir $images_dir
     if ($?) then 
-        echo ERROR making image root directory $WORKFLOW_IMG_ROOT_MOVIES
+        echo ERROR making images root directory $images_dir
         exit 1
     endif
 endif
+
+set movies_dir = $WORKFLOW_IMG_ROOT/movies
+
+if (!(-e $movies_dir)) then
+    mkdir $movies_dir
+    if ($?) then 
+        echo ERROR making movies root directory $movies_dir
+        exit 1
+    endif
+endif
+
+set WORK = $movies_dir/$Quant'_movies'.$$
 
 mkdir $WORK
 mkdir $WORK/frames
@@ -130,7 +139,7 @@ while ($imgtime_t <= $endtime_t)
   set filename = $yyyymmdd'_'$hhmmss'_'$Quant'_'$Size'.'$Type
   if ($i == 0) set Startname = $yyyymmdd'_'$hhmmss
   set Endname = $yyyymmdd'_'$hhmmss
-  set Imgpath = $BASE/$YEAR/$MON/$DAY
+  set Imgpath = $images_dir/$YEAR/$MON/$DAY
   set targpath = $WORK/frames
   set Image = $Imgpath/$filename
   if (-e $Image) then
@@ -175,13 +184,13 @@ if ($path_given == 0) then
 #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mpg 
   ffmpeg $mpg_opts -i %04d.$Type $MOVIE.mpg
   if ($status == 0) then
-      mv $MOVIE.mpg $WORKFLOW_IMG_ROOT/movies/special
+      mv $MOVIE.mpg $movies_dir/special
   endif
 
 #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE.mp4 
   ffmpeg -i %04d.$Type $mp4_opts $MOVIE.mp4
   if ($status == 0) then
-      mv $MOVIE.mp4 $WORKFLOW_IMG_ROOT/movies/special
+      mv $MOVIE.mp4 $movies_dir/special
   endif
 else
 #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $specified_path

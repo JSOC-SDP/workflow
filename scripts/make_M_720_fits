@@ -74,7 +74,16 @@ while ($day <= $dayhigh)
     set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
     set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-    set IMGPATH = $WORKFLOW_IMG_ROOT/fits/$YEAR
+    set fits_dir = $WORKFLOW_IMG_ROOT/fits
+    if (!(-e $fits_dir)) then
+        mkdir $fits_dir
+        if ($?) then 
+            echo ERROR making fits root directory $fits_dir
+            exit 1
+        endif
+    endif
+
+    set IMGPATH = $fits_dir/$YEAR
     if (!(-e $IMGPATH)) mkdir $IMGPATH
     set IMGPATH = $IMGPATH/$MON
     if (!(-e $IMGPATH)) mkdir $IMGPATH
