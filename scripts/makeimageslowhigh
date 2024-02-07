@@ -181,7 +181,7 @@ if ($finalimagetime != NONE) then
 
     set hhmmss_test = `echo $hhmmss | sed -e 's/^0//'`
 
-    if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e i$mages_dir/$YEAR/$MON/$DAY) ) then
+    if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e $images_dir/$YEAR/$MON/$DAY) ) then
         set imagepath = http://jsoc.stanford.edu/data/hmi/images/$YEAR/$MON/$DAY
         set latest = `ls -1t $images_dir/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
         echo "Time    " $latest >  $LATESTLIST
