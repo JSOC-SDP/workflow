@@ -13,7 +13,7 @@ endif
 if (!(-e $WORKFLOW_IMG_ROOT)) then
     mkdir $WORKFLOW_IMG_ROOT
     if ($?) then 
-        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
+        echo "[ makeIcmovie ] ERROR making image root directory $WORKFLOW_IMG_ROOT"
         exit 1
     endif
 endif
@@ -41,7 +41,7 @@ set images_dir = $WORKFLOW_IMG_ROOT/images
 if (!(-e $images_dir)) then
     mkdir $images_dir
     if ($?) then 
-        echo ERROR making images root directory $images_dir
+        echo "[ makeIcmovie ] ERROR making images directory $images_dir"
         exit 1
     endif
 endif
@@ -50,16 +50,48 @@ set movies_dir = $WORKFLOW_IMG_ROOT/movies
 if (!(-e $movies_dir)) then
     mkdir $movies_dir
     if ($?) then 
-        echo ERROR making movies root directory $movies_dir
+        echo "[ makeIcmovie ] ERROR making movies directory $movies_dir"
+        exit 1
+    endif
+endif
+
+set latest_movies_dir = $movies_dir/latest
+if (!(-e $latest_movies_dir)) then
+    mkdir $latest_movies_dir
+    if ($?) then 
+        echo "[ makeIcmovie ] ERROR making latest movies directory $latest_movies_dir"
+        exit 1
+    endif
+endif
+
+set d14d_movies = $movies_dir/.14dmovies
+if (!(-e $d14d_movies)) then
+    mkdir $d14d_movies
+    if ($?) then 
+        echo "[ makeIcmovie ] ERROR making d14d movies directory $d14d_movies"
         exit 1
     endif
 endif
 
 foreach Quant (Ic_flat M M_color)
-    set THISWORK = $Quant'_movies'.$$
-    set WORK = $movies_dir/$THISWORK
-    mkdir $WORK
-    mkdir $WORK/frames
+    set work_dir = $movies_dir/$Quant'_movies'.$$
+
+    if (!(-e $work_dir)) then
+        mkdir $work_dir
+        if ($?) then 
+            echo "[ makeIcmovie ] ERROR making work directory $work_dir"
+            exit 1
+        endif
+    endif
+
+    set frames_dir = $work_dir/frames
+    if (!(-e $frames_dir)) then
+        mkdir $frames_dir
+        if ($?) then 
+            echo "[ makeIcmovie ] ERROR making frames directory $frames_dir"
+            exit 1
+        endif
+    endif
 
     # First make 2 days at 15 minutes
     @ imgtime_t = $endtime_t - 172800
@@ -77,7 +109,7 @@ foreach Quant (Ic_flat M M_color)
         set I = `printf "%04d" $i`
         set filename = $yyyymmdd'_'$hhmmss'_'$Quant'_'$Size'.'$Type
         set Imgpath = $images_dir/$YEAR/$MON/$DAY
-        set targpath = $WORK/frames
+        set targpath = $frames_dir
         set Image = $Imgpath/$filename
 
         if (-e $Image) then
@@ -95,9 +127,8 @@ foreach Quant (Ic_flat M M_color)
         @ imgtime_t = $imgtime_t + $cadence
     end
 
-    set HERE = $WORKFLOW_IMG_ROOT/movies/
-    ls -ld $WORK/frames
-    cd $WORK/frames
+    ls -ld $frames_dir
+    cd $frames_dir
 
     echo Movie making place is $cwd
 
@@ -110,48 +141,55 @@ foreach Quant (Ic_flat M M_color)
         set mp4_opts = "-qscale 5 -r 20 -b 9600"
     endif
 
-    set MOVIE = $WORK/$Quant'_2d'.mpg
+    set MOVIE = $work_dir/$Quant'_2d'.mpg
     #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE 
     ffmpeg -i %04d.$Type $mpg_opts $MOVIE
 
+    # the cp commands use $Imgpath, which is not defined in this scope; it 
+    # was defined in the above while loop, and it takes on a different value
+    # during each iteration; the value used here will be either the last value
+    # of the iteration, or I guess the empty string if the while loop above
+    # never executed - THIS IS A BUG
+    set image_dir = $Imgpath
+    if (!(-e $image_dir)) then
+        mkdir $image_dir
+        if ($?) then 
+            echo "[ makeIcmovie ] ERROR making image directory $image_dir"
+            exit 1
+        endif
+    endif
+
     if ($status == 0) then
         cp $MOVIE $Imgpath
-        mv $MOVIE $WORKFLOW_IMG_ROOT/movies/latest
+        mv $MOVIE $latest_movies_dir
     endif
   
-    set MOVIE = $WORK/$Quant'_2d'.mp4
+    set MOVIE = $work_dir/$Quant'_2d'.mp4
     #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE
     ffmpeg -i %04d.$Type $mp4_opts $MOVIE
 
     if ($status == 0) then
         cp $MOVIE $Imgpath
-        mv $MOVIE $WORKFLOW_IMG_ROOT/movies/latest
+        mv $MOVIE $latest_movies_dir
     endif
 
     cd $movies_dir
-    set D14dMOVIES = .14dmovies
-    if (!(-e $D14dMOVIES)) mkdir $D14dMOVIES
 
     # on even hour endtime, make longer movie also
     @ nowtime_t = $endtime_t / 3600
     @ nowhour_t = $nowtime_t * 3600
     if ($nowhour_t == $endtime_t) then
-        set THISWORK = $Quant'_movies'.$$
-        set WORK = $movies_dir/$THISWORK
-        mkdir $WORK
-        mkdir $WORK/frames
-        cd $WORK/frames
+        cd $frames_dir
         @ fourteen = 86400 * 14
         @ nowtime_t = $endtime_t - $fourteen
         set nowtime = `$TIME_CONVERT zone=TAI s=$nowtime_t`
         set endtime = `$TIME_CONVERT zone=TAI s=$endtime_t`
-        "${DRMS_SCRS_INSTALL_DIR}"/makeAnyMovie $nowtime $endtime 15 $Quant 1k ""$HERE/$D14dMOVIES/$Quant"_14d.mp4"
+        "${DRMS_SCRS_INSTALL_DIR}"/makeAnyMovie $nowtime $endtime 15 $Quant 1k ""$d14d_movies/$Quant"_14d.mp4"
     endif
 end
 
-cd $WORKFLOW_IMG_ROOT/movies
-ls -l $D14dMOVIES/
-mv $D14dMOVIES/Ic_flat_14d.mp4 $D14dMOVIES/M_14d.mp4 $WORKFLOW_IMG_ROOT/movies/latest/
-mv $D14dMOVIES/M_color_14d.mp4 $WORKFLOW_IMG_ROOT/movies/latest/
-rm -rf $D14dMOVIES
-rm -rf $WORKFLOW_IMG_ROOT/movies/*.$$
+ls -l $d14d_movies/
+mv $d14d_movies/Ic_flat_14d.mp4 $d14d_movies/M_14d.mp4 $latest_movies_dir/
+mv $d14d_movies/M_color_14d.mp4 $latest_movies_dir/
+rm -rf $d14d_movies
+rm -rf $movies_dir/*.$$
