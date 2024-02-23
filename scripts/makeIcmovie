@@ -1,5 +1,7 @@
 #! /bin/csh -f
 
+echo "[ makeIcmovie ]"
+
 # optional arg is start_time
 # set echo
 
@@ -98,6 +100,12 @@ foreach Quant (Ic_flat M M_color)
     @ cadence = 15 * 60
 
     set i = 0
+    set Imgpath = somethingbad
+    # the last value of $Imgpath in this while loop should be used as the 
+    # destination directory for the mpg and mp4 movies created; this loop
+    # should ALWAYS execute, and if it doesn't, then this is an error;
+    # check Imgpath after this loop - it will be 'somethingbad' if zero 
+    # iterations executed
     while ($imgtime_t <= $endtime_t)
         set imgtime = `$TIME_CONVERT s=$imgtime_t zone=TAI`
         set yyyymmdd = `echo $imgtime | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
@@ -126,6 +134,11 @@ foreach Quant (Ic_flat M M_color)
 
         @ imgtime_t = $imgtime_t + $cadence
     end
+
+    if ($Imgpath == 'somethingbad') then
+        echo "[ makeIcmovie ] ERROR iterating over image times"
+        exit 1
+    endif
 
     ls -ld $frames_dir
     cd $frames_dir
@@ -193,3 +206,5 @@ mv $d14d_movies/Ic_flat_14d.mp4 $d14d_movies/M_14d.mp4 $latest_movies_dir/
 mv $d14d_movies/M_color_14d.mp4 $latest_movies_dir/
 rm -rf $d14d_movies
 rm -rf $movies_dir/*.$$
+
+echo "[ makeAnyMovie ] exiting"

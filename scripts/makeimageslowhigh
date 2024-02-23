@@ -1,6 +1,7 @@
 #! /bin/csh -f
 # create limb darkening removed Ic record and create image set for Ic_noLD and M for range of time
 # specified by first two arguments.
+echo "[ makeimageslowhigh ]"
 
 # set echo
 # modified to only make new movie if NRT data.
@@ -29,7 +30,7 @@ endif
 set wantlow = $1
 set wanthigh = $2
 
-echo Make images for $wantlow to $wanthigh
+echo "[ makeimageslowhigh ]" Make images for $wantlow to $wanthigh
 
 # from here make script that can make _nrt images in standard place
 set CADENCE = 15
@@ -198,10 +199,14 @@ endif
 
 unset echo
 
+echo "[ makeimageslowhigh ] end_movie is $end_movie_t, isNRT is $isNRT" 
 if ($end_movie_t > 0 && $isNRT ) then
     set end_movie = `$TIME_CONVERT s=$end_movie_t zone=TAI`
+    echo "[ makeimageslowhigh ] calling $MAKE_IC_MOVIE $end_movie"
     $MAKE_IC_MOVIE $end_movie
     set exitstatus = $?
 endif
+
+echo "[ makeimageslowhigh ] exiting with status $exitstatus"
 
 exit $exitstatus

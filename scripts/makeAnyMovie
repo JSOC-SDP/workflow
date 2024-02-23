@@ -1,5 +1,7 @@
 #! /bin/csh -f
 
+echo "[ makeAnyMovie ]"
+
 # set echo
 
 # make movie of selected days at cadence cadence
@@ -224,3 +226,5 @@ if ($path_given == 0) then
 
 rm -rf $work_dir
 cd $HERE
+
+echo "[ makeAnyMovie ] exiting"
