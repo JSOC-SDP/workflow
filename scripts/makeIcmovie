@@ -106,8 +106,10 @@ foreach Quant (Ic_flat M M_color)
     # should ALWAYS execute, and if it doesn't, then this is an error;
     # check Imgpath after this loop - it will be 'somethingbad' if zero 
     # iterations executed
+    set end_time = `$TIME_CONVERT s=$endtime_t zone=TAI`
     while ($imgtime_t <= $endtime_t)
         set imgtime = `$TIME_CONVERT s=$imgtime_t zone=TAI`
+        echo "[ makeIcmovie ] iterating through times, current is $imgtime, end time is $end_time"
         set yyyymmdd = `echo $imgtime | sed -e 's/_.*//' -e 's/\./Q/' -e 's/\./X/'`
         set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
         set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
@@ -115,35 +117,36 @@ foreach Quant (Ic_flat M M_color)
         set yyyymmdd = $YEAR$MON$DAY
         set hhmmss = `echo $imgtime | sed -e 's/_/Q/' -e 's/.*Q//' -e 's/://g' -e 's/_TAI//'`
         set I = `printf "%04d" $i`
-        set filename = $yyyymmdd'_'$hhmmss'_'$Quant'_'$Size'.'$Type
+        set filename = $yyyymmdd'_'$hhmmss'_'$Quant'_'$Size'.jpg'
         set Imgpath = $images_dir/$YEAR/$MON/$DAY
-        set targpath = $frames_dir
         set Image = $Imgpath/$filename
 
         if (-e $Image) then
+            echo "[ makeIcmovie ] image frame exists: $Image"
             set FileSize=`stat --format="%s" $Image`
             if ($FileSize < $minFileSize) then
                 echo Blank image detected for $Image
             else
-                ln -s $Image $targpath/$I.$Type
+                echo "[ makeIcmovie ] making link from $frames_dir/$I.jpg to $Image"
+                ln -s $Image $frames_dir/$I.jpg
                 @ i = $i + 1
             endif
         else
-            echo no frame found for $Image
+            echo "[ makeIcmovie ] image frame missing: $Image"
         endif
 
         @ imgtime_t = $imgtime_t + $cadence
     end
 
     if ($Imgpath == 'somethingbad') then
-        echo "[ makeIcmovie ] ERROR iterating over image times"
+        echo "[ makeIcmovie ] ERROR iterating over image times; exiting"
         exit 1
     endif
 
     ls -ld $frames_dir
     cd $frames_dir
 
-    echo Movie making place is $cwd
+    echo echo "[ makeIcmovie ] movie-making directory is $cwd"
 
     if ( $JSOC_MACHINE == 'linux_avx' ) then
         set mpg_opts = "-b:v 35000k"
@@ -155,8 +158,9 @@ foreach Quant (Ic_flat M M_color)
     endif
 
     set MOVIE = $work_dir/$Quant'_2d'.mpg
-    #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE 
-    ffmpeg -i %04d.$Type $mpg_opts $MOVIE
+    #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.jpg $MOVIE 
+    echo "[ makeIcmovie ] running: ffmpeg -i %04d.jpg $mpg_opts $MOVIE"
+    ffmpeg -i %04d.jpg $mpg_opts $MOVIE
 
     # the cp commands use $Imgpath, which is not defined in this scope; it 
     # was defined in the above while loop, and it takes on a different value
@@ -173,16 +177,21 @@ foreach Quant (Ic_flat M M_color)
     endif
 
     if ($status == 0) then
-        cp $MOVIE $Imgpath
+        echo "[ makeIcmovie ] copying movie $MOVIE to image directory $image_dir"
+        cp $MOVIE $image_dir
+        echo "[ makeIcmovie ] moving movie $MOVIE to latest-movie directory $latest_movies_dir"
         mv $MOVIE $latest_movies_dir
     endif
   
     set MOVIE = $work_dir/$Quant'_2d'.mp4
-    #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.$Type $MOVIE
-    ffmpeg -i %04d.$Type $mp4_opts $MOVIE
+    #  ffmpeg -qscale 5 -r 20 -b 9600 -i %04d.jpg $MOVIE
+    echo "[ makeIcmovie ] running: ffmpeg -i %04d.jpg $mp4_opts $MOVIE"
+    ffmpeg -i %04d.jpg $mp4_opts $MOVIE
 
     if ($status == 0) then
-        cp $MOVIE $Imgpath
+        echo "[ makeIcmovie ] copying movie $MOVIE to image directory $image_dir"
+        cp $MOVIE $image_dir
+        echo "[ makeIcmovie ] moving movie $MOVIE to latest movie directory $latest_movies_dir"
         mv $MOVIE $latest_movies_dir
     endif
 
@@ -197,14 +206,23 @@ foreach Quant (Ic_flat M M_color)
         @ nowtime_t = $endtime_t - $fourteen
         set nowtime = `$TIME_CONVERT zone=TAI s=$nowtime_t`
         set endtime = `$TIME_CONVERT zone=TAI s=$endtime_t`
+        echo "[ makeIcmovie ] running: ${DRMS_SCRS_INSTALL_DIR}/makeAnyMovie $nowtime $endtime 15 $Quant 1k $d14d_movies/${Quant}_14d.mp4"
         "${DRMS_SCRS_INSTALL_DIR}"/makeAnyMovie $nowtime $endtime 15 $Quant 1k ""$d14d_movies/$Quant"_14d.mp4"
     endif
 end
 
 ls -l $d14d_movies/
+echo "[ makeIcmovie ] moving movie $d14d_movies/Ic_flat_14d.mp4 to latest movie directory $latest_movies_dir"
+echo "[ makeIcmovie ] moving movie $d14d_movies/M_14d.mp4 to latest movie directory $latest_movies_dir"
 mv $d14d_movies/Ic_flat_14d.mp4 $d14d_movies/M_14d.mp4 $latest_movies_dir/
+
+echo "[ makeIcmovie ] moving movie $d14d_movies/M_color_14d.mp4 to latest movie directory $latest_movies_dir"
 mv $d14d_movies/M_color_14d.mp4 $latest_movies_dir/
+
+echo "[ makeIcmovie ] removing directory $d14d_movies"
 rm -rf $d14d_movies
+
+echo "[ makeIcmovie ] removing files $movies_dir/*.$$"
 rm -rf $movies_dir/*.$$
 
 echo "[ makeAnyMovie ] exiting"
