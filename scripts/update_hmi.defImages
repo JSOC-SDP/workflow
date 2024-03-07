@@ -13,7 +13,7 @@ else
         set QUE = j.q,o.q
         set QSUB = qsub
     else if ( $JSOC_MACHINE == "linux_avx" ) then
-        set QUE = p.q
+        set QUE = a.q
         set QSUB = /SGE2/bin/lx-amd64/qsub
     endif
 endif

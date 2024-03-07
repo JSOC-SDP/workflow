@@ -5,12 +5,17 @@ set HARP_MOVIE_DRIVER = "${DRMS_SCRS_INSTALL_DIR}"/track_hmi_harp_movie_driver.s
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 set HERE = $cwd

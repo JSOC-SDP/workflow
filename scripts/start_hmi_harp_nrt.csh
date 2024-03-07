@@ -46,12 +46,17 @@ set TEMPLOG = $HERE/runlog
 set CMD = $HERE/MHarp_nrt
 #echo 6 > $HERE/retstatus
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = p.q,j.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = p.q,j.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 set HARP_NRT_MOVIES = "${DRMS_SCRS_INSTALL_DIR}"/harp_nrt_movies.csh

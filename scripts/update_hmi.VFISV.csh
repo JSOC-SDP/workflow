@@ -17,12 +17,17 @@ set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j8.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a8.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j8.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a8.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)

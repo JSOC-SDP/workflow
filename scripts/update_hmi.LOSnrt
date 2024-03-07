@@ -21,15 +21,19 @@ set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-#  set QUE = j8.q
-#  @ THREADS = 1
-#  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = p4.q 
-#  set QUE = k.q
-  @ THREADS = 4
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+	echo Script update_hmi.LOSnrt only runs on linux_avx machines
+	exit 1
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = p4.q 
+    #  set QUE = k.q
+      @ THREADS = 4
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)

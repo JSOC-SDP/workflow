@@ -10,12 +10,23 @@ set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set JREBINSMOOTH = "${DRMS_BINS_INSTALL_DIR}"/jrebinsmooth
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q,p.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q,p.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
+endif
+
+if ( $?WORKFLOW_TEST ) then
+  set output_series = "hmi_test.vw_V_45s"
+else
+  set output_series = "hmi.vw_V_45s"
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -36,7 +47,7 @@ set LOG = $HERE/runlog
 set CMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
-set params = "out=hmi.vw_V_45s IBIN=1 NBIN=4 BIN_XOFF=14 BIN_YOFF=-1 BIN_FILL=nan IGAUSS=1 GAUSS_WID=10 GAUSS_SIG=2.8284271248 GAUSS_NSUB=5 GAUSS_XOFF=1 GAUSS_YOFF=1 GAUSS_FILL=nan -L"
+set params = "IBIN=1 NBIN=4 BIN_XOFF=14 BIN_YOFF=-1 BIN_FILL=nan IGAUSS=1 GAUSS_WID=10 GAUSS_SIG=2.8284271248 GAUSS_NSUB=5 GAUSS_XOFF=1 GAUSS_YOFF=1 GAUSS_FILL=nan -L"
 
 # make qsub script
 
@@ -45,7 +56,7 @@ echo "cd $HERE" >> $CMD
 echo "hostname >>&$LOG" >> $CMD
 echo "" >> $CMD
 echo "set echo" >> $CMD
-echo "$JREBINSMOOTH in=hmi.V_45s'['$wantlow'-'$wanthigh']' $params" >> $CMD
+echo "$JREBINSMOOTH in=hmi.V_45s'['$wantlow'-'$wanthigh']' out=$output_series $params" >> $CMD
 echo 'set REBINstatus = $?' >> $CMD
 echo 'echo $REBINstatus >retstatus' >>&$CMD
 

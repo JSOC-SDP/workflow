@@ -21,8 +21,13 @@ set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
 
 source /home/jsoc/.setJSOCenv
 
-set QUE = k.q
-set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
