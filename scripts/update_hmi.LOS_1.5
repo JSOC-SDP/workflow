@@ -21,6 +21,7 @@ set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
     set QSUB = /SGE2/bin/lx-amd64/qsub
+    @ THREADS = 4
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
       set QUE = j.q
