@@ -28,8 +28,8 @@ set noglob
 
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
-    set QSUB = /SGE2/bin/lx-amd64/qsub
     @ THREADS = 4
+    set QSUB = "/SGE2/bin/lx-amd64/qsub -pe smp $THREADS"
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
       set QUE = j.q
