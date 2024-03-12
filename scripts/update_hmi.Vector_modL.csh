@@ -47,6 +47,14 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set $ATTRTXT
 end
 
+if ( $?WORKFLOW_TEST ) then
+    set test_flag = "-t"
+    set namespace = "hmi_test"
+else
+    set test_flag = ""
+    set namespace = "hmi"
+endif
+
 set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
 set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
@@ -101,17 +109,17 @@ echo 'set IQUVstatus=0' >>&$TEMPCMD
 echo 'set OBSstatus=0' >>&$TEMPCMD
 #echo 'set PATstatus=0' >>&$TEMPCMD
 
-echo "$IQUV_AVERAGING begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
+echo "$IQUV_AVERAGING begin="$wantlow"  end="$wanthigh $IQUV_args $test_flag ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set IQUVstatus = $?' >>$TEMPCMD
 echo 'if ($IQUVstatus) goto DONE' >>&$TEMPCMD
-echo "$OBSERVABLES begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$TEMPCMD
+echo "$OBSERVABLES begin="$wantlow"  end="$wanthigh $OBS_args $test_flag ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set OBSstatus = $?' >>$TEMPCMD
 echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
 
 # Remove limb darkening/create marmask
 
-echo "$LIMBDARK in=hmi.Ic_720s'['$wantlow'-'$wanthigh'][3]'  out=hmi.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
-echo "$MEANPF in=hmi.M_720s\["$wantlow"-"$wanthigh"] >>&$TEMPLOG" >>$TEMPCMD
+echo "$LIMBDARK in=$namespace.Ic_720s'['$wantlow'-'$wanthigh'][3]'  out=$namespace.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
+echo "$MEANPF in=$namespace.M_720s\["$wantlow"-"$wanthigh"] >>&$TEMPLOG" >>$TEMPCMD
 
 # Remap/Resize mags for synoptic charts
 
@@ -123,14 +131,14 @@ if ( $diff < 1080 ) then
   set t = 1080s
 endif
 
-echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=hmi.M_720s\["$wantlow"/"$t"] v2hout=hmi.Ml_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
+echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=1 in=$namespace.M_720s\["$wantlow"/"$t"] v2hout=$namespace.Ml_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
 
-echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=2 in=hmi.M_720s\["$wantlow"/"$t"] v2hout=hmi.Mr_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
+echo "$JV2TS MAPMMAX=5402 SINBDIVS=2160 LGSHIFT=3 CARRSTRETCH=1 MCORLEV=2 in=$namespace.M_720s\["$wantlow"/"$t"] v2hout=$namespace.Mr_hiresmap_720s histlink=none TSTART="$wantlow" TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90 MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1 FORCEOUTPUT=1 >>&$TEMPLOG" >>$TEMPCMD
 
-echo "$JV2TS MAPMMAX=1800 SINBDIVS=720 LGSHIFT=3 CARRSTRETCH=1 in=hmi.Ic_noLimbDark_720s\["$wantlow"/"$t"] v2hout='hmi.Ic_noLimbDark_remap_720s' histlink=none TSTART=$wantlow TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90. MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1" >>$TEMPCMD
+echo "$JV2TS MAPMMAX=1800 SINBDIVS=720 LGSHIFT=3 CARRSTRETCH=1 in=$namespace.Ic_noLimbDark_720s\["$wantlow"/"$t"] v2hout='$namespace.Ic_noLimbDark_remap_720s' histlink=none TSTART=$wantlow TTOTAL="$t" TCHUNK="$t" MAPRMAX=0.998 MAPLGMAX=90.0 MAPLGMIN=-90. MAPBMAX=90.0 VCORLEV=0 NAN_BEYOND_RMAX=1" >>$TEMPCMD
 
-echo "$RESIZE_MAPPING in=hmi.Ml_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Ml_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
-echo "$RESIZE_MAPPING in=hmi.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] out=hmi.Mr_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "$RESIZE_MAPPING in=$namespace.Ml_hiresmap_720s\["$wantlow"-"$wanthigh"] out=$namespace.Ml_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
+echo "$RESIZE_MAPPING in=$namespace.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] out=$namespace.Mr_remap_720s nbin=3 >>&$TEMPLOG" >>$TEMPCMD
 
 # echo 'set PATstatus = $?' >>$TEMPCMD
 # echo 'if ($PATstatus) goto DONE' >>&$TEMPCMD

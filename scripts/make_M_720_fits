@@ -31,6 +31,12 @@ set JSOC_REBIN = "${DRMS_BINS_INSTALL_DIR}"/jsoc_rebin
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
+if ( $?WORKFLOW_TEST ) then
+    set namespace = "hmi_test"
+else
+    set namespace = "hmi"
+endif
+
 set obslist = (M)
 set flaglist = (-c)
 
@@ -97,7 +103,7 @@ while ($day <= $dayhigh)
         set obs = $obslist[$img]
 
         if ($obs == M ) then
-            set in = hmi.M_720s
+            set in = $namespace'.M_720s'
             set out = $in'_resized'
         else
             echo No code for $obs

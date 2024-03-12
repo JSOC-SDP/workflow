@@ -33,6 +33,14 @@ else
     endif
 endif
 
+if ( $?WORKFLOW_TEST ) then
+    set namespace = 'hmi_test'
+    set cgem_space = 'hmi_test'
+else
+    set namespace = 'hmi'
+    set cgem_space = 'cgem'
+endif
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
@@ -71,19 +79,19 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set HMIBstatus=6' >>&$TEMPCMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
-  echo "$DISAMBIG in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
+foreach T ( `$SHOW_INFO JSOC_DBUSER=production $namespace.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
+  echo "$DISAMBIG in=$namespace.ME_720s_fd10'['$T']' out=$namespace.B_720s $ARGS " >> $TEMPCMD
 #  echo "$MAPROJ in=hmi.B_720s'['$T']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
-  echo "$DOPPCAL -w in=hmi.B_720s'['$T']' out=cgem.doppcal_720s" >> $TEMPCMD
+  echo "$DOPPCAL -w in=$namespace.B_720s'['$T']' out=$cgem_space.doppcal_720s" >> $TEMPCMD
 end
-echo "$MAPROJ in=hmi.B_720s'['$wantlow'-'$wanthigh']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
+echo "$MAPROJ in=$namespace.B_720s'['$wantlow'-'$wanthigh']' out=$namespace.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
 
 echo 'set HMIBstatus = $?' >>$TEMPCMD
 echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $HMIBstatus >retstatus' >>&$TEMPCMD
 
-echo "$GAPFILL ds=hmi.B_720s high=$wanthigh low=$wantlow" >> $TEMPCMD
+echo "$GAPFILL ds=$namespace.B_720s high=$wanthigh low=$wantlow" >> $TEMPCMD
 
 # execute qsub script
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`

@@ -3,7 +3,7 @@
 #
 
 # XXXXXXXXXX test
- set echo
+# set echo
 # XXXXXXXXXX test
 set HERE = $cwd 
 
@@ -44,6 +44,11 @@ end
 set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
 set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
+if ( $?WORKFLOW_TEST ) then
+    set namespace = "hmi_test"
+else
+    set namespace = "hmi"
+endif
 
 #set indexlow = `index_convert ds=$product $key=$WANTLOW`
 #set indexhigh = `index_convert ds=$product $key=$WANTHIGH`
@@ -80,8 +85,8 @@ echo 'set VFnrtstatus=0' >>&$TEMPCMD
 
 echo "/usr/bin/Mail -s 'normal ME script' jeneen@sun.stanford.edu"  >>$TEMPCMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
-  echo "$MPIEXEC -n 8 $VFISV -f -L out=hmi.ME_720s_fd10 in=hmi.S_720s\["$T"] in5=hmi.M_720s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
+foreach T ( `$SHOW_INFO JSOC_DBUSER=production $namespace'.S_720s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
+  echo "$MPIEXEC -n 8 $VFISV -f -L out=$namespace.ME_720s_fd10 in=$namespace.S_720s\["$T"] in5=$namespace.M_720s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
 end
 
 echo 'set VFnrtstatus = $?' >>$TEMPCMD

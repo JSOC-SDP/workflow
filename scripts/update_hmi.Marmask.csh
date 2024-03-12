@@ -38,6 +38,11 @@ end
 set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
 set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
+if ($?WORKFLOW_TEST ) then
+    set namespace = "hmi_test"
+else
+    set namespace = "hmi"
+endif
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
@@ -58,8 +63,8 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus=0' >>&$TEMPCMD
 
-foreach trec ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
-  echo "$HMI_SEGMENT xm=hmi.M_720s\["$trec"] xp=hmi.Ic_noLimbDark_720s\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s >>&$TEMPLOG" >>$TEMPCMD
+foreach trec ( `$SHOW_INFO -q $namespace.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
+  echo "$HMI_SEGMENT xm=$namespace.M_720s\["$trec"] xp=$namespace.Ic_noLimbDark_720s\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=$namespace.Marmask_720s >>&$TEMPLOG" >>$TEMPCMD
 end
 echo 'set SEGstatus = $?' >>$TEMPCMD
 echo 'if ($SEGstatus) goto DONE' >>&$TEMPCMD
