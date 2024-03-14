@@ -70,7 +70,7 @@ echo "hostname >>&$LOG" >>$CMD
 echo "set echo >>&$LOG" >>$CMD
 echo 'set HMIBstatus=6' >>&$CMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10_dconS'['$wantlow'-'$wanthigh']' -q key=T_REC` )
+foreach T ( `$SHOW_INFO hmi.ME_720s_fd10_dconS'['$wantlow'-'$wanthigh']' -q key=T_REC` )
   echo "$DISAMBIG in=hmi.ME_720s_fd10_dconS'['$T']' out=hmi.B_720s_dconS $ARGS " >> $CMD
 end
 echo 'set HMIBstatus = $?' >>$CMD

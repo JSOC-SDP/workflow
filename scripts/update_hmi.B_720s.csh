@@ -79,7 +79,7 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set HMIBstatus=6' >>&$TEMPCMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production $namespace.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
+foreach T ( `$SHOW_INFO $namespace.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
   echo "$DISAMBIG in=$namespace.ME_720s_fd10'['$T']' out=$namespace.B_720s $ARGS " >> $TEMPCMD
 #  echo "$MAPROJ in=hmi.B_720s'['$T']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
   echo "$DOPPCAL -w in=$namespace.B_720s'['$T']' out=$cgem_space.doppcal_720s" >> $TEMPCMD

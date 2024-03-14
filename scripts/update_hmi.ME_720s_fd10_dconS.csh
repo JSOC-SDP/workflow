@@ -62,7 +62,7 @@ echo "limit core 0" >> $CMD
 
 echo 'set VFnrtstatus=6' >>&$CMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s_dconS['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
+foreach T ( `$SHOW_INFO 'hmi.S_720s_dconS['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
   echo "$MPIEXEC -n 4 $VFISV -f out=hmi.ME_720s_fd10_dconS in=hmi.S_720s_dconS\["$T"] in5=hmi.M_720s_dconS\["$T"] -v chi2_stop=1e-15" >>$CMD
 end
 

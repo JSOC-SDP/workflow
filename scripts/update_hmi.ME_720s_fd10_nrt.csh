@@ -88,7 +88,7 @@ echo "sleep 10" >> $TEMPCMD
 
 echo 'set VFnrtstatus=0' >>&$TEMPCMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s_nrt['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
+foreach T ( `$SHOW_INFO 'hmi.S_720s_nrt['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
   @ i = 1
   @ n = `$SHOW_INFO hmi.MHarp_720s_nrt'[]['$T']' -cq`
 

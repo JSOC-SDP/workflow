@@ -81,7 +81,7 @@ set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
 set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_5760s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
+foreach T ( `$SHOW_INFO 'hmi.S_5760s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
   echo "$MPIEXEC -n 4 $VFISV -f out=hmi.ME_5760s in=hmi.S_5760s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
 end
 
