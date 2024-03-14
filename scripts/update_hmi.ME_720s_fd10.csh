@@ -83,8 +83,6 @@ echo "sleep 10" >> $TEMPCMD
 
 echo 'set VFnrtstatus=0' >>&$TEMPCMD
 
-echo "/usr/bin/Mail -s 'normal ME script' jeneen@sun.stanford.edu"  >>$TEMPCMD
-
 foreach T ( `$SHOW_INFO $namespace'.S_720s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
   echo "$MPIEXEC -n 8 $VFISV -f -L out=$namespace.ME_720s_fd10 in=$namespace.S_720s\["$T"] in5=$namespace.M_720s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
 end
