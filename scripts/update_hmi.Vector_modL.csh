@@ -119,6 +119,7 @@ echo 'if ($OBSstatus) goto DONE' >>&$TEMPCMD
 # Remove limb darkening/create marmask
 
 echo "$LIMBDARK in=$namespace.Ic_720s'['$wantlow'-'$wanthigh'][3]'  out=$namespace.Ic_noLimbDark_720s -cnxf NONE >>&$TEMPLOG" >>$TEMPCMD
+echo 'set LDstatus = $?' >>$TEMPCMD
 echo "$MEANPF in=$namespace.M_720s\["$wantlow"-"$wanthigh"] >>&$TEMPLOG" >>$TEMPCMD
 
 # Remap/Resize mags for synoptic charts
@@ -145,8 +146,9 @@ echo "$RESIZE_MAPPING in=$namespace.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] ou
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $IQUVstatus >IQUVstatus' >>&$TEMPCMD
 echo 'echo $OBSstatus >OBSstatus' >>&$TEMPCMD
+echo 'echo $LFstatus >LDstatus' >>&$TEMPCMD
 #echo 'echo $PATstatus >PATstatus' >>&$TEMPCMD
-echo '@ retstatus = $IQUVstatus + $OBSstatus' >>$TEMPCMD
+echo '@ retstatus = $IQUVstatus + $OBSstatus + $LDstatus' >>$TEMPCMD
 echo 'echo $retstatus >retstatus' >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 

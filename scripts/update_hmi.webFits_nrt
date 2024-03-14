@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-set MAKE_M_720s_FITS_NRT = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/make_M_720_fits_nrt
+set MAKE_M_720_FITS_NRT = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/make_M_720_fits_nrt
 
 set HERE = $cwd
 
@@ -29,7 +29,7 @@ echo 0 > retstatus
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$MAKE_M_720s_FITS_NRT $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
+echo "$MAKE_M_720_FITS_NRT $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD
