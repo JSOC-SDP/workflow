@@ -14,7 +14,7 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-set DISAMGIB = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
+set DISAMBIG = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert

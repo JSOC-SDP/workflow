@@ -12,7 +12,7 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
-set DISAMGIB = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
+set DISAMBIG = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
 set DOPPCAL = "${DRMS_BINS_INSTALL_DIR}"/cgem_doppcal
 set GAPFILL = "${DRMS_BINS_INSTALL_DIR}"/set_gaps_missing
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
