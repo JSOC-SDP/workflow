@@ -23,6 +23,12 @@ else
     endif
 endif
 
+if ( $?WORKFLOW_TEST ) then
+  set namespace = "hmi_test"
+else
+  set namespace = "hmi"
+endif
+
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
@@ -41,7 +47,7 @@ set LOG = $HERE/runlog
 set CMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
-set params = "out=hmi.vw_V_45s_nrt IBIN=1 NBIN=4 BIN_XOFF=14 BIN_YOFF=-1 BIN_FILL=nan IGAUSS=1 GAUSS_WID=10 GAUSS_SIG=2.8284271248 GAUSS_NSUB=5 GAUSS_XOFF=1 GAUSS_YOFF=1 GAUSS_FILL=nan"
+set params = "out=$namespace.vw_V_45s_nrt IBIN=1 NBIN=4 BIN_XOFF=14 BIN_YOFF=-1 BIN_FILL=nan IGAUSS=1 GAUSS_WID=10 GAUSS_SIG=2.8284271248 GAUSS_NSUB=5 GAUSS_XOFF=1 GAUSS_YOFF=1 GAUSS_FILL=nan"
 
 # make qsub script
 
@@ -50,7 +56,7 @@ echo "cd $HERE" >> $CMD
 echo "hostname >>&$LOG" >> $CMD
 echo "" >> $CMD
 echo "set echo" >> $CMD
-echo "$JREBINSMOOTH in=hmi.V_45s_nrt'['$wantlow'-'$wanthigh']' $params" >> $CMD
+echo "$JREBINSMOOTH in=$namespace.V_45s_nrt'['$wantlow'-'$wanthigh']' $params" >> $CMD
 echo 'set REBINstatus = $?' >> $CMD
 echo 'echo $REBINstatus >retstatus' >>&$CMD
 

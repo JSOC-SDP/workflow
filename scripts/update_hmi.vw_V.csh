@@ -24,9 +24,9 @@ else
 endif
 
 if ( $?WORKFLOW_TEST ) then
-  set output_series = "hmi_test.vw_V_45s"
+  set namespace = "hmi_test"
 else
-  set output_series = "hmi.vw_V_45s"
+  set namespace = "hmi"
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -56,7 +56,7 @@ echo "cd $HERE" >> $CMD
 echo "hostname >>&$LOG" >> $CMD
 echo "" >> $CMD
 echo "set echo" >> $CMD
-echo "$JREBINSMOOTH in=hmi.V_45s'['$wantlow'-'$wanthigh']' out=$output_series $params" >> $CMD
+echo "$JREBINSMOOTH in=$namespace.V_45s'['$wantlow'-'$wanthigh']' out=$namespace.vw_V_45s $params" >> $CMD
 echo 'set REBINstatus = $?' >> $CMD
 echo 'echo $REBINstatus >retstatus' >>&$CMD
 
