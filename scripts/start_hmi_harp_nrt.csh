@@ -227,7 +227,11 @@ echo "hostname >>&$TEMPLOG" >>$CMD
 echo "set echo" >>$CMD
 
 # Ugh
-echo "setenv TMPDIR /tmp28/jsocprod/HARPS/nrt/" >>$CMD
+if ( $?WORKFLOW_TEST ) then
+  echo "setenv TMPDIR /tmp30/jsocprod/HARPS/nrt/" >>$CMD
+else
+  echo "setenv TMPDIR /tmp28/jsocprod/HARPS/nrt/" >>$CMD
+endif
 echo "set MHarpstatus = 0" >>&$CMD
 set Htimes
 
