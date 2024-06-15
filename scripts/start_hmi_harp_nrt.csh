@@ -47,8 +47,10 @@ set CMD = $HERE/MHarp_nrt
 #echo 6 > $HERE/retstatus
 
 if ( $?WORKFLOW_TEST ) then
-    set QUE = k.q
+    set QUE = a.q
     set QSUB = /SGE2/bin/lx-amd64/qsub
+    set namespace = "hmi_test"
+    set tmpdir = "/tmp30/jsoctest"
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
       set QUE = p.q,j.q
@@ -57,6 +59,8 @@ else
       set QUE = a.q
       set QSUB = /SGE2/bin/lx-amd64/qsub
     endif
+    set namespace = "hmi"
+    set tmpdir = "/tmp28/jsocprod"
 endif
 
 set HARP_NRT_MOVIES = "${DRMS_SCRS_INSTALL_DIR}"/harp_nrt_movies.csh
@@ -126,7 +130,7 @@ set maskMag = `$SHOW_INFO -q hmi.M_720s_nrt'['$last_mask']' key=t_obs`
 @ next_mag_s = $last_mask_s + 720
 set next_mag = `$TIME_CONVERT s=$next_mag_s`
 #set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1`
-set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][$]' key=t_rec n=-1`
+set last_harp = `$SHOW_INFO -q $namespace.MHarp_720s_nrt'[][$]' key=t_rec n=-1`
 
 
 while ( $i <= 270 )  # 9 hours, allowing for long maneuvers 
@@ -150,7 +154,7 @@ end
 rm $HERE/NO_GOOD_MAG
 
 #set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1` 
-set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][$]' key=t_rec n=-1`
+set last_harp = `$SHOW_INFO -q $namespace.MHarp_720s_nrt'[][$]' key=t_rec n=-1`
 @ last_harp_s = `$TIME_CONVERT time=$last_harp`
 @ harp_lag = $last_mask_s - $last_harp_s
 @ last_processed = `cat $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/last_processed`
@@ -178,7 +182,7 @@ while ( ($harp_lag < 1440) || ($process_lag < 1440) || (-e $WORKFLOW_DATA/tasks/
   endif
   sleep 120
 #  set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1`
-  set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][$]' key=t_rec n=-1`
+  set last_harp = `$SHOW_INFO -q $namespace.MHarp_720s_nrt'[][$]' key=t_rec n=-1`
   @ last_harp_s = `$TIME_CONVERT time=$last_harp`
   set last_mask = `$SHOW_INFO -q hmi.Marmask_720s_nrt\[\$] key=t_rec`
   @ last_mask_s = `$TIME_CONVERT time=$last_mask`
@@ -227,11 +231,7 @@ echo "hostname >>&$TEMPLOG" >>$CMD
 echo "set echo" >>$CMD
 
 # Ugh
-if ( $?WORKFLOW_TEST ) then
-  echo "setenv TMPDIR /tmp30/jsocprod/HARPS/nrt/" >>$CMD
-else
-  echo "setenv TMPDIR /tmp28/jsocprod/HARPS/nrt/" >>$CMD
-endif
+echo "setenv TMPDIR $tmpdir/HARPS/nrt/" >>$CMD
 echo "set MHarpstatus = 0" >>&$CMD
 set Htimes
 
@@ -250,7 +250,7 @@ while ( $nextH_s < $last_mask_s )
   else
     set Htimes = ($Htimes $nextH)
     echo "touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
-    echo "$TRACK_AND_INGEST_MHARP -n -m /tmp28/jsocprod/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] hmi.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
+    echo "$TRACK_AND_INGEST_MHARP -n -m $tmpdir/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] $namespace.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
     echo 'set MHarpstatus = $?' >> $CMD
     echo 'if ($MHarpstatus) goto DONE' >>&$CMD
     echo $HARP_NRT_MOVIES >> $CMD
@@ -275,10 +275,10 @@ $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
 # submit next harp and VFISV tickets
 
 if (-e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
-@ num_harps = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
+@ num_harps = `$SHOW_INFO $namespace.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH']' -qc`
 echo "number of harps:  $num_harps" >> $TEMPLOG
 echo $num_harps > $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps
-@ num_harps2 = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH'][? npix >= 2000 ?]' -qc`
+@ num_harps2 = `$SHOW_INFO $namespace.mharp_720s_nrt'[]['$WANTLOW'-'$WANTHIGH'][? npix >= 2000 ?]' -qc`
 echo "TIME:$WANTLOW   HARPS:$num_harps2" > /web/jsoc/htdocs/data/hmi/HARPs_images/latest_HARP_info
 
 sleep 15 

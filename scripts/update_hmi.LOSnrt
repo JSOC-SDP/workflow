@@ -87,7 +87,7 @@ echo 6 > $HERE/retstatus
 # check for eclipse quality bits to be set in lev1_nrt
 #$ECLIPSE $wantlow $wanthigh nrt
 
-echo "BEFORE qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
+# echo "BEFORE qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "setenv OMP_NUM_THREADS $THREADS" >>$TEMPCMD
