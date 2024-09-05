@@ -5,12 +5,17 @@ set HERE = $cwd
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 set MAKE_IMAGES_HIGH_LOW = $WORKFLOW_DIR/scripts/makeimageslowhigh
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q,o.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+        set QUE = j.q,o.q
+        set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+        set QUE = a.q
+        set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 set wantlow = `cat wantlow`

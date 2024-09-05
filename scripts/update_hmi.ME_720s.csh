@@ -4,12 +4,17 @@ set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set HERE = $cwd
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j8.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a8.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j8.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a8.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 set wantlow = `cat wantlow`

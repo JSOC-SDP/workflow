@@ -18,14 +18,20 @@ set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set IQUV_AVERAGING = "${DRMS_BINS_INSTALL_DIR}"/HMI_IQUV_averaging
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q
-  @ THREADS = 1
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = p4.q
-  @ THREADS = 4
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    @ THREADS = 4
+    set QSUB = "/SGE2/bin/lx-amd64/qsub -pe smp $THREADS"
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q
+      @ THREADS = 1
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = p4.q
+      @ THREADS = 4
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)

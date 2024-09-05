@@ -18,12 +18,25 @@ set LIMB_PROGRAM = "${DRMS_BINS_INSTALL_DIR}"/lfwrp_tas
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q
-  set QSUB = /SGE/bin/lx24-amd64/qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q
+      set QSUB = /SGE/bin/lx24-amd64/qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
+endif
+
+if ( $?WORKFLOW_TEST ) then
+    set namespace = "hmi_test"
+    set TMPDIR = /tmp30/jsoctest/lfwrp
+else
+    set namespace = "hmi"
+    set TMPDIR = /tmp28/jsocprod/lfwrp
 endif
 
 #set QSUB = $SGE_ROOT/bin/$SGE_ARCH
@@ -32,8 +45,6 @@ foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
 end
-
-set TMPDIR = /tmp28/jsocprod/lfwrp
 
 set product = `/bin/cat $WORKFLOW_DATA/gates/$GATE/product`
 set key = `/bin/cat $WORKFLOW_DATA/gates/$GATE/key`
@@ -50,7 +61,7 @@ set retstatus=0
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$LIMB_PROGRAM tmpdir=$TMPDIR/ logdir=$TMPDIR/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=hmi.limbfit_tas >>&$TEMPLOG" >>$TEMPCMD
+echo "$LIMB_PROGRAM tmpdir=$TMPDIR/ logdir=$TMPDIR/logs/ bfsn=$WANTLOW efsn=$WANTHIGH dsout=$namespace.limbfit_tas >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD

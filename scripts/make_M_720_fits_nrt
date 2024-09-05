@@ -9,6 +9,14 @@ if ( ! $?WORKFLOW_IMG_ROOT ) then
     exit 1
 endif
 
+if (!(-e $WORKFLOW_IMG_ROOT)) then
+    mkdir $WORKFLOW_IMG_ROOT
+    if ($?) then 
+        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
+        exit 1
+    endif
+endif
+
 set wantlow = $1
 set wanthigh = $2
 
@@ -65,8 +73,16 @@ while ($day <= $dayhigh)
     set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
     set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-    set IMGROOT = $WORKFLOW_IMG_ROOT/fits/
-    set IMGPATH = $IMGROOT/$YEAR
+    set fits_dir = $WORKFLOW_IMG_ROOT/fits
+    if (!(-e $fits_dir)) then
+        mkdir $fits_dir
+        if ($?) then 
+            echo ERROR making fits root directory $fits_dir
+            exit 1
+        endif
+    endif
+
+    set IMGPATH = $fits_dir/$YEAR
     if (!(-e $IMGPATH)) mkdir $IMGPATH
     set IMGPATH = $IMGPATH/$MON
     if (!(-e $IMGPATH)) mkdir $IMGPATH
@@ -111,7 +127,7 @@ while ($day <= $dayhigh)
 end
 
 set exitstatus = 0
-set LATESTLIST = $IMGROOT/latest_fits_time
+set LATESTLIST = $fits_dir/latest_fits_time
 set last_fits_t = `$SHOW_INFO -q hmi.M_720s_nrt_resized n=-1 key=t_obs`
 @ s = `$TIME_CONVERT time=$last_fits_t` + 30
 set real_t = `$TIME_CONVERT s=$s zone=tai`

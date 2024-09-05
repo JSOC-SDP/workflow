@@ -8,6 +8,14 @@ if ( ! $?WORKFLOW_IMG_ROOT ) then
     exit 1
 endif
 
+if (!(-e $WORKFLOW_IMG_ROOT)) then
+    mkdir $WORKFLOW_IMG_ROOT
+    if ($?) then 
+        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
+        exit 1
+    endif
+endif
+
 set wantlow = $1
 set wanthigh = $2
 
@@ -53,7 +61,16 @@ while ($day <= $dayhigh)
   set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
   set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-  set IMGPATH = $WORKFLOW_IMG_ROOT/images/$YEAR
+  set images_dir = $WORKFLOW_IMG_ROOT/images
+  if (!(-e $images_dir)) then
+      mkdir $images_dir
+      if ($?) then 
+          echo ERROR making images root directory $images_dir
+          exit 1
+      endif
+  endif
+
+  set IMGPATH = $images_dir/$YEAR
   if (!(-e $IMGPATH)) mkdir $IMGPATH
   set IMGPATH = $IMGPATH/$MON
   if (!(-e $IMGPATH)) mkdir $IMGPATH

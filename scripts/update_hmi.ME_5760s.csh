@@ -22,14 +22,20 @@ set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
 source /home/jsoc/.setJSOCenv
 
 # UGH
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = p8.q,j8.q
-  set QSUB = qsub
-  set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = k.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
-  set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+    set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = p8.q,j8.q
+      set QSUB = qsub
+      set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = k.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+      set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
+    endif
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -75,7 +81,7 @@ set indexhigh = `$INDEX_CONVERT ds=$product $key=$WANTHIGH`
 set wantlow = `$INDEX_CONVERT ds=$product $key"_index"=$indexlow`
 set wanthigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_5760s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
+foreach T ( `$SHOW_INFO 'hmi.S_5760s['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
   echo "$MPIEXEC -n 4 $VFISV -f out=hmi.ME_5760s in=hmi.S_5760s\["$T"] -v chi2_stop=1e-15" >>$TEMPCMD
 end
 

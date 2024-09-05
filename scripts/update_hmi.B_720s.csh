@@ -12,7 +12,7 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
-set DISAMGIB = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
+set DISAMBIG = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
 set DOPPCAL = "${DRMS_BINS_INSTALL_DIR}"/cgem_doppcal
 set GAPFILL = "${DRMS_BINS_INSTALL_DIR}"/set_gaps_missing
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
@@ -20,12 +20,25 @@ set MAPROJ = "${DRMS_BINS_INSTALL_DIR}"/maproj3comperrorlonat02deg
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = k.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = k.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
+endif
+
+if ( $?WORKFLOW_TEST ) then
+    set namespace = 'hmi_test'
+    set cgem_space = 'hmi_test'
+else
+    set namespace = 'hmi'
+    set cgem_space = 'cgem'
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -66,19 +79,19 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set HMIBstatus=6' >>&$TEMPCMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
-  echo "$DISAMBIG in=hmi.ME_720s_fd10'['$T']' out=hmi.B_720s $ARGS " >> $TEMPCMD
+foreach T ( `$SHOW_INFO $namespace.ME_720s_fd10'['$wantlow'-'$wanthigh']' -q key=T_REC` )
+  echo "$DISAMBIG in=$namespace.ME_720s_fd10'['$T']' out=$namespace.B_720s $ARGS " >> $TEMPCMD
 #  echo "$MAPROJ in=hmi.B_720s'['$T']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
-  echo "$DOPPCAL -w in=hmi.B_720s'['$T']' out=cgem.doppcal_720s" >> $TEMPCMD
+  echo "$DOPPCAL -w in=$namespace.B_720s'['$T']' out=$cgem_space.doppcal_720s" >> $TEMPCMD
 end
-echo "$MAPROJ in=hmi.B_720s'['$wantlow'-'$wanthigh']' out=hmi.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
+echo "$MAPROJ in=$namespace.B_720s'['$wantlow'-'$wanthigh']' out=$namespace.Bmap_lowres_latlon_720s $MAPARGS " >> $TEMPCMD
 
 echo 'set HMIBstatus = $?' >>$TEMPCMD
 echo 'if ($HMIBstatus) goto DONE' >>&$TEMPCMD
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $HMIBstatus >retstatus' >>&$TEMPCMD
 
-echo "$GAPFILL ds=hmi.B_720s high=$wanthigh low=$wantlow" >> $TEMPCMD
+echo "$GAPFILL ds=$namespace.B_720s high=$wanthigh low=$wantlow" >> $TEMPCMD
 
 # execute qsub script
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`

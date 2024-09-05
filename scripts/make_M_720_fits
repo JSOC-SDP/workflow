@@ -8,6 +8,14 @@ if ( ! $?WORKFLOW_IMG_ROOT ) then
     exit 1
 endif
 
+if (!(-e $WORKFLOW_IMG_ROOT)) then
+    mkdir $WORKFLOW_IMG_ROOT
+    if ($?) then 
+        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
+        exit 1
+    endif
+endif
+
 set wantlow = $1
 set wanthigh = $2
 
@@ -22,6 +30,12 @@ set JSOC_AS_FITS = "${DRMS_BINS_INSTALL_DIR}"/jsoc_export_as_fits
 set JSOC_REBIN = "${DRMS_BINS_INSTALL_DIR}"/jsoc_rebin
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
+
+if ( $?WORKFLOW_TEST ) then
+    set namespace = "hmi_test"
+else
+    set namespace = "hmi"
+endif
 
 set obslist = (M)
 set flaglist = (-c)
@@ -66,7 +80,16 @@ while ($day <= $dayhigh)
     set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
     set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-    set IMGPATH = $WORKFLOW_IMG_ROOT/fits/$YEAR
+    set fits_dir = $WORKFLOW_IMG_ROOT/fits
+    if (!(-e $fits_dir)) then
+        mkdir $fits_dir
+        if ($?) then 
+            echo ERROR making fits root directory $fits_dir
+            exit 1
+        endif
+    endif
+
+    set IMGPATH = $fits_dir/$YEAR
     if (!(-e $IMGPATH)) mkdir $IMGPATH
     set IMGPATH = $IMGPATH/$MON
     if (!(-e $IMGPATH)) mkdir $IMGPATH
@@ -80,7 +103,7 @@ while ($day <= $dayhigh)
         set obs = $obslist[$img]
 
         if ($obs == M ) then
-            set in = hmi.M_720s
+            set in = $namespace'.M_720s'
             set out = $in'_resized'
         else
             echo No code for $obs

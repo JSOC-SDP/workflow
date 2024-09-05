@@ -17,12 +17,17 @@ set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set HMI_SEGMENT = "${DRMS_BINS_INSTALL_DIR}"/hmi_segment_module
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q,p.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q,p.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -33,6 +38,11 @@ end
 set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
 set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
+if ($?WORKFLOW_TEST ) then
+    set namespace = "hmi_test"
+else
+    set namespace = "hmi"
+endif
 
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
@@ -53,8 +63,8 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus=0' >>&$TEMPCMD
 
-foreach trec ( `$SHOW_INFO -q hmi.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
-  echo "$HMI_SEGMENT xm=hmi.M_720s\["$trec"] xp=hmi.Ic_noLimbDark_720s\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s >>&$TEMPLOG" >>$TEMPCMD
+foreach trec ( `$SHOW_INFO -q $namespace.M_720s'['$wantlow'-'$wanthigh']' key=t_rec` )
+  echo "$HMI_SEGMENT xm=$namespace.M_720s\["$trec"] xp=$namespace.Ic_noLimbDark_720s\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=$namespace.Marmask_720s >>&$TEMPLOG" >>$TEMPCMD
 end
 echo 'set SEGstatus = $?' >>$TEMPCMD
 echo 'if ($SEGstatus) goto DONE' >>&$TEMPCMD

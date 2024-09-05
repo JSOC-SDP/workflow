@@ -209,7 +209,7 @@ while ($keep_running > 0) # KEEPRUNNING LOOP
                 echo "STATUS=2" >> new_tickets/$ticket
                 mv new_tickets/$ticket active_tickets # must happen before statustask
                 touch statusbusy
-                $WORKFLOW_DIR/$statustask $gate low=$low high=$high &
+                $WORKFLOW_DIR/$gate_status_task $gate low=$low high=$high &
 	        endif # end action switch?
 
 	        if ($verbosemode) echo GATEKEEPER moved new_tickets/$ticket to active_tickets with action=$ACTION
@@ -417,7 +417,7 @@ q
 		        # XXXXX need to update coverage here with want range in done ticket.  For now call get coverage.
                 echo Start statustask
 		        touch statusbusy
-		        $WORKFLOW_DIR/$statustask $gate  # wait for this to complete.
+		        $WORKFLOW_DIR/$gate_status_task $gate  # wait for this to complete.
                 echo done statustask
                 # ticket should have been already removed from the target task's pending list
                 # but check anyway

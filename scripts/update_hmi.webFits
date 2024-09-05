@@ -1,15 +1,20 @@
 #! /bin/csh -f
 
-set MAKE_M_720s_FITS = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/make_M_720_fits
+set MAKE_M_720_FITS = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/make_M_720_fits
 
 set HERE = $cwd
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q,o.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q,o.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 set wantlow = `cat wantlow`
@@ -24,7 +29,7 @@ echo 0 > retstatus
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$MAKE_M_720S_FITS $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
+echo "$MAKE_M_720_FITS $wantlow $wanthigh >>&$TEMPLOG"  >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 echo "rm -f $HERE/qsub_running" >>$TEMPCMD

@@ -1,6 +1,7 @@
 #! /bin/csh -f
 # create limb darkening removed Ic record and create image set for Ic_noLD and M for range of time
 # specified by first two arguments.
+echo "[ makeimageslowhigh ]"
 
 # set echo
 # modified to only make new movie if NRT data.
@@ -9,12 +10,27 @@ if ( ! $?WORKFLOW_IMG_ROOT ) then
     exit 1
 endif
 
-set IMGROOT = $WORKFLOW_IMG_ROOT/images
+if (!(-e $WORKFLOW_IMG_ROOT)) then
+    mkdir $WORKFLOW_IMG_ROOT
+    if ($?) then 
+        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
+        exit 1
+    endif
+endif
+
+set images_dir = $WORKFLOW_IMG_ROOT/images
+if (!(-e $images_dir)) then
+    mkdir $images_dir
+    if ($?) then 
+        echo ERROR making images root directory $images_dir
+        exit 1
+    endif
+endif
 
 set wantlow = $1
 set wanthigh = $2
 
-echo Make images for $wantlow to $wanthigh
+echo "[ makeimageslowhigh ]" Make images for $wantlow to $wanthigh
 
 # from here make script that can make _nrt images in standard place
 set CADENCE = 15
@@ -74,7 +90,7 @@ while ($day <= $dayhigh)
     set YEAR = `echo $yyyymmdd | sed -e 's/Q.*//'`
     set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
     set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
-    set IMGPATH = $IMGROOT/$YEAR
+    set IMGPATH = $images_dir/$YEAR
     if (!(-e $IMGPATH)) mkdir $IMGPATH
     set IMGPATH = $IMGPATH/$MON
     if (!(-e $IMGPATH)) mkdir $IMGPATH
@@ -153,7 +169,7 @@ if ($finalimagetime != NONE) then
     set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
     set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
     set yyyymmdd = $YEAR$MON$DAY
-    set LATESTLIST = $IMGROOT/image_times
+    set LATESTLIST = $images_dir/image_times
     set prevd = 0
     set prevt = 0
 
@@ -166,15 +182,15 @@ if ($finalimagetime != NONE) then
 
     set hhmmss_test = `echo $hhmmss | sed -e 's/^0//'`
 
-    if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e $WORKFLOW_IMG_ROOT/images/$YEAR/$MON/$DAY) ) then
+    if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e $images_dir/$YEAR/$MON/$DAY) ) then
         set imagepath = http://jsoc.stanford.edu/data/hmi/images/$YEAR/$MON/$DAY
-        set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
+        set latest = `ls -1t $images_dir/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
         echo "Time    " $latest >  $LATESTLIST
-        echo '{"first":"20100501_000000","last":"'$latest'"}' > $IMGROOT/image_times.json
+        echo '{"first":"20100501_000000","last":"'$latest'"}' > $images_dir/image_times.json
         set img = 1
         while ($img <= $#obslist)
             set obs = $obslist[$img]
-            set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*$obs'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
+            set latest = `ls -1t $images_dir/$YEAR/$MON/$DAY/*$obs'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
             echo "$obs " $imagepath/$latest"_"$obs >> $LATESTLIST
             @ img = $img + 1
         end
@@ -183,10 +199,14 @@ endif
 
 unset echo
 
+echo "[ makeimageslowhigh ] end_movie is $end_movie_t, isNRT is $isNRT" 
 if ($end_movie_t > 0 && $isNRT ) then
     set end_movie = `$TIME_CONVERT s=$end_movie_t zone=TAI`
+    echo "[ makeimageslowhigh ] calling $MAKE_IC_MOVIE $end_movie"
     $MAKE_IC_MOVIE $end_movie
     set exitstatus = $?
 endif
+
+echo "[ makeimageslowhigh ] exiting with status $exitstatus"
 
 exit $exitstatus

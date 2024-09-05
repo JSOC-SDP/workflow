@@ -21,15 +21,21 @@ set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv_harp
 source /home/jsoc/.setJSOCenv
 
 # UGH
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = p8.q,j8.q
-  set QSUB = qsub
-  set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-#  set QUE = a8.q
-  set QUE = k.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
-  set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+    set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = p8.q,j8.q
+      set QSUB = qsub
+      set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+    #  set QUE = a8.q
+      set QUE = k.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+      set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
+    endif
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -82,7 +88,7 @@ echo "sleep 10" >> $TEMPCMD
 
 echo 'set VFnrtstatus=0' >>&$TEMPCMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production 'hmi.S_720s_nrt['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
+foreach T ( `$SHOW_INFO 'hmi.S_720s_nrt['$wantlow'-'$wanthigh']' -q key=t_rec` ) 
   @ i = 1
   @ n = `$SHOW_INFO hmi.MHarp_720s_nrt'[]['$T']' -cq`
 

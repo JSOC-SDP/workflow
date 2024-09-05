@@ -32,10 +32,10 @@ date >>$WORKFLOW_DATA/watchhminrt
 # First get taskid of the current instance, it is the name of the current directory
 set TASKID = $cwd:t
 # now make tickets to compute the desired products for this interval
-set ARGS =  "taskid=$TASKID wantlow=$WANTLOW wanthigh=$WANTHIGH action=5"
-set IMGARGS =  "taskid=$TASKID wantlow=$WANTLOW wanthigh=$IMGWANTHIGH action=5"
-set NRTLOS_TICKET = `$MAKE_TICKET gate=hmi.LOSnrt  $ARGS `
-set WEBIMAGE_TICKET = `$MAKE_TICKET gate=hmi.webImages  $IMGARGS `
+set ARGS = "taskid=$TASKID wantlow=$WANTLOW wanthigh=$WANTHIGH action=5"
+set IMGARGS = "taskid=$TASKID wantlow=$WANTLOW wanthigh=$IMGWANTHIGH action=5"
+set NRTLOS_TICKET = `$MAKE_TICKET gate=hmi.LOSnrt $ARGS `
+set WEBIMAGE_TICKET = `$MAKE_TICKET gate=hmi.webImages $IMGARGS `
 
 cd pending_tickets
 while ((-e $NRTLOS_TICKET || -e $WEBIMAGE_TICKET))

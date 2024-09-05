@@ -8,6 +8,14 @@ if ( ! $?WORKFLOW_IMG_ROOT ) then
     exit 1
 endif
 
+if (!(-e $WORKFLOW_IMG_ROOT)) then
+    mkdir $WORKFLOW_IMG_ROOT
+    if ($?) then 
+        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
+        exit 1
+    endif
+endif
+
 # modified to only make new movie if NRT data.
 set wantlow = $1
 set wanthigh = $2
@@ -78,8 +86,16 @@ while ($day <= $dayhigh)
   set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
   set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-  set IMGROOT = $WORKFLOW_IMG_ROOT/hicadImages
-  set IMGPATH = $IMGROOT/$YEAR/$MON/$DAY
+  set hicad_images_dir = $WORKFLOW_IMG_ROOT/hicadImages
+  if (!(-e $hicad_images_dir)) then
+    mkdir $hicad_images_dir
+    if ($?) then 
+        echo ERROR making hciad images root directory $hicad_images_dir
+        exit 1
+    endif
+  endif
+
+  set IMGPATH = $hicad_images_dir/$YEAR/$MON/$DAY
   mkdir -p $IMGPATH
   cd $IMGPATH
 
@@ -130,7 +146,7 @@ if ($finalimagetime != NONE) then
   set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
   set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
   set yyyymmdd = $YEAR$MON$DAY
-  set LATESTLIST = $IMGROOT/hicadImage_times
+  set LATESTLIST = $hicad_images_dir/hicadImage_times
   set prevd = 0
   set prevt = 0
   if (-e $LATESTLIST) then
@@ -140,16 +156,16 @@ if ($finalimagetime != NONE) then
     set prevt = `echo $prevdt | sed -e 's/.*_//' | sed -e 's/^0*//'`
   endif
   set hhmmss_test = `echo $hhmmss | sed -e 's/^[0]*//'`
-  if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e $WORKFLOW_IMG_ROOT/hicadImages/$YEAR/$MON/$DAY) ) then
+  if ( ($yyyymmdd > $prevd || ( $yyyymmdd == $prevd && $hhmmss_test > $prevt)) && (-e $hicad_images_dir/$YEAR/$MON/$DAY) ) then
       set imagepath = http://jsoc.stanford.edu/data/hmi/hicadImages/$YEAR/$MON/$DAY
-      set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
+      set latest = `ls -1t $hicad_images_dir/$YEAR/$MON/$DAY/*'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
 #     set latest = $yyyymmdd'_'$hhmmss
       echo "Time    " $latest >  $LATESTLIST
-      echo '{"first":"20100501_000000","last":"'$latest'"}' > $IMGROOT/hicadImage_times.json
+      echo '{"first":"20100501_000000","last":"'$latest'"}' > $hicad_images_dir/hicadImage_times.json
       set img = 1
       while ($img <= $#obslist)
         set obs = $obslist[$img]
-        set latest = `ls -1t $IMGROOT/$YEAR/$MON/$DAY/*$obs'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
+        set latest = `ls -1t $hicad_images_dir/$YEAR/$MON/$DAY/*$obs'_'1k.jpg | head -1 | awk -F\/ '{print $9}' | awk -F\_ '{print $1"_"$2}'`
         echo "$obs " $imagepath/$latest"_"$obs >> $LATESTLIST
         @ img = $img + 1
       end

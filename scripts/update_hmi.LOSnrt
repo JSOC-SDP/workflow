@@ -21,21 +21,32 @@ set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-#  set QUE = j8.q
-#  @ THREADS = 1
-#  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = p4.q 
-#  set QUE = k.q
-  @ THREADS = 4
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    @ THREADS = 4
+    set QSUB = "/SGE2/bin/lx-amd64/qsub -pe smp $THREADS"
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+	echo Script update_hmi.LOSnrt only runs on linux_avx machines
+	exit 1
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = p4.q 
+    #  set QUE = k.q
+      @ THREADS = 4
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
    set ATTRTXT = `grep $ATTR ticket`
    set $ATTRTXT
 end
+
+if ( $?WORKFLOW_TEST ) then
+    set test_flag = "-t"
+else
+    set test_flag = ""
+endif
 
 set product = `cat $WORKFLOW_DATA/gates/$GATE/product`
 set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
@@ -76,13 +87,13 @@ echo 6 > $HERE/retstatus
 # check for eclipse quality bits to be set in lev1_nrt
 #$ECLIPSE $wantlow $wanthigh nrt
 
-echo "BEFORE qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
+# echo "BEFORE qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "setenv OMP_NUM_THREADS $THREADS" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD
-echo "$OBSERVABLES lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh"  >>&$TEMPLOG" >>$TEMPCMD
+echo "$OBSERVABLES lev1=$input quicklook=$nrt camid=$camera cadence=$cadence $otherargs begin="$wantlow"  end="$wanthigh" $test_flag >>&$TEMPLOG" >>$TEMPCMD
 echo 'set retstatus = $?' >>$TEMPCMD
 echo 'echo $retstatus >' "$HERE/retstatus" >>$TEMPCMD
 

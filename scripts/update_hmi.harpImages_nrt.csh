@@ -5,18 +5,26 @@ set HARP_MOVIE_DRIVER = "${DRMS_SCRS_INSTALL_DIR}"/track_hmi_harp_movie_driver.s
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+    set namespace = 'hmi_test'
+    set tmpdir = '/tmp30/jsoctest'
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
+    set namespace = 'hmi'
+    set tmpdir = 'tmp28/jsocprod'
 endif
-
 set HERE = $cwd
 set MASKSERIES = hmi.Marmask_720s_nrt
-set HARPSERIES = hmi.Mharp_720s_nrt
-set OUTDIR = /tmp28/jsocprod/HARPS/nrt/images
+set HARPSERIES = $namespace.Mharp_720s_nrt
+set OUTDIR = $tmpdir/HARPS/nrt/images
 set CONVERT = /usr/bin/convert
 if ( ! -e $OUTDIR ) then
   mkdir -p $OUTDIR
@@ -65,7 +73,7 @@ foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
   echo $trec
   set file = $OUTDIR/harp.$trec.png
   echo "if ( -e $file ) then" >>$CMDFILE
-  echo "  mv $file /tmp28/jsocprod/HARPS/nrt/images" >> $CMDFILE
+  echo "  mv $file $tmpdir/HARPS/nrt/images" >> $CMDFILE
   echo "endif" >> $CMDFILE
 end
 

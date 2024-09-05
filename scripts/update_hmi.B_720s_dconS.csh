@@ -14,17 +14,22 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
-set DISAMGIB = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
+set DISAMBIG = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = j.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = k.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = j.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = k.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)
@@ -65,7 +70,7 @@ echo "hostname >>&$LOG" >>$CMD
 echo "set echo >>&$LOG" >>$CMD
 echo 'set HMIBstatus=6' >>&$CMD
 
-foreach T ( `$SHOW_INFO JSOC_DBUSER=production hmi.ME_720s_fd10_dconS'['$wantlow'-'$wanthigh']' -q key=T_REC` )
+foreach T ( `$SHOW_INFO hmi.ME_720s_fd10_dconS'['$wantlow'-'$wanthigh']' -q key=T_REC` )
   echo "$DISAMBIG in=hmi.ME_720s_fd10_dconS'['$T']' out=hmi.B_720s_dconS $ARGS " >> $CMD
 end
 echo 'set HMIBstatus = $?' >>$CMD

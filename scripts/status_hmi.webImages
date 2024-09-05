@@ -5,11 +5,26 @@ if ( ! $?WORKFLOW_IMG_ROOT ) then
     exit 1
 endif
 
+if (!(-e $WORKFLOW_IMG_ROOT)) then
+    mkdir $WORKFLOW_IMG_ROOT
+    if ($?) then 
+        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
+        exit 1
+    endif
+endif
+
 set low = 2010.02.11_00:00:00_TAI
 
-set IMGROOT = $WORKFLOW_IMG_ROOT/images
+set images_dir = $WORKFLOW_IMG_ROOT/images
+if (!(-e $images_dir)) then
+    mkdir $images_dir
+    if ($?) then 
+        echo ERROR making images root directory $images_dir
+        exit 1
+    endif
+endif
 
-set LATESTLIST = $IMGROOT/image_times
+set LATESTLIST = $images_dir/image_times
 
 set prevd = 0
 set prevt = 0

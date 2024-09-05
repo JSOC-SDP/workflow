@@ -35,12 +35,17 @@ mkdir $HERE/qsubs_running
 mkdir $HERE/$TEMP
 set LOG = $HERE/runlog
 
-if ( $JSOC_MACHINE == "linux_x86_64" ) then
-  set QUE = p.q,j.q
-  set QSUB = qsub
-else if ( $JSOC_MACHINE == "linux_avx" ) then
-  set QUE = a.q
-  set QSUB = /SGE2/bin/lx-amd64/qsub
+if ( $?WORKFLOW_TEST ) then
+    set QUE = k.q
+    set QSUB = /SGE2/bin/lx-amd64/qsub
+else
+    if ( $JSOC_MACHINE == "linux_x86_64" ) then
+      set QUE = p.q,j.q
+      set QSUB = qsub
+    else if ( $JSOC_MACHINE == "linux_avx" ) then
+      set QUE = a.q
+      set QSUB = /SGE2/bin/lx-amd64/qsub
+    endif
 endif
 
 # wait here if qsub queue too big already
