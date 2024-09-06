@@ -250,7 +250,7 @@ while ( $nextH_s < $last_mask_s )
   else
     set Htimes = ($Htimes $nextH)
     echo "touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
-    echo "$TRACK_AND_INGEST_MHARP -n -m $tmpdir/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] $namespace.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
+    echo "$TRACK_AND_INGEST_MHARP -n -m $tmpdir/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] $namespace.Mharp_720s_nrt $namespace.Mharp_log_720s_nrt" >> $CMD
     echo 'set MHarpstatus = $?' >> $CMD
     echo 'if ($MHarpstatus) goto DONE' >>&$CMD
     echo $HARP_NRT_MOVIES >> $CMD
