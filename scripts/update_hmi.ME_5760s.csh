@@ -15,6 +15,7 @@ endif
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
+set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
@@ -94,6 +95,14 @@ echo "echo DONE >> $OLOG" >>$TEMPCMD
 
 $QSUB -pe smp 4 -e $ELOG -o $OLOG -q $QUE $TEMPCMD
 
-if (-e retstatus) set retstatus = `cat $HERE/retstatus`
+if (-e retstatus) then
+  set retstatus = `cat $HERE/retstatus`
+  if ( $retstatus == 0 ) then
+    @ s = `$TIME_CONVERT time=$wanthigh`
+    @ sB = $s + 360
+    set BHigh = `$TIME_CONVERT s=$sB zone=TAI`
+    set B_TICKET = `$MAKE_TICKET gate=hmi.B_5760s wantlow=$wantlow wanthigh=$BHigh action=5`
+  endif
+endif
 
 exit $retstatus
