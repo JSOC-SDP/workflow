@@ -1,6 +1,8 @@
 #! /bin/csh -f
 
-#set echo
+set echo
+setenv PGOPTIONS '--client-min-messages=warning'
+
 source /home/jsoc/.setJSOCenv
 source /SGE2/default/common/settings.csh
 
@@ -136,7 +138,7 @@ while ($iprod <= $nprod)
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then        
       set times = `$SHOW_INFO -q key=T_REC $prod'[][$][? T_OBS > 0 ?]' n=-1`
     endif
- set echo
+ # set echo
   else if ( $prod == iris.lev0 ) then
     set times = `$SHOW_INFO -q key=t_obs iris.lev0'[? FSN != 8421504 ?][? t_obs > 0 ?]' n=-1 | sed s/-/./g | sed s/T/_/ | cut -c1-19`
     set iris_proc_time = `$SHOW_INFO -q iris.lev0'[:#$]' key=date`
@@ -195,7 +197,7 @@ while ($iprod <= $nprod)
       @ r = 1                
       echo "$now IRIS lev1 is $iris1_diff behind" >> /web/jsoc/htdocs/data/red.log
     endif 
-  unset echo
+  # unset echo
   else
     set times = `$SHOW_INFO -q key=T_OBS $prod'[$]'`
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then       
@@ -318,7 +320,7 @@ else
   echo -n ' bgcolor="#FF6666">' >>$TMP
 endif
 #echo "$lag"'s</td><td>'$webinfo[2]'s, '$webinfo[3]'s, lookdata, exportdata response</td></tr>' >>$TMP
-echo "$lag"'s</td><td>'$webinfo[2]'s, '$webinfo[3]'s, last ReqID: '$lastReqId' </td></tr>' >>$TMP
+echo "$lag"' s</td><td>'$webinfo[2]'s, '$webinfo[3]'s, last ReqID: '$lastReqId' </td></tr>' >>$TMP
 
 ### Added 9/7/12 for monitoring lag between hmidb and hmidb2
 
@@ -336,21 +338,51 @@ else
   echo -n ' bgcolor="#FF6666">' >>$TMP
   set stat = RED
 endif
-echo "$db_diff"'s </td><td>Lag between hmidb and hmidb2</td></tr>' >>$TMP
+echo "$db_diff"' s </td><td>Lag between hmidb and hmidb2</td></tr>' >>$TMP
 
 ### Added 12/5/11 for monitoring exports ###
 
-set count1 = `wget -O - -q 'http://jsoc2.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
-#echo -n $count1
-set count2 = `wget -O - -q 'http://jsoc.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
+#set count1 = `wget -O - -q 'http://jsoc2.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
+@ count1 = `$SHOW_INFO JSOC_DBHOST=hmidb2 ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production`
+#set count2 = `wget -O - -q 'http://jsoc.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
+@ count2 = `$SHOW_INFO JSOC_DBHOST=hmidb ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production`
 #set count3 = `/SGE/bin/lx24-amd64/qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
-set count3 = `qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
+@ count3 = `qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
+
+### These times are how long the exports have been waiting to be processed
+
+#@ diff1 = 0
+#@ diff2 = 0
+
+#set nowExp = `date -u +%Y.%m.%d_%H:%M:%S`
+#set nowExp_s = `$TIME_CONVERT time=$nowExp`
+
+#if ( $count1 > 0 ) then
+#  $SHOW_INFO JSOC_DBHOST=hmidb2 ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production key=ReqTime n=-1` > /tmp/hmidb2_T1
+#  if ( `wc -l /tmp/hmidb2_T1` > 0 ) then
+#    set T1 = `cat /tmp/hmidb2_T1`
+#    @ T1_s = `$TIME_CONVERT time=$T1`
+#    @ diff1 = $nowExp_s - $T1_s
+#  else
+#    @ diff1 = 0
+#  endif
+#endif
+
+#if ( $count2 > 0 ) then
+#  if ( `$SHOW_INFO JSOC_DBHOST=hmidb ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production` > 0 ) then
+#    set T2 =  `$SHOW_INFO JSOC_DBHOST=hmidb ds='jsoc.export_new[][? status=2 ?]' -q JSOC_DBUSER=production key=ReqTime n=-1`
+#    @ T2_s = `$TIME_CONVERT time=$T2`
+#    @ diff2 = $nowExp_s - $T2_s
+#  else
+#    @ diff2 = 0
+#  endif
+#endif
  
 echo -n '<tr><td>Exports Pending </td><td' >> $TMP
 
-if ($count1 < 2) then
+if ($count1 < 6) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
-else if ( ($count1 >= 2) && ($count1 < 6) ) then
+ 	else if ( ($count1 >= 6) && ($count1 < 8) ) then
   echo -n ' bgcolor="yellow">'  >>$TMP
 else
   echo -n ' bgcolor="#FF6666">' >>$TMP
@@ -359,12 +391,24 @@ else
 endif
 echo "$count1"' </td><td>' $USERDB'</td></tr>' >>$TMP
 
+#echo -n '<tr><td>Export Waiting Time </td><td' >> $TMP
+
+#if ($diff1 < 60 ) then
+#  echo -n ' bgcolor="#66FF66">' >>$TMP
+#else if ( ($diff1 >= 60) && ($diff1 < 120) ) then
+#  echo -n ' bgcolor="yellow">'  >>$TMP
+#else
+#  echo -n ' bgcolor="#FF6666">' >>$TMP
+#  set stat = RED
+#  @ r = 1
+#endif
+#echo "$diff1"' seconds </td><td>' $USERDB'</td></tr>' >>$TMP
 
 echo -n '<tr><td>Exports Pending </td><td' >> $TMP
 
-if ($count2 < 2) then
+if ($count2 < 6) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
-else if ( ($count2 >= 2) && ($count2 < 6) ) then
+else if ( ($count2 >= 6) && ($count2 < 8) ) then
   echo -n ' bgcolor="yellow">'  >>$TMP
 else
   echo -n ' bgcolor="#FF6666">' >>$TMP
@@ -373,7 +417,21 @@ else
 endif
 echo "$count2"' </td><td>' $USERDB2'</td></tr>' >>$TMP
 
-echo -n '<tr><td>Exports in Queue </td><td' >> $TMP
+echo -n '<tr><td>Export Waiting Time </td><td' >> $TMP
+
+#if ($diff2 < 60 ) then
+#  echo -n ' bgcolor="#66FF66">' >>$TMP
+#else if ( ($diff2 >= 60) && ($diff2 < 120) ) then
+#  echo -n ' bgcolor="yellow">'  >>$TMP
+#else
+#  echo -n ' bgcolor="#FF6666">' >>$TMP
+#  set stat = RED
+#  @ r = 1
+#endif
+#echo "$diff2"' seconds </td><td>' $USERDB2'</td></tr>' >>$TMP
+
+
+echo -n '<tr><td>Exports Processing </td><td' >> $TMP
 
 if ($count3 < 7) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
@@ -706,7 +764,7 @@ echo 'Colors indicate: green -> as expected; yellow -> late; red -> very late; b
 echo 'orange -> datamin < 0 (Ground station issues, likely)' >>$TMP
 echo '<p>' >>$TMP
 
-set echo
+#set echo
 if ($b == 1) then
   set favicon = blue_sq.gif 
   # UGH

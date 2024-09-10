@@ -22,12 +22,20 @@ end
 ffmpeg -y -i $dir/tmp/%03d.jpg -b:v 35000k /tmp28/jsocprod/hmi/HARPs_movies/nrt/latest.mp4
 
 set daily_dir = /tmp28/jsocprod/hmi/HARPs_movies/nrt
-@ last_daily = `ls -1 $daily_dir/QL_HARPs* | tail -1 | cut -c47-50,52-53,55-56`
 set hourly_dir = /tmp28/jsocprod/HARPS/nrt/images
-@ last_hourly = `ls -1 $hourly_dir/harp.2* | tail -1 | cut -c39-42,44-45,47-48`
-if ( $last_hourly - $last_daily == 2) then
-  @ day = $last_hourly - 1 
-  set day = `echo $day | sed 's/./&\./4' | sed 's/./&./7'`
+set last_hourly = `ls -1 $hourly_dir/harp.2* | tail -1 | cut -c39-42,44-45,47-48`
+
+set days = ()
+foreach check_D ( `ls -1 $hourly_dir/harp.2* | cut -c39-42,44-45,47-48 | sort -u` )
+  set file = $daily_dir/QL_HARPs_`echo $check_D | sed 's/./&\./4' | sed 's/./&./7'`.mp4
+  if ( ! -e $file ) then
+    set days = ( $days $check_D )
+  endif
+end
+set days = ( $days $last_hourly )
+
+foreach D ( $days )
+  set day = `echo $D | sed 's/./&\./4' | sed 's/./&./7'`
   rm -f $dir/tmp2/*png $dir/tmp2/*jpg
   @ n = 1
   foreach d ( `ls -1 $dir/*$day*png` )
@@ -44,6 +52,5 @@ if ( $last_hourly - $last_daily == 2) then
     mogrify -format jpg $d2
   end
   ffmpeg -y -i $dir/tmp2/%02d.jpg -b:v 35000k /tmp28/jsocprod/hmi/HARPs_movies/nrt/QL_HARPs_$day.mp4
-endif
-  
+end 
   
