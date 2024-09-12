@@ -68,7 +68,7 @@ echo "#! /bin/csh -f " >> $CMDFILE
 echo "cd $HERE" >> $CMDFILE
 echo "hostname >>&$log" >>$CMDFILE
 
-echo "$$HARP_MOVIE_DRIVER -fE $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $log" >> $CMDFILE
+echo "$HARP_MOVIE_DRIVER -fE $MASKSERIES'['"$low-$high@1h"']' $HARPSERIES $OUTDIR >>& $log" >> $CMDFILE
 foreach trec (`$SHOW_INFO $MASKSERIES'['"$low-$high@1h"']' -q key=T_REC` )
   echo $trec
   set file = $OUTDIR/harp.$trec.png
