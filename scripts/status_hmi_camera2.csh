@@ -14,6 +14,8 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
+set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
+
 cd $WORKFLOW_DATA/gates
 set gate = $1
 cd $gate
@@ -33,7 +35,7 @@ if ($low == "NaN") then
         set STATUS = 0
         goto EXITPLACE
     endif
-    show_info -q  $product"Q_CAMERA" n=1 key=$key > low
+    "$SHOW_INFO" -q  $product"Q_CAMERA" n=1 key=$key > low
     if ($?) then
        echo $0 $* FAILED
        set STATUS = 1
@@ -51,7 +53,7 @@ set low = `cat low`
 
 if ($high == "NaN") @ nancount = $nancount + 1
 
-show_info -q  $product"$Q_CAMERA" n=-1 key=$key > high
+"$SHOW_INFO" -q  $product"$Q_CAMERA" n=-1 key=$key > high
 if ($?) then
    echo $0 $* FAILED
    set STATUS = 1
@@ -60,7 +62,7 @@ endif
 set nhigh = `wc -c <high`
 if ($nhigh == 0) then # There are no records in the series
 echo ##### setting low to -1 from nhigh=0 for product=$product from:
-show_info -q  $product"$Q_CAMERA" n=-1 key=$key > 
+"$SHOW_INFO" -q  $product"$Q_CAMERA" n=-1 key=$key > 
         echo "-1" > low
         echo "-1" > high
         set STATUS = 0

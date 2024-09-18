@@ -82,13 +82,13 @@ if ( $num > 0 && $bigEnough == 1 ) then
   while ( $n <= $num )
 #    if ( ($pix[$n] >= 2000) && ($pix[$n] <= 400000) ) then    ### Removed high pixel restriction on 2013.09.04
     if ( $pix[$n] >= 2000 ) then
-      echo "$CUTOUT -L mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' me=hmi.ME_720s_fd10_nrt meharp=hmi.MEharp_720s_nrt" >> $CMD
+      echo "$CUTOUT mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' me=hmi.ME_720s_fd10_nrt meharp=hmi.MEharp_720s_nrt" >> $CMD
       echo 'set M2Mstatus = $?' >>$CMD
       echo 'if ($M2Mstatus) goto DONE' >>&$CMD
-      echo "$DISAMBIG -L in=hmi.MEharp_720s_nrt'['$harps[$n]']['$times[$n]']' out=hmi.Bharp_720s_nrt AMBGMTRY=1 AMBNEQ=20 AMBTFCTR=0.99 OFFSET=20" AMBNPAD=50 >>$CMD
+      echo "$DISAMBIG in=hmi.MEharp_720s_nrt'['$harps[$n]']['$times[$n]']' out=hmi.Bharp_720s_nrt AMBGMTRY=1 AMBNEQ=20 AMBTFCTR=0.99 OFFSET=20" AMBNPAD=50 >>$CMD
       echo 'set DISstatus = $?' >>$CMD
       echo 'if ($DISstatus) goto DONE' >>&$CMD
-      echo "$SHARP -L mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' bharp=hmi.Bharp_720s_nrt'['$harps[$n]']['$times[$n]']' \\
+      echo "$SHARP mharp=hmi.Mharp_720s_nrt'['$harps[$n]']['$times[$n]']' bharp=hmi.Bharp_720s_nrt'['$harps[$n]']['$times[$n]']' \\
        dop=hmi.V_720s_nrt'['$times[$n]']' cont=hmi.Ic_720s_nrt'['$times[$n]']' \\
        sharp_cea=hmi.sharp_cea_720s_nrt sharp_cut=hmi.sharp_720s_nrt" >>$CMD
       echo 'set SHPstatus = $?' >>$CMD
@@ -111,7 +111,7 @@ if ( $num > 0 && $bigEnough == 1 ) then
 # execute qsub script
 
   set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-  $QSUB -pe smp 8 -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
+  $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
 
   if (-e retstatus) set retstatus = `cat $HERE/retstatus`
   exit $retstatus

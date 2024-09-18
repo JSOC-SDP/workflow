@@ -79,9 +79,6 @@ set babble = $HERE/babble
 set TEMPCMD = $HERE/$qsubname
 echo 6 > $HERE/retstatus
 
-# check for eclipse quality bits to be set in lev1_nrt
-$ECLIPSE $wantlow $wanthigh nrt
-
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
 echo "setenv OMP_NUM_THREADS $THREADS" >>$TEMPCMD
@@ -132,15 +129,12 @@ echo "rm -f $HERE/qsub_running" >>$TEMPCMD
 # execute qsub script
 touch $HERE/qsub_running
 set TEMPLOG = `echo $TEMPLOG | sed "s/^\/auto//"`
-#$QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD 
-$QSUB -sync yes -pe smp 4 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD     <---use this command if using k.q
+$QSUB -sync yes -pe smp 4 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD     # <---use this command if using k.q
 
-@ count = `$SHOW_INFO -qc hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality > 0 ?]'`
-
-if ( -e retstatus ) set retstatus = `cat $HERE/retstatus`
-if ( ($retstatus == 0) && ($count > 0) ) then
-  set FITS_TICKET = `$MAKE_TICKET gate=hmi.webFits_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+if ( -e $HERE/retstatus) set retstatus = `cat $HERE/retstatus`
+if ( ($retstatus == 0) ) then
   set MSK_TICKET = `$MAKE_TICKET gate=hmi.Marmask_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
+  set REMAP_TICKET = `$MAKE_TICKET gate=hmi.MrMap_latlon_720s_nrt wantlow=$wantlow wanthigh=$wanthigh action=5`
 endif
 
 exit $retstatus

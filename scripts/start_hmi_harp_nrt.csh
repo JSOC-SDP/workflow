@@ -33,6 +33,7 @@
 ### 2.  don't change it back to ACTIVE unless you're absolutely sure everything has been cleaned up.
 ###
 set noglob
+setenv PGOPTIONS '--client-min-messages=warning'
 
 if ( ! $?WORKFLOW_DATA ) then
     echo WORKFLOW_DATA environment variable is undefined
@@ -151,7 +152,7 @@ while ( $i <= 270 )  # 9 hours, allowing for long maneuvers
   endif
 end
 
-rm $HERE/NO_GOOD_MAG
+rm -f $HERE/NO_GOOD_MAG
 
 #set last_harp = `$SHOW_INFO -q 'hmi.MHarp_720s_nrt[][]' key=t_rec n=-1000 | sort -u | tail -1` 
 set last_harp = `$SHOW_INFO -q $namespace.MHarp_720s_nrt'[][$]' key=t_rec n=-1`
@@ -198,7 +199,7 @@ while ( ($harp_lag < 1440) || ($process_lag < 1440) || (-e $WORKFLOW_DATA/tasks/
   @ rdiff = $last_two_good_mag_r[2] - $last_two_good_mag_r[1]
 end
 
-rm $HERE/WAITING*
+rm -f $HERE/WAITING*
 
 
 if ( $harp_lag >= 3600 ) then
@@ -250,7 +251,7 @@ while ( $nextH_s < $last_mask_s )
   else
     set Htimes = ($Htimes $nextH)
     echo "touch $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
-    echo "$TRACK_AND_INGEST_MHARP -n -m $tmpdir/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] $namespace.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
+    echo "$TRACK_AND_INGEST_MHARP -n -m $tmpdir/HARPS/nrt hmi.Marmask_720s_nrt\[$nextH] $namespace.Mharp_720s_nrt $namespace.Mharp_log_720s_nrt" >> $CMD
     echo 'set MHarpstatus = $?' >> $CMD
     echo 'if ($MHarpstatus) goto DONE' >>&$CMD
     echo $HARP_NRT_MOVIES >> $CMD
@@ -261,7 +262,7 @@ echo 'DONE:' >>$CMD
 echo 'echo $MHarpstatus >retstatus' >> $CMD
 #echo HOLD > $WORKFLOW_DATA/gates/repeat_harp_nrt/gatestatus
 #echo "$WORKFLOW_DATA/scripts/harp_nrt_movies.csh" >> $CMD
-echo $HARP_NRT_MOVIES >> $CMD
+#echo $HARP_NRT_MOVIES >> $CMD
 echo 'echo $MHarpstatus >retstatus' >>$CMD
 echo "rm $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/QSUB_RUNNING" >> $CMD
 

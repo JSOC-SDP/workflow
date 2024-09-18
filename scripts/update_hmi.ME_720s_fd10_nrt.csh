@@ -31,8 +31,7 @@ else
       set QSUB = qsub
       set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
     else if ( $JSOC_MACHINE == "linux_avx" ) then
-    #  set QUE = a8.q
-      set QUE = k.q
+      set QUE = a8.q
       set QSUB = /SGE2/bin/lx-amd64/qsub
       set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
     endif
@@ -119,10 +118,7 @@ echo 'echo $VFnrtstatus >retstatus' >>&$TEMPCMD
 echo "echo DONE >> $TEMPLOG" >>$TEMPCMD
 # execute qsub script
 
-
-##$QSUB -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
-$QSUB -pe smp 8 -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
-
+$QSUB -sync yes -l h_rt=36:00:00 -e $TEMPLOG -o $TEMPLOG -q $QUE $TEMPCMD
 
 if (-e retstatus) set retstatus = `cat $HERE/retstatus`
 if ( $retstatus ) then

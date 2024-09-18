@@ -173,6 +173,7 @@ if ( $retstatus == 0 ) then
   set S_TICKET = `$MAKE_TICKET gate=hmi.S_5760s wantlow=$wantlow wanthigh=$wanthigh action=5`
   set vfisvhigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
   set VFISV_TICKET = `$MAKE_TICKET gate=hmi.ME_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
+  set MEF_TICKET = `$MAKE_TICKET gate=hmi.MEF_720s_fd10 wantlow=$wantlow wanthigh=$vfisvhigh action=5`
   #@ indexhigh++
   set MrMaphigh = `$INDEX_CONVERT ds=$product $key"_index"=$indexhigh`
   set LATLON_TICKET = `$MAKE_TICKET gate=hmi.MrMap_latlon_720s wantlow=$WANTLOW wanthigh=$MrMaphigh action=5`
