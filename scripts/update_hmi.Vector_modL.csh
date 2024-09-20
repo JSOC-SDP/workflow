@@ -26,19 +26,20 @@ set RESIZE_MAPPING = "${DRMS_BINS_INSTALL_DIR}"/resizemappingmag
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
+set QSUBFLAGS = "-v JSOC_r10"
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
     @ THREADS = 4
-    set QSUB = "/SGE2/bin/lx-amd64/qsub -pe smp $THREADS"
+    set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS -pe smp $THREADS"
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
       set QUE = j.q
       @ THREADS = 1
-      set QSUB = qsub
+      set QSUB = "qsub $QSUBFLAGS"
     else if ( $JSOC_MACHINE == "linux_avx" ) then
       set QUE = p4.q
       @ THREADS = 4
-      set QSUB = /SGE2/bin/lx-amd64/qsub
+      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
     endif
 endif
 

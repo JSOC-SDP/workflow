@@ -47,18 +47,19 @@ set TEMPLOG = $HERE/runlog
 set CMD = $HERE/MHarp_nrt
 #echo 6 > $HERE/retstatus
 
+set QSUBFLAGS = "-v JSOC_r10"
 if ( $?WORKFLOW_TEST ) then
-    set QUE = a.q
-    set QSUB = /SGE2/bin/lx-amd64/qsub
+    set QUE = a.q 
+    set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
     set namespace = "hmi_test"
     set tmpdir = "/tmp30/jsoctest"
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
       set QUE = p.q,j.q
-      set QSUB = qsub
+      set QSUB = "qsub $QSUBFLAGS"
     else if ( $JSOC_MACHINE == "linux_avx" ) then
       set QUE = a.q
-      set QSUB = /SGE2/bin/lx-amd64/qsub
+      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
     endif
     set namespace = "hmi"
     set tmpdir = "/tmp28/jsocprod"

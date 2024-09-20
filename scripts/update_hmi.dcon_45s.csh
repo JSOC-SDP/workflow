@@ -10,12 +10,13 @@ endif
 
 set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
+set QSUBFLAGS = "-v JSOC_r10"
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
-    set QSUB = /SGE2/bin/lx-amd64/qsub
+    set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
 else
     set QUE = k.q
-    set QSUB = /SGE2/bin/lx-amd64/qsub
+    set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
 endif
 
 foreach ATTR (WANTLOW WANTHIGH GATE)

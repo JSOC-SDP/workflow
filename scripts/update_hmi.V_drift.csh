@@ -21,16 +21,17 @@ set CORRECTION_VELOCITIES = "${DRMS_BINS_INSTALL_DIR}"/correction_velocities
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
+set QSUBFLAGS = "-v JSOC_r10"
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
-    set QSUB = /SGE2/bin/lx-amd64/qsub
+    set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
       set QUE = j.q
-      set QSUB = qsub
+      set QSUB = "qsub $QSUBFLAGS"
     else if ( $JSOC_MACHINE == "linux_avx" ) then
       set QUE = a.q
-      set QSUB = /SGE2/bin/lx-amd64/qsub
+      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
     endif
 endif
 

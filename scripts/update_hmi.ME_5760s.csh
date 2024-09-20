@@ -22,19 +22,20 @@ set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
 
 source /home/jsoc/.setJSOCenv
 
+set QSUBFLAGS = "-v JSOC_r10"
 # UGH
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
-    set QSUB = /SGE2/bin/lx-amd64/qsub
+    set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
     set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
 else
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
       set QUE = p8.q,j8.q
-      set QSUB = qsub
+      set QSUB = "qsub $QSUBFLAGS"
       set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
     else if ( $JSOC_MACHINE == "linux_avx" ) then
       set QUE = k.q
-      set QSUB = /SGE2/bin/lx-amd64/qsub
+      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
       set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
     endif
 endif
