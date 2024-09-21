@@ -20,7 +20,7 @@ set QSUBFLAGS = "-v JSOC_r10"
 if ( $?WORKFLOW_TEST ) then
     set namespace = "hmi_test"
     set QUE = k.q
-    set "QSUB = /SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
+    set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
 else
     set namespace = "hmi"
     if ( $JSOC_MACHINE == "linux_x86_64" ) then
