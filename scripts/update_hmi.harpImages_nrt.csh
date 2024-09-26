@@ -20,7 +20,7 @@ else
       set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
     endif
     set namespace = 'hmi'
-    set tmpdir = 'tmp28/jsocprod'
+    set tmpdir = '/tmp28/jsocprod'
 endif
 set HERE = $cwd
 set MASKSERIES = hmi.Marmask_720s_nrt

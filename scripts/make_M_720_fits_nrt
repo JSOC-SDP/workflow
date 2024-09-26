@@ -32,6 +32,8 @@ set JSOC_AS_FITS = "${DRMS_BINS_INSTALL_DIR}"/jsoc_export_as_fits
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 
+set fits_dir = $WORKFLOW_IMG_ROOT/fits
+
 set obslist = (M)
 set flaglist = (-c)
 set finalimagetime = NONE
@@ -73,7 +75,6 @@ while ($day <= $dayhigh)
     set MON = `echo $yyyymmdd | sed -e 's/^.*Q//' -e 's/X.*//'`
     set DAY = `echo $yyyymmdd | sed -e 's/^.*X//'`
 
-    set fits_dir = $WORKFLOW_IMG_ROOT/fits
     if (!(-e $fits_dir)) then
         mkdir $fits_dir
         if ($?) then 
