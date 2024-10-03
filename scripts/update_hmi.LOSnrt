@@ -91,6 +91,7 @@ echo 6 > $HERE/retstatus
 # echo "BEFORE qsub OMP_NUM_THREADS="$OMP_NUM_THREADS >>$TEMPLOG
 # make qsub script
 echo "#! /bin/csh -f " >$TEMPCMD
+echo "env" >>$TEMPCMD
 echo "setenv OMP_NUM_THREADS $THREADS" >>$TEMPCMD
 echo "cd $HERE" >>$TEMPCMD
 echo "hostname >>&$TEMPLOG" >>$TEMPCMD

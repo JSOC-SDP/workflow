@@ -147,7 +147,7 @@ echo "$RESIZE_MAPPING in=$namespace.Mr_hiresmap_720s\["$wantlow"-"$wanthigh"] ou
 echo 'DONE:' >>$TEMPCMD
 echo 'echo $IQUVstatus >IQUVstatus' >>&$TEMPCMD
 echo 'echo $OBSstatus >OBSstatus' >>&$TEMPCMD
-echo 'echo $LFstatus >LDstatus' >>&$TEMPCMD
+echo 'echo $LDstatus >LDstatus' >>&$TEMPCMD
 #echo 'echo $PATstatus >PATstatus' >>&$TEMPCMD
 echo '@ retstatus = $IQUVstatus + $OBSstatus + $LDstatus' >>$TEMPCMD
 echo 'echo $retstatus >retstatus' >>$TEMPCMD
