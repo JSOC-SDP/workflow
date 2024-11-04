@@ -18,8 +18,9 @@ set CMD = $HERE/MHarp_nrt
 
 touch $HERE/info
 
+set QSUBFLAGS = "-v JSOC_r10"
 set QUE = a.q
-set QSUB = /SGE2/bin/lx-amd64/qsub
+set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
 set tmpdir = "/tmp28/jsocprod"
 
 set HARP_NRT_MOVIES = "${DRMS_SCRS_INSTALL_DIR}"/harp_nrt_movies.csh
@@ -63,7 +64,7 @@ rm -f $HERE/NO_GOOD_DATA
 
 # if there's no new data, wait:
 
-set T_lastHarp = `$SHOW_INFO $hmi.mharp_720s_nrt'[][$]' -q key=t_rec n=1`
+set T_lastHarp = `$SHOW_INFO hmi.mharp_720s_nrt'[][$]' -q key=t_rec n=1`
 @ T_lastHarp_s =  `$TIME_CONVERT time=$T_lastHarp zone=TAI`
 set T_lastGoodM = `$SHOW_INFO hmi.marmask_720s_nrt'[$][? quality >= 0 ?]' -q key=t_rec`
 @ T_lastGoodM_s = `$TIME_CONVERT time=$T_lastGoodM zone=TAI`
@@ -71,7 +72,7 @@ set T_lastGoodM = `$SHOW_INFO hmi.marmask_720s_nrt'[$][? quality >= 0 ?]' -q key
 while ( $T_lastGoodM_s == $T_lastHarp_s )
   touch $HERE/WAITING_MAG_LAG
   sleep 60
-  set T_lastHarp = `$SHOW_INFO $hmi.mharp_720s_nrt'[][$]' -q key=t_rec n=1`
+  set T_lastHarp = `$SHOW_INFO hmi.mharp_720s_nrt'[][$]' -q key=t_rec n=1`
   @ T_lastHarp_s =  `$TIME_CONVERT time=$T_lastHarp zone=TAI`
   set T_lastGoodM = `$SHOW_INFO hmi.marmask_720s_nrt'[$][? quality >= 0 ?]' -q key=t_rec`
   @ T_lastGoodM_s = `$TIME_CONVERT time=$T_lastGoodM zone=TAI`
@@ -108,8 +109,8 @@ if ( $T_lastGoodM_s > $T_lastHarp_s ) then
   echo "set MHarpstatus = 0" >>&$CMD
 
   foreach t_rec ( `$SHOW_INFO hmi.Marmask_720s_nrt'['$T_nextHarp'-'$T_lastGoodM'][? quality >= 0 ?]' -q key=T_REC` )
-    echo "$TRACK_AND_INGEST_MHARP -n -m $tmpdir/HARPS/nrt hmi.Marmask_720s_nrt\[$t_rec] $hmi.Mharp_720s_nrt $hmi.Mharp_log_720s_nrt" >> $CMD
-    set ME_TICKET = `$MAKE_TICKET gate=$hmi.ME_720s_fd10_nrt wantlow=$t_rec wanthigh=$t_rec action=5`
+    echo "$TRACK_AND_INGEST_MHARP -n -m $tmpdir/HARPS/nrt hmi.Marmask_720s_nrt\[$t_rec] hmi.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
+    set ME_TICKET = `$MAKE_TICKET gate=hmi.ME_720s_fd10_nrt wantlow=$t_rec wanthigh=$t_rec action=5`
   end
   echo 'set MHarpstatus = $?' >> $CMD
   echo 'if ($MHarpstatus) goto DONE' >>&$CMD
@@ -125,11 +126,10 @@ if ( $T_lastGoodM_s > $T_lastHarp_s ) then
   if ( `ls -1 $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l` == 1 ) then
     $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
     sleep 20
-    set T_lastHarp = `$SHOW_INFO $hmi.mharp_720s_nrt'[][$]' -q key=t_rec n=1`
+    set T_lastHarp = `$SHOW_INFO hmi.mharp_720s_nrt'[][$]' -q key=t_rec n=1`
     @ T_lastHarp_s =  `$TIME_CONVERT time=$T_lastHarp zone=TAI`
     @ newT_s = $T_lastHarp_s + 720
     set newT = `$TIME_CONVERT s=$newT_s zone=TAI`
     set nextTicket = `$MAKE_TICKET gate=repeat_harp_nrt wantlow=$newT wanthigh=$newT action=5`
   endif
-E
 endif 
