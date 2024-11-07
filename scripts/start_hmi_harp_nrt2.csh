@@ -133,3 +133,10 @@ if ( $T_lastGoodM_s > $T_lastHarp_s ) then
     set nextTicket = `$MAKE_TICKET gate=repeat_harp_nrt wantlow=$newT wanthigh=$newT action=5`
   endif
 endif 
+
+set min = `echo $WANTLOW | awk -F\: '{print $2}'`
+echo "Minute is $min" >> $TEMPLOG
+if ( $min == "00" ) then
+  set HARPIMG_TICKET = `$WFCODE/maketicket.csh gate=hmi.harpImages_nrt wantlow=$WANTLOW wanthigh=$WANTLOW action=5`
+endif
+
