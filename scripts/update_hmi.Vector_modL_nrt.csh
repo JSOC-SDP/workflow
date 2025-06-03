@@ -54,7 +54,7 @@ set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 
 set IQUV_args = "wavelength=3 camid=0 cadence=90.0 npol=8 size=48 lev1=hmi.lev1_nrt quicklook=1 linearity=1"
-set OBS_args = "-V levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=3 cadence=720.0 lev1=hmi.lev1_nrt smooth=1 linearity=1" 
+set OBS_args = "levin=lev1p levout=lev15 wavelength=3 quicklook=1 camid=3 cadence=720.0 lev1=hmi.lev1_nrt smooth=1 linearity=1" 
 set LD_args = "-cnxf NONE"
 
 # round times to a slot
@@ -91,7 +91,7 @@ echo 'set IQUVstatus=0' >>&$TEMPCMD
 echo 'set OBSstatus=0' >>&$TEMPCMD
 echo 'set LDstatus=0' >>&$TEMPCMD
 
-echo "$IQUV_AVERAGING begin="$wantlow"  end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
+echo "$IQUV_AVERAGING begin="$wantlow" end="$wanthigh $IQUV_args  ">>&$TEMPLOG" >>$TEMPCMD
 echo 'set IQUVstatus = $?' >>$TEMPCMD
 echo 'if ($IQUVstatus) goto DONE' >>&$TEMPCMD
 echo "$OBSERVABLES begin="$wantlow"  end="$wanthigh $OBS_args  ">>&$TEMPLOG" >>$TEMPCMD
