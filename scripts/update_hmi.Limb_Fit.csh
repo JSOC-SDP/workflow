@@ -27,7 +27,8 @@ else
       set QUE = j.q
       set QSUB = "/SGE/bin/lx24-amd64/qsub $QSUBFLAGS"
     else if ( $JSOC_MACHINE == "linux_avx" ) then
-      set QUE = a.q
+#      set QUE = a.q
+      set QUE = k.q
       set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
     endif
 endif

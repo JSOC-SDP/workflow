@@ -19,6 +19,7 @@ set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
 set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 
 set QSUBFLAGS = "-v JSOC_r10"
+
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
     @ THREADS = 4
@@ -29,9 +30,11 @@ else
       @ THREADS = 1
       set QSUB = "qsub $QSUBFLAGS"
     else if ( $JSOC_MACHINE == "linux_avx" ) then
-      set QUE = p4.q
       @ THREADS = 4
-	set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
+      set QUE = p4.q
+      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
+#      set QUE = k.q
+#      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS -pe smp $THREADS"
     endif
 endif
 

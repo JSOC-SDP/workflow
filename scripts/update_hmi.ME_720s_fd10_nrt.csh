@@ -32,8 +32,11 @@ else
       set QSUB = "qsub $QSUBFLAGS"
       set MPIEXEC = /home/jsoc/mpich2/bin/mpiexec
     else if ( $JSOC_MACHINE == "linux_avx" ) then
-      set QUE = a8.q
-      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
+#      set QUE = a8.q
+#      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
+      set QUE = k.q
+      @ THREADS = 8
+      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS -pe smp $THREADS"
       set MPIEXEC = /home/jsoc/bin/linux_avx/mpiexec
     endif
 endif

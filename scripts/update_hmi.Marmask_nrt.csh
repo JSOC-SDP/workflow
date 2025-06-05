@@ -42,7 +42,7 @@ set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
 
-@ count = `$SHOW_INFO -qc hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality > 0 ?]'`
+@ count = `$SHOW_INFO -qc hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality >= 0 ?]'`
 if ( $count == 0 ) then
   exit
 endif
@@ -64,7 +64,7 @@ echo "hostname >>&$TEMPLOG" >>$TEMPCMD
 echo "set echo >>&$TEMPLOG" >>$TEMPCMD
 echo 'set SEGstatus=0' >>&$TEMPCMD
 
-foreach trec ( `$SHOW_INFO -q hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality > 0 ?]' key=t_rec` )
+foreach trec ( `$SHOW_INFO -q hmi.M_720s_nrt'['$wantlow'-'$wanthigh'][? quality >= 0 ?]' key=t_rec` )
   echo "$HMI_SEGMENT xm=hmi.M_720s_nrt\["$trec"] xp=hmi.Ic_noLimbDark_720s_nrt\["$trec"] model=/builtin/hmi.M_Ic_noLimbDark_720s.production y=hmi.Marmask_720s_nrt >>&$TEMPLOG" >>$TEMPCMD
 end
 

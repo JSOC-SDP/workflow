@@ -29,9 +29,11 @@ else
       @ THREADS = 1
       set QSUB = "qsub $QSUBFLAGS"
     else if ( $JSOC_MACHINE == "linux_avx" ) then
-      set QUE = p4.q
       @ THREADS = 4
-      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
+      #set QUE = p4.q
+      #set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
+      set QUE = k.q
+      set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS -pe smp $THREADS"
     endif
 endif
 

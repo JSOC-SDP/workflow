@@ -1,17 +1,10 @@
 #! /bin/csh -f
 
 set echo
-setenv PGOPTIONS '--client-min-messages=warning'
 
 source /home/jsoc/.setJSOCenv
+source /home/jeneen/scripts/env_file.git
 source /SGE2/default/common/settings.csh
-
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
-
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set TARG = /web/jsoc/htdocs/data
 set TMP = $TARG/.jsoc_proc_status.tmp
@@ -20,14 +13,11 @@ set noglob
 unsetenv QUERY_STRING
 umask 2
 
-set SHOW_JSOC_PROC_STATUS = $WORKFLOW_DIR/scripts/show_jsoc_proc_status.csh
-set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
-set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
-set SHOW_SERIES = "${DRMS_BINS_INSTALL_DIR}"/show_series
-set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
-# UGH
+set SHOW_INFO = ${DRMS_BINS_INSTALL_DIR}/show_info
+set SHOW_SERIES = ${DRMS_BINS_INSTALL_DIR}/show_series
+set TIME_CONVERT = ${DRMS_BINS_INSTALL_DIR}/time_convert
 set ARITH = /home/phil/bin/_linux4/arith
-
+set SHOW_COVERAGE = ${DRMS_BINS_INSTALL_DIR}/show_coverage
 set USERDB=hmidb
 set USERDB2=hmidb2
 
@@ -81,13 +71,12 @@ set last_update = `ls -l --time-style="+%Y.%m.%d_%H:%M" /web/jsoc/htdocs/data/js
 @ last_update_s = `$TIME_CONVERT time=$last_update`
 @ update_lag = $now_pacific_s - $last_update_s
 if ( $update_lag > 600 ) then
-  set mail_list = jeneen,phil,kehcheng,thailand
+  set mail_list = jeneen,kehcheng,thailand
   echo "/web/jsoc/htdocs/data/jsoc_proc_status.html is $update_lag seconds old" > /tmp/update_lag
-  echo "Run $SHOW_JSOC_PROC_STATUS to find error" >> /tmp/update_lag
+  echo "Run /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/show_jsoc_proc_status.csh to find error" >> /tmp/update_lag
   @ min = $update_lag / 60
   /usr/bin/Mail -s "Status Page Not Updated for $min minutes" $mail_list < /tmp/update_lag
 endif
-#echo "Content-type: text/html" >$TMP
 echo '<\!doctype html public "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">' >$TMP
 echo '<html><head><title>JSOC Processing Status</title><meta http-equiv="refresh" content="60" url="http://jsoc.stanford.edu/data/jsoc_proc_status.html"></head><body link=black>' >>$TMP
 echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' >> $TMP
@@ -97,8 +86,8 @@ cat /web/jsoc/htdocs/ajax/URGENT_MOTD.html >>$TMP
 echo '<p><table width=800>' >>$TMP
 echo '<tr><td>Product</td><td>Lag</td><td>Note</td></tr>' >>$TMP
 
-set lastAccess = `stat -c "%z" $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps`
-@ numHarps = `cat $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps`
+set lastAccess = `stat -c "%z" /home/jsoc/pipeline/tasks/update_hmi.harp_nrt/numHarps`
+@ numHarps = `cat /home/jsoc/pipeline/tasks/update_hmi.harp_nrt/numHarps`
 set Htime = $lastAccess[1]"_"$lastAccess[2]
 @ Htime_s = `$TIME_CONVERT time=$Htime`
 @ Htime_diff = $now_pacific_s - $Htime_s
@@ -120,10 +109,6 @@ while ($iprod <= $nprod)
     endif
     set times = `echo $times[2] | awk --  'BEGIN {FIELDWIDTHS = "4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%s_TAI",$1,$2,$3,$5,$6,$7)}'`
   else if ($prod == aia_synoptic_nrt_images) then
-# #  set file = /web/jsoc/htdocs/data/aia/synoptic/mostrecent/AIAsynoptic0131.fits
-# #  set times = `listhead $file | grep T_OBS | grep -v CRLT | awk '{print $3}' | sed s/\'//g`
-# #  set times = `echo $times | awk -- 'BEGIN {FIELDWIDTHS = "4 1 2 1 2 1 2 1 2 1 2 1 2 "} {printf("%s.%s.%s_%s:%s:%s:%sZ",$1,$3,$5,$7,$9,$11,$13)}'`
-  #  set times = `$SHOW_INFO lm_jps.synoptic3'[$][131]' -q key=t_obs | awk -- 'BEGIN {FIELDWIDTHS = "4 1 2 1 2 1 2 1 2 1 2 1 2 "} {printf("%s.%s.%s_%s:%s:%s:%sZ",$1,$3,$5,$7,$9,$11,$13)}'`
      set times = `head -1 /home/jsoc/aia/synoptic/mostrecent/image_times | awk '{print $2}' | awk -- 'BEGIN {FIELDWIDTHS = "4 2 2 1 2 2 2"} {printf("%s.%s.%s_%s:%s:%sZ",$1,$2,$3,$5,$6,$7)}'`
   else if ($prod == aia_synoptic_images) then
     set times = `grep synoptic /web/jsoc/htdocs/data/aia/synoptic/image_times | awk '{print $2}' | awk -F\/ '{print $11}'`
@@ -138,7 +123,6 @@ while ($iprod <= $nprod)
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then        
       set times = `$SHOW_INFO -q key=T_REC $prod'[][$][? T_OBS > 0 ?]' n=-1`
     endif
- # set echo
   else if ( $prod == iris.lev0 ) then
     set times = `$SHOW_INFO -q key=t_obs iris.lev0'[? FSN != 8421504 ?][? t_obs > 0 ?]' n=-1 | sed s/-/./g | sed s/T/_/ | cut -c1-19`
     set iris_proc_time = `$SHOW_INFO -q iris.lev0'[:#$]' key=date`
@@ -197,7 +181,6 @@ while ($iprod <= $nprod)
       @ r = 1                
       echo "$now IRIS lev1 is $iris1_diff behind" >> /web/jsoc/htdocs/data/red.log
     endif 
-  # unset echo
   else
     set times = `$SHOW_INFO -q key=T_OBS $prod'[$]'`
     if ( $times[1] == '-4712.01.01_11:59:28_TAI' ) then       
@@ -308,7 +291,6 @@ echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
 echo -n '<tr><td>web response</td><td' >>$TMP
 set lag=$webinfo[1]
 
-# Ugh
 set mslag = `echo $lag | sed -e "s/\.//" -e "s/^0*//"`
 set lastReqId = `grep JSOC /home/jsoc/exports/RequestID`
 echo $lastReqId
@@ -319,7 +301,6 @@ else if ($mslag < 20000) then
 else
   echo -n ' bgcolor="#FF6666">' >>$TMP
 endif
-#echo "$lag"'s</td><td>'$webinfo[2]'s, '$webinfo[3]'s, lookdata, exportdata response</td></tr>' >>$TMP
 echo "$lag"' s</td><td>'$webinfo[2]'s, '$webinfo[3]'s, last ReqID: '$lastReqId' </td></tr>' >>$TMP
 
 ### Added 9/7/12 for monitoring lag between hmidb and hmidb2
@@ -342,47 +323,15 @@ echo "$db_diff"' s </td><td>Lag between hmidb and hmidb2</td></tr>' >>$TMP
 
 ### Added 12/5/11 for monitoring exports ###
 
-#set count1 = `wget -O - -q 'http://jsoc2.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
-@ count1 = `$SHOW_INFO JSOC_DBHOST=hmidb2 ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production`
-#set count2 = `wget -O - -q 'http://jsoc.stanford.edu/cgi-bin/ajax/show_info?c=1&q=1&ds=jsoc.export_new[?status=2?]'` 
-@ count2 = `$SHOW_INFO JSOC_DBHOST=hmidb ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production`
-#set count3 = `/SGE/bin/lx24-amd64/qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
+@ count2 = `$SHOW_INFO JSOC_DBHOST=hmidb2 ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production`
+@ count1 = `$SHOW_INFO JSOC_DBHOST=hmidb ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production`
 @ count3 = `qstat | grep JSOC_ | grep jsoc | grep -v qw | wc -l`
 
-### These times are how long the exports have been waiting to be processed
-
-#@ diff1 = 0
-#@ diff2 = 0
-
-#set nowExp = `date -u +%Y.%m.%d_%H:%M:%S`
-#set nowExp_s = `$TIME_CONVERT time=$nowExp`
-
-#if ( $count1 > 0 ) then
-#  $SHOW_INFO JSOC_DBHOST=hmidb2 ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production key=ReqTime n=-1` > /tmp/hmidb2_T1
-#  if ( `wc -l /tmp/hmidb2_T1` > 0 ) then
-#    set T1 = `cat /tmp/hmidb2_T1`
-#    @ T1_s = `$TIME_CONVERT time=$T1`
-#    @ diff1 = $nowExp_s - $T1_s
-#  else
-#    @ diff1 = 0
-#  endif
-#endif
-
-#if ( $count2 > 0 ) then
-#  if ( `$SHOW_INFO JSOC_DBHOST=hmidb ds='jsoc.export_new[][? status=2 ?]' -qc JSOC_DBUSER=production` > 0 ) then
-#    set T2 =  `$SHOW_INFO JSOC_DBHOST=hmidb ds='jsoc.export_new[][? status=2 ?]' -q JSOC_DBUSER=production key=ReqTime n=-1`
-#    @ T2_s = `$TIME_CONVERT time=$T2`
-#    @ diff2 = $nowExp_s - $T2_s
-#  else
-#    @ diff2 = 0
-#  endif
-#endif
- 
 echo -n '<tr><td>Exports Pending </td><td' >> $TMP
 
 if ($count1 < 6) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
- 	else if ( ($count1 >= 6) && ($count1 < 8) ) then
+else if ( ($count1 >= 6) && ($count1 < 8) ) then
   echo -n ' bgcolor="yellow">'  >>$TMP
 else
   echo -n ' bgcolor="#FF6666">' >>$TMP
@@ -390,19 +339,6 @@ else
   @ r = 1
 endif
 echo "$count1"' </td><td>' $USERDB'</td></tr>' >>$TMP
-
-#echo -n '<tr><td>Export Waiting Time </td><td' >> $TMP
-
-#if ($diff1 < 60 ) then
-#  echo -n ' bgcolor="#66FF66">' >>$TMP
-#else if ( ($diff1 >= 60) && ($diff1 < 120) ) then
-#  echo -n ' bgcolor="yellow">'  >>$TMP
-#else
-#  echo -n ' bgcolor="#FF6666">' >>$TMP
-#  set stat = RED
-#  @ r = 1
-#endif
-#echo "$diff1"' seconds </td><td>' $USERDB'</td></tr>' >>$TMP
 
 echo -n '<tr><td>Exports Pending </td><td' >> $TMP
 
@@ -416,20 +352,6 @@ else
   @ r = 1
 endif
 echo "$count2"' </td><td>' $USERDB2'</td></tr>' >>$TMP
-
-echo -n '<tr><td>Export Waiting Time </td><td' >> $TMP
-
-#if ($diff2 < 60 ) then
-#  echo -n ' bgcolor="#66FF66">' >>$TMP
-#else if ( ($diff2 >= 60) && ($diff2 < 120) ) then
-#  echo -n ' bgcolor="yellow">'  >>$TMP
-#else
-#  echo -n ' bgcolor="#FF6666">' >>$TMP
-#  set stat = RED
-#  @ r = 1
-#endif
-#echo "$diff2"' seconds </td><td>' $USERDB2'</td></tr>' >>$TMP
-
 
 echo -n '<tr><td>Exports Processing </td><td' >> $TMP
 
@@ -478,9 +400,8 @@ endif
 ### Look for missing HMI observables ###
 
 # these showCov files are generated every 30m by a cronjob
-# on n04 as jeneen: "${DRMS_SCRS_INSTALL_DIR}"/workflow/scripts/status_show_cov.csh
+# on n04 as jeneen: /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/status_show_cov.csh
 
-# Ugh
 set showCov = "/web/jsoc/htdocs/data/.showCov"
 set showCovNRT = "/web/jsoc/htdocs/data/.showCovNRT" 
 
@@ -505,7 +426,6 @@ echo -n '<tr><td>Missing HMI Obs </td><td' >> $TMP
 if ($missingDefinitive == 0 ) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
 else
-#  echo -n ' bgcolor="#FF6666">' >>$TMP
    echo -n ' bgcolor="yellow">' >>$TMP
 endif
 if ( $missingDefinitive == 0 ) then
@@ -535,7 +455,6 @@ echo -n '<tr><td>Missing HMI NRT </td><td' >> $TMP
 if ($missingNRT == 0 ) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
 else
-#  echo -n ' bgcolor="#FF6666">' >>$TMP
    echo -n ' bgcolor="yellow">' >>$TMP
 endif
 if ( $missingNRT == 0 ) then
@@ -547,27 +466,14 @@ endif
 
 ### Look for missing AIA lev1
 
-# Ugh
 set showCovAIA = "/web/jsoc/htdocs/data/.showCovAIA"
 set showCovAIANRT = "/web/jsoc/htdocs/data/.showCovAIANRT"
 
 if ( -z $showCovAIA ) then
-#  @ n = 0
   @ missingDefAIA = 0
 else
-  #@ n = `wc -l $showCovAIA | awk '{print $1}'`
   @ missingDefAIA = `awk '{print $3}' $showCovAIA | head -1`
 endif
-
-#@ missingDefAIA = 0
-
-#if ( $n > 0 ) then
-#  @ N = $n - 1
-#  foreach i ( `awk '{print $3}' $showCovAIA | head -$N` )
-#    @ missingDefAIA = $missingDefAIA + $i
-#  end
-#endif
-
 
 echo '<tr><td>&nbsp;<td><td>&nbsp;</td><td>&nbsp;</td></tr>' >>$TMP
 echo -n '<tr><td>Missing AIA Lev1 </td><td' >> $TMP
@@ -575,7 +481,6 @@ echo -n '<tr><td>Missing AIA Lev1 </td><td' >> $TMP
 if ($missingDefAIA <= 0 ) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
 else
-#  echo -n ' bgcolor="#FF6666">' >>$TMP
   echo -n ' bgcolor="yellow">' >>$TMP
 endif
 if ( $missingDefAIA <= 0 ) then
@@ -605,7 +510,6 @@ echo -n '<tr><td>Missing AIA NRT </td><td' >> $TMP
 if ( $missingAIANRT < 1200  ) then
   echo -n ' bgcolor="#66FF66">' >>$TMP
 else
-#  echo -n ' bgcolor="#FF6666">' >>$TMP
   echo -n ' bgcolor="yellow">' >>$TMP
 endif
 if ( $missingAIANRT == 0 ) then
@@ -620,13 +524,7 @@ if ( -e /tmp/camera_anomaly ) then
   rm /tmp/camera_anomaly
 endif
 
-### Look for Bit Flip Anomaly in AIA
-
-#@ fsn0 = `$SHOW_INFO -q key=fsn aia.lev0 n=-2 | head -1` - 3999
-#@ BF1 = `$SHOW_INFO -cq 'aia.lev0['$fsn0'/4000][?datamin=0?][?camera=1?]'` 
-#@ BF2 = `$SHOW_INFO -cq 'aia.lev0['$fsn0'/4000][?datamin=0?][?camera=2?]'`  
-#@ BF3 = `$SHOW_INFO -cq 'aia.lev0['$fsn0'/4000][?datamin=0?][?camera=3?]'`
-#@ BF4 = `$SHOW_INFO -cq 'aia.lev0['$fsn0'/4000][?datamin=0?][?camera=4?]'`
+### Look for Bit Flip Anomaly in AIA and Excessive Missvals
 
 @ then_t = $now_t - 1200
 @ BF1 = `$SHOW_INFO -cq "aia.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=1?]"`
@@ -635,6 +533,8 @@ endif
 @ BF4 = `$SHOW_INFO -cq "aia.lev0[? t_obs > $then_t ?][?datamin=0?][?camera=4?]"`
 
 @ totalBF = $BF1 + $BF2 + $BF3 + $BF4
+
+@ AMV = `$SHOW_INFO -cq "aia.lev0[? t_obs > $then_t ?][? missvals > 16000000 ?]"`
 
 echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBF < 100 ) then
@@ -668,11 +568,8 @@ else
   echo "</td></tr>" >>$TMP
 endif
 
-### Look for Bit Flip Anomaly in HMI
+### Look for Bit Flip Anomaly in HMI and Excessive Missvals
 
-#@ fsn0 = `$SHOW_INFO -q key=fsn hmi.lev0a n=-2 | head -1` - 3999
-#@ BF1 = `$SHOW_INFO -cq 'hmi.lev0a['$fsn0'/4000][?datamin=0?][?camera=1?]'`
-#@ BF2 = `$SHOW_INFO -cq 'hmi.lev0a['$fsn0'/4000][?datamin=0?][?camera=2?]'`
 @ BF1 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin=0?][?camera=1?]"`
 @ BF2 = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][?datamin=0?][?camera=2?]"`
 @ bad_t = $now_t - 300
@@ -681,6 +578,8 @@ endif
 
 @ totalBF = $BF1 + $BF2 
 @ totalBAD = $BAD1 + $BAD2
+
+@ HMV = `$SHOW_INFO -cq "hmi.lev0a[? t_obs > $then_t ?][? missvals > 13000000?]"`
 
 echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBF < 100 ) then
@@ -704,7 +603,6 @@ else
   echo "</td></tr>" >>$TMP
 endif
 
-#echo -n '<tr><td>Datamin = 0</td><td' >> $TMP
 if ( $totalBAD > 0 ) then
   rm /tmp/camera_bad
   @ o = 1
@@ -721,10 +619,6 @@ endif
 
 set t2 = `$SHOW_INFO -q iris.lev0'[$]' key=fsn`
 @ t1 = $t2 - 600
-#@ s_last = `$TIME_CONVERT time=$t_last`
-#@ s_first = $s_last - 600
-#set t1 = `$TIME_CONVERT s=$s_first | awk -F\_ '{print $1"_"$2}'`
-#set t2 = `$TIME_CONVERT s=$s_last | awk -F\_ '{print $1"_"$2}'`
 
 @ BF1 = `$SHOW_INFO -cq iris.lev0'['$t1'-'$t2'][?datamin=0?][?camera=1?]'`
 @ BF2 = `$SHOW_INFO -cq iris.lev0'['$t1'-'$t2'][?datamin=0?][?camera=2?]'`
@@ -753,6 +647,33 @@ else
   echo "</td></tr>" >>$TMP
 endif
 
+echo -n '<tr><td>AIA Missvals</td><td' >> $TMP
+if ( $AMV < 400 ) then
+  echo -n ' bgcolor="#66FF66">' >>$TMP
+else if ( ($AMV >= 400) && ($AMV < 500) ) then
+  @ y = 1
+  echo -n ' bgcolor="yellow">' >>$TMP
+else
+  echo -n ' bgcolor="#FF6666">' >>$TMP
+  set stat = RED
+  @ r = 1
+endif
+echo "$AMV"' </td><td> ' >>$TMP  
+echo "Images with missvals greater than 16M (20m)</td></tr>" >> $TMP
+
+echo -n '<tr><td>HMI Missvals</td><td' >> $TMP
+if ( $HMV < 300 ) then
+  echo -n ' bgcolor="#66FF66">' >>$TMP
+else if ( ($HMV >= 300) && ($AMV < 400) ) then
+  @ y = 1
+  echo -n ' bgcolor="yellow">' >>$TMP
+else
+  echo -n ' bgcolor="#FF6666">' >>$TMP
+  set stat = RED
+  @ r = 1
+endif
+echo "$HMV"' </td><td> ' >>$TMP
+echo "Images with missvals greater than 13M (20m)</td></tr>" >> $TMP
 
 echo '</table>' >>$TMP
 echo '<p>' >>$TMP
@@ -764,32 +685,30 @@ echo 'Colors indicate: green -> as expected; yellow -> late; red -> very late; b
 echo 'orange -> datamin < 0 (Ground station issues, likely)' >>$TMP
 echo '<p>' >>$TMP
 
-#set echo
 if ($b == 1) then
   set favicon = blue_sq.gif 
-  # UGH
-  /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh blue
+  ${SCRIPT_DIR}/monitoring/update_proc_status.csh blue
   if ( ! -e /home/jeneen/CAMERA_ANOMALY.lock ) then
     /usr/bin/Mail -s 'Important:  Camera Anomaly' jsoc_ops@lmsal.com < /tmp/camera_anomaly
-    /usr/bin/Mail -s 'Remove cameral anomaly temp files' jsoc_ops@lmsal.com < /tmp/camera_anomaly_reminder
+    /usr/bin/Mail -s 'Remove cameral anomaly temp files' jeneen@stanford.edu < /tmp/camera_anomaly_reminder
     touch /home/jeneen/CAMERA_ANOMALY.lock
   endif
 else if ($o == 1 ) then
   set favicon = orange_sq.gif
-  /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh orange
+  ${SCRIPT_DIR}/monitoring/update_proc_status.csh orange
   /usr/bin/Mail -s 'HMI images with datamin < 0 found' jeneen,baldner,thomas.j.cruz@lmco.com < /tmp/camera_bad
 else if ($r == 1) then
   set favicon = red_sq.gif
-  /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh red
+  ${SCRIPT_DIR}/monitoring/update_proc_status.csh red
 else if ( $g2 == 1 ) then
   set favicon = green2_sq.gif
-  /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh green2
+  ${SCRIPT_DIR}/monitoring/update_proc_status.csh green2
 else if ($y == 1) then
   set favicon = yellow_sq.gif
-  /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh yellow
+  ${SCRIPT_DIR}/monitoring/update_proc_status.csh yellow
 else
   set favicon = green_sq.gif 
-  /home/jeneen/campaigns/scripts/hmi/update_proc_status.csh green
+  ${SCRIPT_DIR}/monitoring/update_proc_status.csh green
 endif
 echo '</body>' >>$TMP
 echo '<head><link rel="stat icon" href="http://jsoc.stanford.edu/data/tmp/'$favicon'"></head>' >>$TMP

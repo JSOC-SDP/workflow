@@ -56,7 +56,7 @@ while ($need_t <= $wanthigh_t)
   set need = `$TIME_CONVERT zone=TAI s=$need_t`
   set needlow = `$TIME_CONVERT zone=TAI s=$needlow_t`
   set needhigh = `$TIME_CONVERT zone=TAI s=$needhigh_t`
-  set n = `$SHOW_INFO -cq hmi.coefficients'['$needlow'-'$need']'`
+  @ n = `$SHOW_INFO -cq hmi.coefficients'['$needlow'-'$need']'`
   if ($n <= 0) then
     echo >>$LOG Need V_drift record for $needlow - $need 
     # make a new coef record on the nearest 06:45 or 18:45 before the needed time.
@@ -76,7 +76,7 @@ while ($need_t <= $wanthigh_t)
       goto FAILURE
     endif
   endif
-  set n = `$SHOW_INFO -cq hmi.coefficients'['$need'-'$needhigh']'`
+  @ n = `$SHOW_INFO -cq hmi.coefficients'['$need'-'$needhigh']'`
   if ($n <= 0) then
     echo >>$LOG Need V_drift record for $need - $needhigh 
     # make a new coef record on the nearest 06:45 or 18:45 after the needed time.
