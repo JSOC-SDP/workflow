@@ -107,6 +107,8 @@ if ( $T_lastGoodM_s > $T_lastHarp_s ) then
   echo "set echo" >>$CMD
   echo "setenv TMPDIR $tmpdir/HARPS/nrt/" >>$CMD
   echo "set MHarpstatus = 0" >>&$CMD
+  
+  echo "find /tmp28/jsocprod/HARPS/nrt/Tracks/jsoc/State -mtime +30 -print0 | xargs -0 rm -f" >> $CMD
 
   foreach t_rec ( `$SHOW_INFO hmi.Marmask_720s_nrt'['$T_nextHarp'-'$T_lastGoodM'][? quality >= 0 ?]' -q key=T_REC` )
     echo "$TRACK_AND_INGEST_MHARP -n -m $tmpdir/HARPS/nrt hmi.Marmask_720s_nrt\[$t_rec] hmi.Mharp_720s_nrt hmi.Mharp_log_720s_nrt" >> $CMD
@@ -126,6 +128,13 @@ if ( $T_lastGoodM_s > $T_lastHarp_s ) then
   if ( `ls -1 $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/active | grep -v root | wc -l` == 1 ) then
     $QSUB -sync yes -e $TEMPLOG -o $TEMPLOG -q $QUE $CMD
     sleep 20
+
+    @ num_harps = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$t_rec']' -qc`
+    echo "number of harps:  $num_harps" >> $TEMPLOG
+    echo $num_harps > $WORKFLOW_DATA/tasks/update_hmi.harp_nrt/numHarps
+    @ num_harps2 = `$SHOW_INFO hmi.mharp_720s_nrt'[]['$t_rec'][? npix >= 2000 ?]' -qc`
+    echo "TIME:$t_rec   HARPS:$num_harps2" > /tmp28/jsocprod/HARPS/nrt/images/latest_HARP_info
+
     set min = `echo $t_rec | awk -F\: '{print $2}'`
     if ( $min == "00" ) then
       set HARPIMG_TICKET = `$MAKE_TICKET gate=hmi.harpImages_nrt wantlow=$t_rec wanthigh=$t_rec action=5`
