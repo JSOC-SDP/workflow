@@ -23,7 +23,6 @@ my $drms_params_install_dir;
 my $drms_root_dir;
 my $drms_scrs_install_dir;
 my $drms_src_install_dir;
-my $drms_table_dir;
 
 BEGIN {
     $drms_bins_install_dir = "$ENV{'DRMS_BINS_INSTALL_DIR'}";
@@ -33,7 +32,6 @@ BEGIN {
     $drms_root_dir = "$ENV{'DRMS_ROOT_DIR'}";
     $drms_scrs_install_dir = "$ENV{'DRMS_SCRS_INSTALL_DIR'}";
     $drms_src_install_dir = "$ENV{'DRMS_SRC_INSTALL_DIR'}";
-    $drms_table_dir = "$ENV{'DRMS_TABLE_DIR'}";
 }
 
 use lib $drms_params_install_dir;
