@@ -2,8 +2,6 @@
 
 set echo
 
-source /home/jsoc/.setJSOCenv
-source /home/jeneen/scripts/env_file.git
 source /SGE2/default/common/settings.csh
 
 set TARG = /web/jsoc/htdocs/data
@@ -73,7 +71,7 @@ set last_update = `ls -l --time-style="+%Y.%m.%d_%H:%M" /web/jsoc/htdocs/data/js
 if ( $update_lag > 600 ) then
   set mail_list = jeneen,kehcheng,thailand
   echo "/web/jsoc/htdocs/data/jsoc_proc_status.html is $update_lag seconds old" > /tmp/update_lag
-  echo "Run /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/show_jsoc_proc_status.csh to find error" >> /tmp/update_lag
+  echo "Run /home/jsoc/releases/jsoc-v10.0.0-rc8/scripts/show_jsoc_proc_status.csh/show_jsoc_proc_status.csh to find error" >> /tmp/update_lag
   @ min = $update_lag / 60
   /usr/bin/Mail -s "Status Page Not Updated for $min minutes" $mail_list < /tmp/update_lag
 endif

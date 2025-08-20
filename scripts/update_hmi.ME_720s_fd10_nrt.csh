@@ -18,8 +18,6 @@ set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv_harp
 
-source /home/jsoc/.setJSOCenv
-
 set QSUBFLAGS = "-v JSOC_r10"
 # UGH
 if ( $?WORKFLOW_TEST ) then

@@ -19,8 +19,6 @@ set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set VFISV = "${DRMS_BINS_INSTALL_DIR}"/vfisv
 
-source /home/jsoc/.setJSOCenv
-
 set QSUBFLAGS = "-v JSOC_r10"
 if ( $?WORKFLOW_TEST ) then
     set QUE = k.q
