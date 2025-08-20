@@ -1,6 +1,5 @@
 #! /bin/csh -f
 
-source /home/jsoc/.setJSOCenv
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info
