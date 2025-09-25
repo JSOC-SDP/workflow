@@ -198,7 +198,7 @@ SUBTICKETSDONE:
     set num_errors = 0
 	foreach subticket (`/bin/ls  ticket_return/`)
 		set STATUS = 5
-		set substatus = `grep STATUS ticket_return/$subticket`
+		set substatus = `grep STATUS ticket_return/$subticket | tail -1`
         if ($#substatus) set $substatus
 		if ($STATUS) then
             @ num_errors = $num_errors + 1
@@ -368,7 +368,7 @@ end
 set num_errors = 0
 foreach subticket (`/bin/ls  ticket_return/`)
     set STATUS = 5
-	set substatus = `grep STATUS ticket_return/$subticket`
+	set substatus = `grep STATUS ticket_return/$subticket | tail -1`
     if ($#substatus) set $substatus
     if ($STATUS) then
         echo PreCondition subticket $subticket returned error code $STATUS >>FAIL_reason

@@ -22,7 +22,6 @@ echo $HOST'.'$$ > Keep_running
 set keep_running = 1
 
 while ($keep_running > 0) # KEEPRUNNING LOOP
-    sed -i 's/STATUS=[0-9]/STATUS=0/' $WORKFLOW_DATA/ticket.test
     echo " "
     echo " "
     echo " "
@@ -261,11 +260,11 @@ while ($keep_running > 0) # KEEPRUNNING LOOP
             set parenttask = $TASKID:s/-/./:r
             if ($TICKET != VOID) rm -f ../logs/$TICKET/manager.pid
             if ($verbosemode) echo "GATEKEEPER parent task is $parenttask"
-	        ex - $donetask/ticket <<! ##### replacing this with a sed command causes parent tickets to fail
-/STATUS/d
-w
-q
-!
+#	        ex - $donetask/ticket <<! ##### replacing this with a sed command causes parent tickets to fail
+#/STATUS/d
+#w
+#q
+#!
             # still in the done-task loop?
             if ($debugmode) ls -l $donetask/ticket
             set taskstate = `cat $donetask/state`
@@ -331,11 +330,11 @@ q
             # check expire time on working tickets
 	        if ( ($STATUS == 3 || $STATUS == 2) && $EXPIRES_t < $now) then
                 if ($verbosemode) echo GATEKEEPER TIMEOUT of ticket $ticket
-                ex - active_tickets/$ticket <<!
-/STATUS/d
-w
-q
-!
+#                ex - active_tickets/$ticket <<!
+#/STATUS/d
+#w
+#q
+#!
 		        echo "STATUS=4" >> active_tickets/$ticket
                 set STATUS=4
                 set task = `echo $TASKID | sed -e 's/-.*//'`
@@ -384,11 +383,11 @@ q
 
 		        if ($ACTION == 3  && $WANTLOW_t >= $low_t && $WANTHIGH_t <= $high_t ) then
 		            if ( $verbosemode ) echo "GATEKEEPER ACTION = 3, waiting done"
-                    ex - active_tickets/$ticket << !
-/STATUS/d
-w
-q
-!
+#                    ex - active_tickets/$ticket << !
+#/STATUS/d
+#w
+#q
+#!
                     echo "GATELOW=$WANTLOW" >> active_tickets/$ticket
                     echo "GATEHIGH=$WANTHIGH" >> active_tickets/$ticket
                     echo "STATUS=0" >> active_tickets/$ticket
@@ -397,11 +396,11 @@ q
                     if ($verbosemode) echo "GATEKEEPER ACTION = 6"
                     # XXXXX this logic will need to change when coverage map implemented
                     if ($low != "NaN" && $high != "NaN") then # Coverage map must be complete now
-                        ex - active_tickets/$ticket <<!
-/STATUS/d
-w
-q
-!
+#                        ex - active_tickets/$ticket <<!
+#/STATUS/d
+#w
+#q
+#!
                         echo "GATELOW=$low" >> active_tickets/$ticket
                         echo "GATEHIGH=$high" >> active_tickets/$ticket
                         echo "STATUS=0" >> active_tickets/$ticket
@@ -441,7 +440,6 @@ ALL_GATES_DONE:
     if (!(-e Keep_running)) then
 	    set keep_running = 0
     else
-        sed -i 's/STATUS=[0-9]/STATUS=5/' $WORKFLOW_DATA/ticket.test
         echo "XXXXXXXXXXXXXXXXX Start Sleeping XXXXXXXXXXXXXXXX"
         sleep $CADENCE
     endif

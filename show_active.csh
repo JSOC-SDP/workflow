@@ -47,7 +47,7 @@ foreach gate ( $LIST )
         cat ../product
 
         foreach ticket ($ticketlist)
-            set STATUS = `grep STATUS $ticket`
+            set STATUS = `grep STATUS $ticket | tail -1`
             set WANTLOW = `grep WANTLOW $ticket`
             set WANTHIGH = `grep WANTHIGH $ticket`
             set ACTION = `grep ACTION $ticket`
