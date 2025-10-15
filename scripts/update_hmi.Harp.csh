@@ -12,7 +12,10 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
 
 set HARPS = "${DRMS_SCRS_INSTALL_DIR}"/track_and_ingest_mharp.sh
 

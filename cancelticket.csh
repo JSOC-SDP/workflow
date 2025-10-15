@@ -12,7 +12,13 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
-set CANCEL_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/cancelticket.csh"
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
+
+
+set CANCEL_TICKET = "${WORKFLOW_DIR}/cancelticket.csh"
 
 cd $WORKFLOW_DATA
 

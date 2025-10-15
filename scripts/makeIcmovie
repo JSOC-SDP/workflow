@@ -20,6 +20,11 @@ if (!(-e $WORKFLOW_IMG_ROOT)) then
     endif
 endif
 
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
+
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 
 if ($#argv > 0) then
@@ -206,8 +211,8 @@ foreach Quant (Ic_flat M M_color)
         @ nowtime_t = $endtime_t - $fourteen
         set nowtime = `$TIME_CONVERT zone=TAI s=$nowtime_t`
         set endtime = `$TIME_CONVERT zone=TAI s=$endtime_t`
-        echo "[ makeIcmovie ] running: ${DRMS_SCRS_INSTALL_DIR}/makeAnyMovie $nowtime $endtime 15 $Quant 1k $d14d_movies/${Quant}_14d.mp4"
-        "${DRMS_SCRS_INSTALL_DIR}"/makeAnyMovie $nowtime $endtime 15 $Quant 1k ""$d14d_movies/$Quant"_14d.mp4"
+        echo "[ makeIcmovie ] running: $WORKFLOW_DIR/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k $d14d_movies/${Quant}_14d.mp4"
+        "${WORKFLOW_DIR}"/scripts/makeAnyMovie $nowtime $endtime 15 $Quant 1k ""$d14d_movies/$Quant"_14d.mp4"
     endif
 end
 

@@ -27,8 +27,12 @@ echo Make images for $wantlow to $wanthigh
 #set CADENCE = 15
 set CADENCE = 45
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
-setenv RGBDEF $WORKFLOW_DIR/scripts/rgb.txt
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
+
+setenv RGBDEF "${WORKFLOW_DIR}"/scripts/rgb.txt
 set HMI_LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
 set RENDER_IMAGE = "${DRMS_BINS_INSTALL_DIR}"/render_image
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info

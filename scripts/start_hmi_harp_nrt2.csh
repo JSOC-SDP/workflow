@@ -10,7 +10,10 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
 
 set HERE = $cwd
 set TEMPLOG = $HERE/runlog
@@ -24,7 +27,7 @@ set QSUB = "/SGE2/bin/lx-amd64/qsub $QSUBFLAGS"
 set tmpdir = "/tmp28/jsocprod"
 
 set HARP_NRT_MOVIES = "${DRMS_SCRS_INSTALL_DIR}"/harp_nrt_movies.csh
-set MAKE_TICKET = ${DRMS_SRC_INSTALL_DIR}/workflow//maketicket.csh
+set MAKE_TICKET = "${WORKFLOW_DIR}/maketicket.csh"
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info 
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set TRACK_AND_INGEST_MHARP = "${DRMS_SCRS_INSTALL_DIR}"/track_and_ingest_mharp.sh

@@ -14,7 +14,10 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
 
 set QSUBFLAGS = "-v JSOC_r10"
 
@@ -28,9 +31,9 @@ set key = `cat $WORKFLOW_DATA/gates/$GATE/key`
 
 # set HMIprogram = /home/couvidat/cvs/JSOC/bin/linux_x86_64/HMI_observables
 # copied 23 Oct 2010 2:38 PM
-set OBSERVABLES = "$DRMS_BINS_INSTALL_DIR/HMI_observables"
+set OBSERVABLES = "${DRMS_BINS_INSTALL_DIR}"/HMI_observables
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert
-set MAKEIMAGES = "$WORKFLOW_DIR/scripts/makeimageslowhigh"
+set MAKEIMAGES = "${WORKFLOW_DIR"/scripts/makeimageslowhigh
 
 # note in Sebastien's code camera=1 is front camera, where CAMERA=2.
 set camera = 1

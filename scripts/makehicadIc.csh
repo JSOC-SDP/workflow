@@ -25,9 +25,12 @@ echo Make images for $wantlow to $wanthigh
 # from here make script that can make _nrt images in standard place
 
 set CADENCE = 3
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
 
-setenv RGBDEF $WORKFLOW_DIR/scripts/rgb.txt
+setenv RGBDEF "${WORKFLOW_DIR}"/scripts/rgb.txt
 set HMI_LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
 set RENDER_IMAGE = "${DRMS_BINS_INSTALL_DIR}"/render_image
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info

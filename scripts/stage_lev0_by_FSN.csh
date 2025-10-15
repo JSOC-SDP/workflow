@@ -3,7 +3,11 @@
 echo ACTIONTASK starting $0 $*
 
 set echo
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
 
 # script to stage data based on FSN with SUMS tape file ordering
 # WANTLOW and WANTHIGH are exptected to be in FSN already.
@@ -33,7 +37,7 @@ end
 set gate = `cat ../../target`
 set product = `cat $WORKFLOW_DATA/gates/$gate/product`
  
-"$WORKFLOW_DIR/scripts/stage_tapes_in_order.csh" 10 $product'['$WANTLOW'-'$WANTHIGH']' >& stage_tapes.log
+"${WORKFLOW_DIR}/scripts/stage_tapes_in_order.csh" 10 $product'['$WANTLOW'-'$WANTHIGH']' >& stage_tapes.log
 
 if ($?) then
    echo $0 $* FAILED

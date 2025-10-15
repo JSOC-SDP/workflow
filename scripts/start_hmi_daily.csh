@@ -8,7 +8,10 @@ if ( ! $?WORKFLOW_DATA ) then
     exit 1
 endif
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
 
 # Note that start/stop minute are hour 23 minute 54 for LOS and 24 for vector.
 @ LOS_offset = 6 * 60

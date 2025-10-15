@@ -398,7 +398,7 @@ endif
 ### Look for missing HMI observables ###
 
 # these showCov files are generated every 30m by a cronjob
-# on n04 as jeneen: /home/jsoc/cvs/Development/JSOC/proj/workflow/scripts/status_show_cov.csh
+# on n04 as jeneen: $"{WORKFLOW_DIR}"/scripts/status_show_cov.csh
 
 set showCov = "/web/jsoc/htdocs/data/.showCov"
 set showCovNRT = "/web/jsoc/htdocs/data/.showCovNRT" 

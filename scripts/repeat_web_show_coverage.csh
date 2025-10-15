@@ -1,7 +1,10 @@
 #! /bin/csh -f
 # modified to make one run per UT day, shortly after start of UT day.
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
 
-set WORKFLOW_DIR = ${DRMS_SRC_INSTALL_DIR}/workflow
 set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set TIME_CONVERT = ${DRMS_BINS_INSTALL_DIR}/time_convert
 

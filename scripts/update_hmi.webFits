@@ -1,6 +1,10 @@
 #! /bin/csh -f
+if ( ! $?WORKFLOW_DIR ) then
+    echo WORKFLOW_DIR environment variable is undefined, setting local variable to "${DRMS_SRC_INSTALL_DIR}"/workflow
+    set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+endif
 
-set MAKE_M_720_FITS = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/make_M_720_fits
+set MAKE_M_720_FITS = "${WORKFLOW_DIR}"/scripts/make_M_720_fits
 
 set HERE = $cwd
 
