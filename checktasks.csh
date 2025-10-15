@@ -81,7 +81,7 @@ while (1)
             set maxdone = 2
             if ($ndone < $maxdone) set maxdone = $ndone
                 foreach donetask ( $donelist[1-$maxdone] )
-                    set tickstatus = `grep STATUS done/$donetask/ticket | tail -1`
+                    set tickstatus = `grep STATUS done/$donetask/ticket`
                     set tickname = `grep TICKET done/$donetask/ticket`
                     echo "         $donetask, $tickname, $tickstatus"
                 end #donetask
@@ -100,7 +100,7 @@ while (1)
                 while ($nfailedlist)
                     set failedtask = $failedlist[$nfailedlist]
                     # foreach failedtask ( $failedlist )
-                    set tickstatus = `grep STATUS archive/failed/$failedtask/ticket | tail -1`
+                    set tickstatus = `grep STATUS archive/failed/$failedtask/ticket`
                     set tickname = `grep TICKET archive/failed/$failedtask/ticket`
                     set wantlow = `grep WANTLOW archive/failed/$failedtask/ticket`
                     set wanthigh = `grep WANTHIGH archive/failed/$failedtask/ticket`

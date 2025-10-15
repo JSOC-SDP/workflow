@@ -69,7 +69,7 @@ while (1)
         set ntickets = $#ticketlist
         if ($ntickets) then
             foreach ticket ($ticketlist)
-                set STATUS = `grep STATUS $ticket | tail -1`
+                set STATUS = `grep STATUS $ticket`
                 set WANTLOW = `grep WANTLOW $ticket`
                 set WANTHIGH = `grep WANTHIGH $ticket`
                 set ACTION = `grep ACTION $ticket`

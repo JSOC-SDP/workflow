@@ -87,7 +87,7 @@ while (1)
     endif
   
     if ($foundpath != "NOTFOUND") then # Found the task instance for this ticket
-        set ticket_status = `grep STATUS $foundpath/ticket | tail -1`
+        set ticket_status = `grep STATUS $foundpath/ticket`
         set STATUS = 999
         if ($#ticket_status) set $ticket_status 
         cat $foundpath/ticket
