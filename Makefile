@@ -21,6 +21,10 @@ install: all
 	cp bin/GetNextID $(MAKE_INSTALL_PREFIX)/bin/
 	mkdir -p $(MAKE_INSTALL_PREFIX)/scripts
 	cp scripts/* $(MAKE_INSTALL_PREFIX)/scripts/
+	cp *.csh $(MAKE_INSTALL_PREFIX)/
+	cp *.pm $(MAKE_INSTALL_PREFIX)/
+	cp *.pl $(MAKE_INSTALL_PREFIX)/
+	cp gatekeeper.restart $(MAKE_INSTALL_PREFIX)/
 
 uninstall:
 	@if [ "$(MAKE_INSTALL_PREFIX)" = "." ] || [ "$(MAKE_INSTALL_PREFIX)" = "/" ]; then \
@@ -28,6 +32,10 @@ uninstall:
 		exit 1; \
 	fi
 	rm -f $(MAKE_INSTALL_PREFIX)/bin/GetNextID
+	rm -f $(MAKE_INSTALL_PREFIX)/*.csh
+	rm -f $(MAKE_INSTALL_PREFIX)/*.pm
+	rm -f $(MAKE_INSTALL_PREFIX)/*.pl
+	rm -f $(MAKE_INSTALL_PREFIX)/gatekeeper.restart
 	rm -rf $(MAKE_INSTALL_PREFIX)/scripts
 
 clean:
