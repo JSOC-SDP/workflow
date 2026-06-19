@@ -21,6 +21,8 @@ install: all
 	cp bin/GetNextID $(MAKE_INSTALL_PREFIX)/bin/
 	mkdir -p $(MAKE_INSTALL_PREFIX)/scripts
 	cp scripts/* $(MAKE_INSTALL_PREFIX)/scripts/
+	cp apps/heat.sao $(MAKE_INSTALL_PREFIX)/scripts/.
+	cp apps/mag.lut $(MAKE_INSTALL_PREFIX)/scripts/.
 	cp *.csh $(MAKE_INSTALL_PREFIX)/
 	cp *.pm $(MAKE_INSTALL_PREFIX)/
 	cp *.pl $(MAKE_INSTALL_PREFIX)/

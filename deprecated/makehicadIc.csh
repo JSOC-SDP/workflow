@@ -33,7 +33,7 @@ set minlist = (10000)
 set maxlist = (62000)
 set scalinglist = (minmaxgiven)
 #set colorlist = (/home/phil/apps/heat.sao)
-set colorlist = ($WORKFLOW_DIR/apps/heat.sao)
+set colorlist = ($WORKFLOW_DIR/scripts/heat.sao)
 set namelist = (Continuum)
 set flaglist = ("")
 

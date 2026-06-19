@@ -15,7 +15,11 @@ file(GLOB APP_SOURCES "apps/GetNextID.c")
 add_executable(GetNextID ${APP_SOURCES})
 
 # Install binary
-install(TARGETS GetNextID RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(
+    TARGETS GetNextID
+    RUNTIME
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}
+)
 
 # Define all the installable scripts in the root directory and install them
 file(GLOB ROOT_SCRIPTS
@@ -26,7 +30,19 @@ file(GLOB ROOT_SCRIPTS
 )
 install(
     FILES ${ROOT_SCRIPTS}
-    DESTINATION ${CMAKE_INSTALL_SCRIPTDIR}
+    DESTINATION ${CMAKE_INSTALL_PREFIX}
+    PERMISSIONS
+        OWNER_EXECUTE OWNER_WRITE OWNER_READ
+        GROUP_EXECUTE GROUP_READ
+        WORLD_EXECUTE WORLD_READ
+)
+
+# Install app specific files into the scripts directory
+install(
+    FILES
+        ${CMAKE_SOURCE_DIR}/apps/heat.sao
+        ${CMAKE_SOURCE_DIR}/apps/mag.lut
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SCRIPTDIR}
     PERMISSIONS
         OWNER_EXECUTE OWNER_WRITE OWNER_READ
         GROUP_EXECUTE GROUP_READ
@@ -36,7 +52,7 @@ install(
 # Install scripts directory with subdirectories
 install(
     DIRECTORY scripts/
-    DESTINATION ${CMAKE_INSTALL_SCRIPTDIR}/scripts
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_SCRIPTDIR}
     FILES_MATCHING PATTERN "*"
     PERMISSIONS
         OWNER_EXECUTE OWNER_WRITE OWNER_READ
