@@ -2,13 +2,12 @@
 #
 # make test gates and tasks for mdi.fd_M_96m_lev18 96 minute data at lev1.8
 # If the tasks and gates directories exist only the test gates and tasks will be rebuilt.
-# If the gates and tasks diretories are not present, they will be created.
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
+# If the gates and tasks directories are not present, they will be created.
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
 
 # Stop the gatekeeper if it is running.
 cd $WORKFLOW_DATA

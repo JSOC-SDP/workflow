@@ -6,12 +6,12 @@
 # set echo
 # XXXXXXXXXX test
 
-set HERE = $cwd 
+set HERE = $cwd
 
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
 
 set DISAMBIG = "${DRMS_BINS_INSTALL_DIR}"/disambig_v3
 set GAPFILL = "${DRMS_BINS_INSTALL_DIR}"/set_gaps_missing

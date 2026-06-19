@@ -10,13 +10,6 @@
 set HERE = $cwd 
 set LOG = $HERE/runlog
 
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
-
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
-
 set CORRECTION_VELOCITIES = "${DRMS_BINS_INSTALL_DIR}"/correction_velocities
 set TIME_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/time_convert
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info

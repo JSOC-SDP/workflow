@@ -1,7 +1,11 @@
 #! /bin/csh -f
 # modified to make one run per UT day, shortly after start of UT day.
 
-set WORKFLOW_DIR = ${DRMS_SRC_INSTALL_DIR}/workflow
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
+
 set MAKE_TICKET = $WORKFLOW_DIR/maketicket.csh
 set TIME_CONVERT = ${DRMS_BINS_INSTALL_DIR}/time_convert
 

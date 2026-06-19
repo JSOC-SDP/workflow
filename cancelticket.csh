@@ -2,17 +2,17 @@
 
 # cancel ticket
 
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
+
 # set echo
 
 set ticket = $1
 set verbosemode=1
 
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
-
-set CANCEL_TICKET = "${DRMS_SRC_INSTALL_DIR}/workflow/cancelticket.csh"
+set CANCEL_TICKET = "${WORKFLOW_DIR}/scripts/cancelticket.csh"
 
 cd $WORKFLOW_DATA
 

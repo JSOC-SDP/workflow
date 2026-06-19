@@ -2,17 +2,15 @@
 # Script to make aia.lev1p5
 #
 
-# XXXXXXXXXX test
- set echo
-# XXXXXXXXXX test
-set HERE = $cwd 
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
 
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
-
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+# XXXXXXXXXX test
+set echo
+# XXXXXXXXXX test
+set HERE = $cwd
 
 set AIA_MAKE_LEV1P5 = "${DRMS_BINS_INSTALL_DIR}"/aia_lev1p5
 set INDEX_CONVERT = "${DRMS_BINS_INSTALL_DIR}"/index_convert

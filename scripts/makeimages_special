@@ -4,18 +4,10 @@
 
 set echo
 
-if ( ! $?WORKFLOW_IMG_ROOT ) then
-    echo WORKFLOW_IMG_ROOT environment variable is undefined
-    exit 1
-endif
-
-if (!(-e $WORKFLOW_IMG_ROOT)) then
-    mkdir $WORKFLOW_IMG_ROOT
-    if ($?) then 
-        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
-        exit 1
-    endif
-endif
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
 
 set wantlow = $1
 set wanthigh = $2
@@ -27,7 +19,6 @@ echo Make images for $wantlow to $wanthigh
 #set CADENCE = 15
 set CADENCE = 45
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 setenv RGBDEF $WORKFLOW_DIR/scripts/rgb.txt
 set HMI_LIMBDARK = "${DRMS_BINS_INSTALL_DIR}"/hmi_limbdark
 set RENDER_IMAGE = "${DRMS_BINS_INSTALL_DIR}"/render_image

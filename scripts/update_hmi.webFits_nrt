@@ -1,6 +1,11 @@
 #! /bin/csh -f
 
-set MAKE_M_720_FITS_NRT = "${DRMS_SRC_INSTALL_DIR}"/workflow/scripts/make_M_720_fits_nrt
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
+
+set MAKE_M_720_FITS_NRT = "${WORKFLOW_DIR}"/scripts/make_M_720_fits_nrt
 
 set HERE = $cwd
 

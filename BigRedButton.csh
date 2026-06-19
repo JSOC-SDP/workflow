@@ -19,12 +19,11 @@ if ( $user != 'jsocprod' ) then
     exit
 endif
 
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
 
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 set GATEKEEPER_RESTART = $WORKFLOW_DIR/gatekeeper.restart
 set TASKS = $WORKFLOW_DATA/tasks
 set GATES = $WORKFLOW_DATA/gates

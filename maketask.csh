@@ -2,12 +2,10 @@
 
 echo $0 $*
 
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
-
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
 
 # Call with at least task, target, and task as key=value pairs
 # e.g.   maketasks.csh task=<taskname> target=<target> command=<command>

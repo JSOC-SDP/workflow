@@ -1,18 +1,16 @@
 #! /bin/csh -f
 
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
+
 # status for DSDS 6-hour datasets.
 # keyword is DSDS index value, not a time.
 # but low and high are stored as time.
 
 # echo starting $0 $*
 # set echo
-
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined
-    exit 1
-endif
-
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 set SHOW_COVERAGE = "${DRMS_BINS_INSTALL_DIR}"/show_coverage
 set SHOW_INFO = "${DRMS_BINS_INSTALL_DIR}"/show_info

@@ -37,14 +37,6 @@ else
     endif
 endif
 
-if ( ! $?WORKFLOW_DATA ) then
-    echo WORKFLOW_DATA environment variable is undefined >>$LOG
-    env >>$LOG
-    exit 1
-endif
-
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
-
 set wantlow = `cat wantlow`
 set wanthigh = `cat wanthigh`
 hostname >> $LOG

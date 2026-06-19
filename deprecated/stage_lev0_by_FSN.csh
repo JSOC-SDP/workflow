@@ -1,9 +1,13 @@
 #! /bin/csh -f
 
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
+
 echo ACTIONTASK starting $0 $*
 
 set echo
-set WORKFLOW_DIR = "${DRMS_SRC_INSTALL_DIR}"/workflow
 
 # script to stage data based on FSN with SUMS tape file ordering
 # WANTLOW and WANTHIGH are exptected to be in FSN already.

@@ -2,19 +2,12 @@
 # create limb darkening removed Ic record and create image set for Ic_noLD and M for range of time
 # specified by first two arguments.
 
-# set echo
-if ( ! $?WORKFLOW_IMG_ROOT ) then
-    echo WORKFLOW_IMG_ROOT environment variable is undefined
-    exit 1
-endif
+# Verify our workflow environment variables are set
+# Assumes this script is run from the root of the workflow directory
+set script_dir = `cd $(dirname $0) && pwd`
+source "$script_dir/setup_workflow.csh"
 
-if (!(-e $WORKFLOW_IMG_ROOT)) then
-    mkdir $WORKFLOW_IMG_ROOT
-    if ($?) then 
-        echo ERROR making image root directory $WORKFLOW_IMG_ROOT
-        exit 1
-    endif
-endif
+# set echo
 
 set wantlow = $1
 set wanthigh = $2
